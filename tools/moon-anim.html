@@ -1,0 +1,39 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000"><canvas id=c width=1080 height=1920></canvas><script>
+const c=document.getElementById('c'),x=c.getContext('2d'),W=1080,H=1920;
+let seed=11;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
+const stars=[];for(let i=0;i<220;i++)stars.push([rnd()*W,rnd()*H,rnd()*1.6+.3,rnd()*6.28]);
+function txt(s,y,size,col,alpha){x.save();x.globalAlpha=alpha;x.fillStyle=col;x.font='bold '+size+'px "DejaVu Sans",Arial,sans-serif';x.textAlign='center';x.shadowColor='rgba(0,0,0,.85)';x.shadowBlur=14;s.split('\n').forEach((l,i)=>x.fillText(l,W/2,y+i*size*1.25));x.restore()}
+const caps=[[0,4,"The Moon is slowly\ndrifting away from Earth."],[4,10,"Laser pulses bounce off mirrors\nApollo astronauts left behind."],[10,17,"Timing them shows it:\nabout 3.8 cm farther every year."],[17,23,"In 100 years at that rate,\nit is about 3.8 m farther."],[23,28,"More space facts: @BeyondAtom"]];
+const EX=540,EY=1180,ER=150,M0=600; // earth, base moon distance (px, not to scale)
+function draw(t){
+ x.fillStyle='#04060d';x.fillRect(0,0,W,H);
+ for(const s of stars){x.globalAlpha=.4+.4*Math.sin(t*1.5+s[3]);x.fillStyle='#fff';x.beginPath();x.arc(s[0],s[1],s[2],0,6.283);x.fill()}x.globalAlpha=1;
+ // drift: exaggerated, grows with years counter
+ const yrs=t<10?0:Math.min(100,(t-10)/13*100);
+ const drift=(t<4?t/4*40:40)+(t<10?0:(yrs/100)*70);
+ const my=EY-M0-drift,mx=EX;
+ // earth
+ const g=x.createRadialGradient(EX,EY,ER*.9,EX,EY,ER*1.5);g.addColorStop(0,'rgba(80,140,255,.5)');g.addColorStop(1,'rgba(80,140,255,0)');x.fillStyle=g;x.beginPath();x.arc(EX,EY,ER*1.5,0,6.283);x.fill();
+ x.fillStyle='#2f6fd6';x.beginPath();x.arc(EX,EY,ER,0,6.283);x.fill();
+ x.fillStyle='#3f9a5a';[[-50,-40,40],[40,-10,30],[-10,50,34]].forEach(a=>{x.beginPath();x.arc(EX+a[0],EY+a[1],a[2],0,6.283);x.fill()});
+ // moon
+ x.fillStyle='#bdb8b0';x.beginPath();x.arc(mx,my,52,0,6.283);x.fill();
+ x.fillStyle='rgba(0,0,0,.15)';[[-14,-10,12],[15,12,9],[-4,20,7]].forEach(a=>{x.beginPath();x.arc(mx+a[0],my+a[1],a[2],0,6.283);x.fill()});
+ // original-position marker
+ if(t>=10){x.strokeStyle='rgba(255,255,255,.35)';x.setLineDash([8,10]);x.lineWidth=3;x.beginPath();x.arc(mx,EY-M0-40,52,0,6.283);x.stroke();x.setLineDash([])}
+ // laser
+ if(t>=4&&t<17){const ph=((t-4)*0.5)%1;const L=EY-ER-(my+52);x.strokeStyle='rgba(255,70,70,.9)';x.lineWidth=5;x.shadowColor='#ff3030';x.shadowBlur=18;
+  const out=ph<.5?ph*2:1,back=ph<.5?0:(ph-.5)*2;const y0=EY-ER+(ph<.5?0:-(EY-ER-(my+52))*back*0),a=EY-ER,b=my+52;
+  const head=ph<.5?a-(a-b)*out:b+(a-b)*back,tail=ph<.5?a:b;
+  x.beginPath();x.moveTo(EX+(ph<.5?-30:30),Math.min(head,tail));x.lineTo(EX+(ph<.5?-30:30),Math.max(head,tail));x.stroke();x.shadowBlur=0;
+  if(ph>.45&&ph<.6){x.fillStyle='#ff5050';x.beginPath();x.arc(EX-30,b,14,0,6.283);x.fill()}}
+ // counters
+ if(t>=10){x.fillStyle='rgba(255,255,255,.08)';x.fillRect(90,1440,900,200);
+  txt('YEARS FROM NOW: '+Math.round(yrs),1500,50,'#cfe0ff',1);
+  txt('MOON FARTHER BY: '+(yrs*3.8>=100?(yrs*3.8/100).toFixed(2)+' m':(yrs*3.8).toFixed(0)+' cm'),1575,50,'#ffd45a',1)}
+ txt('THE MOON',170,90,'#ffffff',1);txt('IS LEAVING US',255,44,'#9fb4e0',1);
+ txt('(not to scale)',330,30,'#7f8fb0',.8);
+ for(const cp of caps){if(t>=cp[0]&&t<cp[1]){const a=Math.min(1,(t-cp[0])*4,(cp[1]-t)*4);txt(cp[2],1740,42,'#ffffff',Math.max(0,a))}}
+}
+window.draw=draw;draw(0);
+</script>
