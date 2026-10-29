@@ -1,0 +1,51 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000"><canvas id=c width=1080 height=1920></canvas><script>
+const c=document.getElementById('c'),x=c.getContext('2d'),W=1080,H=1920;
+const E=0.2056,A=400,B=A*Math.sqrt(1-E*E),CX=540-0,CY=800,FOC=E*A; // focus (sun) at CX+FOC
+const SUN=[CX+FOC,CY];
+let seed=7;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
+const stars=[];for(let i=0;i<220;i++)stars.push([rnd()*W,rnd()*H,rnd()*1.6+.3,rnd()*6.28]);
+const P=87.969,SPIN=58.646,DPS=8; // orbit period, sidereal spin (days), days per second
+function kepler(M){let Ea=M;for(let i=0;i<12;i++)Ea=Ea-(Ea-E*Math.sin(Ea)-M)/(1-E*Math.cos(Ea));return Ea}
+function pos(d){const M=2*Math.PI*(d/P);const Ea=kepler(M);return [CX+A*Math.cos(Ea),CY+B*Math.sin(Ea)]} // sun at (CX+FOC)?? ellipse center CX
+const caps=[[0,4,"On Mercury, one day lasts\nlonger than one year."],[4,9,"Mercury circles the Sun\nin just 88 Earth days."],[9,15,"But it spins so slowly that\nsunrise to sunrise takes 176 days."],[15,22,"That is two Mercury years\nfor a single day."],[22,28,"More space facts: @BeyondAtom"]];
+function txt(s,y,size,col,alpha){x.save();x.globalAlpha=alpha;x.fillStyle=col;x.font='bold '+size+'px "DejaVu Sans",Arial,sans-serif';x.textAlign='center';x.shadowColor='rgba(0,0,0,.8)';x.shadowBlur=14;const L=s.split('\n');L.forEach((l,i)=>x.fillText(l,W/2,y+i*size*1.25));x.restore()}
+function draw(t){
+ x.fillStyle='#04060d';x.fillRect(0,0,W,H);
+ for(const s of stars){x.globalAlpha=.4+.4*Math.sin(t*1.5+s[3]);x.fillStyle='#fff';x.beginPath();x.arc(s[0],s[1],s[2],0,6.283);x.fill()}x.globalAlpha=1;
+ const d=t*DPS;
+ // orbit path
+ x.strokeStyle='rgba(120,160,255,.35)';x.lineWidth=3;x.setLineDash([10,14]);x.beginPath();x.ellipse(CX,CY,A,B,0,0,6.283);x.stroke();x.setLineDash([]);
+ // sun
+ const g=x.createRadialGradient(SUN[0],SUN[1],10,SUN[0],SUN[1],190);g.addColorStop(0,'rgba(255,230,140,1)');g.addColorStop(.25,'rgba(255,170,40,.55)');g.addColorStop(1,'rgba(255,120,0,0)');x.fillStyle=g;x.beginPath();x.arc(SUN[0],SUN[1],190,0,6.283);x.fill();
+ x.fillStyle='#ffd45a';x.beginPath();x.arc(SUN[0],SUN[1],62,0,6.283);x.fill();
+ // mercury
+ const [px,py]=pos(d),R=56,phi=Math.PI+2*Math.PI*(d/SPIN);
+ const sa=Math.atan2(SUN[1]-py,SUN[0]-px);
+ x.save();x.translate(px,py);
+ x.fillStyle='#8f8a84';x.beginPath();x.arc(0,0,R,0,6.283);x.fill();
+ // night half
+ x.save();x.rotate(sa);x.fillStyle='rgba(5,8,18,.82)';x.beginPath();x.arc(0,0,R,Math.PI/2,Math.PI*1.5);x.closePath();x.fill();x.restore();
+ // craters
+ x.fillStyle='rgba(0,0,0,.18)';[[-17,-14,11],[20,8,8],[-6,23,7],[23,-20,6]].forEach(a=>{x.beginPath();x.arc(a[0],a[1],a[2],0,6.283);x.fill()});
+ // spot needle
+ const sx=Math.cos(phi)*R,sy=Math.sin(phi)*R;
+ x.strokeStyle='rgba(255,70,70,.9)';x.lineWidth=4;x.beginPath();x.moveTo(0,0);x.lineTo(sx*1.0,sy*1.0);x.stroke();
+ x.fillStyle='#ff4646';x.beginPath();x.arc(sx,sy,9,0,6.283);x.fill();
+ x.restore();
+ // is spot in daylight
+ const dot=Math.cos(phi)*Math.cos(sa)+Math.sin(phi)*Math.sin(sa);const day=dot>0;
+ // counters
+ const years=Math.floor(d/P),dayN=d.toFixed(0);
+ x.fillStyle='rgba(255,255,255,.08)';x.fillRect(90,1390,900,250);
+ txt('EARTH DAYS: '+Math.min(dayN,999),1450,52,'#cfe0ff',1);
+ txt('MERCURY YEARS: '+(d/P).toFixed(1),1520,52,'#ffd45a',1);
+ txt('RED SPOT: '+(day?'DAYTIME':'NIGHT'),1590,46,day?'#ffb347':'#7fa6ff',1);
+ // title
+ txt('MERCURY',170,86,'#ffffff',1);
+ txt('A DAY LONGER THAN A YEAR',250,38,'#9fb4e0',1);
+ // caption
+ for(const cp of caps){if(t>=cp[0]&&t<cp[1]){const a=Math.min(1,(t-cp[0])*4,(cp[1]-t)*4);txt(cp[2],1740,44,'#ffffff',Math.max(0,a))}}
+ // hook flash first sec scale
+}
+window.draw=draw;draw(0);
+</script>
