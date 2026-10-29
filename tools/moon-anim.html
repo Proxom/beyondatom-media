@@ -3,8 +3,8 @@ const c=document.getElementById('c'),x=c.getContext('2d'),W=1080,H=1920;
 let seed=11;function rnd(){seed=(seed*16807)%2147483647;return seed/2147483647}
 const stars=[];for(let i=0;i<220;i++)stars.push([rnd()*W,rnd()*H,rnd()*1.6+.3,rnd()*6.28]);
 function txt(s,y,size,col,alpha){x.save();x.globalAlpha=alpha;x.fillStyle=col;x.font='bold '+size+'px "DejaVu Sans",Arial,sans-serif';x.textAlign='center';x.shadowColor='rgba(0,0,0,.85)';x.shadowBlur=14;s.split('\n').forEach((l,i)=>x.fillText(l,W/2,y+i*size*1.25));x.restore()}
-const caps=[[0,4,"The Moon is slowly\ndrifting away from Earth."],[4,10,"Laser pulses bounce off mirrors\nApollo astronauts left behind."],[10,17,"Timing them shows it:\nabout 3.8 cm farther every year."],[17,23,"In 100 years at that rate,\nit is about 3.8 m farther."],[23,28,"More space facts: @BeyondAtom"]];
-const EX=540,EY=1180,ER=150,M0=600; // earth, base moon distance (px, not to scale)
+const caps=[[0,4,"The Moon is slowly\ndrifting away."],[4,10,"Laser pulses bounce off\nreflectors left by Apollo\nastronauts."],[10,17,"Timing them shows about\n3.8 cm farther a year."],[17,23,"In 100 years at that rate:\nabout 3.8 m farther."],[23,28,"More space facts:\n@BeyondAtom"]];
+const EX=540,EY=980,ER=130,M0=460; // earth, base moon distance (px, not to scale)
 function draw(t){
  x.fillStyle='#04060d';x.fillRect(0,0,W,H);
  for(const s of stars){x.globalAlpha=.4+.4*Math.sin(t*1.5+s[3]);x.fillStyle='#fff';x.beginPath();x.arc(s[0],s[1],s[2],0,6.283);x.fill()}x.globalAlpha=1;
@@ -22,18 +22,18 @@ function draw(t){
  // original-position marker
  if(t>=10){x.strokeStyle='rgba(255,255,255,.35)';x.setLineDash([8,10]);x.lineWidth=3;x.beginPath();x.arc(mx,EY-M0-40,52,0,6.283);x.stroke();x.setLineDash([])}
  // laser
- if(t>=4&&t<17){const ph=((t-4)*0.5)%1;const L=EY-ER-(my+52);x.strokeStyle='rgba(255,70,70,.9)';x.lineWidth=5;x.shadowColor='#ff3030';x.shadowBlur=18;
+ if(t>=0.5&&t<17){const ph=((t-0.5)*0.5)%1;const L=EY-ER-(my+52);x.strokeStyle='rgba(255,70,70,.9)';x.lineWidth=5;x.shadowColor='#ff3030';x.shadowBlur=18;
   const out=ph<.5?ph*2:1,back=ph<.5?0:(ph-.5)*2;const y0=EY-ER+(ph<.5?0:-(EY-ER-(my+52))*back*0),a=EY-ER,b=my+52;
   const head=ph<.5?a-(a-b)*out:b+(a-b)*back,tail=ph<.5?a:b;
   x.beginPath();x.moveTo(EX+(ph<.5?-30:30),Math.min(head,tail));x.lineTo(EX+(ph<.5?-30:30),Math.max(head,tail));x.stroke();x.shadowBlur=0;
   if(ph>.45&&ph<.6){x.fillStyle='#ff5050';x.beginPath();x.arc(EX-30,b,14,0,6.283);x.fill()}}
  // counters
- if(t>=10){x.fillStyle='rgba(255,255,255,.08)';x.fillRect(90,1440,900,200);
-  txt('YEARS FROM NOW: '+Math.round(yrs),1500,50,'#cfe0ff',1);
-  txt('MOON FARTHER BY: '+(yrs*3.8>=100?(yrs*3.8/100).toFixed(2)+' m':(yrs*3.8).toFixed(0)+' cm'),1575,50,'#ffd45a',1)}
- txt('THE MOON',170,90,'#ffffff',1);txt('IS LEAVING US',255,44,'#9fb4e0',1);
- txt('(not to scale)',330,30,'#7f8fb0',.8);
- for(const cp of caps){if(t>=cp[0]&&t<cp[1]){const a=Math.min(1,(t-cp[0])*4,(cp[1]-t)*4);txt(cp[2],1740,42,'#ffffff',Math.max(0,a))}}
+ if(t>=10){x.fillStyle='rgba(255,255,255,.08)';x.fillRect(90,1170,900,200);
+  txt('YEARS FROM NOW: '+Math.round(yrs),1235,46,'#cfe0ff',1);
+  txt('MOON FARTHER BY: '+(yrs*3.8>=100?(yrs*3.8/100).toFixed(2)+' m':(yrs*3.8).toFixed(0)+' cm'),1310,46,'#ffd45a',1)}
+ txt('THE MOON',170,90,'#ffffff',1);txt('3.8 cm / YEAR',255,64,'#ffd45a',1);
+ txt('(distance exaggerated, not to scale)',320,34,'#c8d4f2',1);
+ for(const cp of caps){if(t>=cp[0]&&t<cp[1]){const a=Math.min(1,(t-cp[0])*4,(cp[1]-t)*4);txt(cp[2],1400,50,'#ffffff',Math.max(0,a))}}
 }
 window.draw=draw;draw(0);
 </script>
