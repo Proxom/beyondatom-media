@@ -32,6 +32,9 @@ Publish 4 videos a day at 09:00, 13:00, 17:00 and 21:00 Europe/London (Metricool
 ## Status (29 Oct 20:20)
 The first Short (media/mercury-day-year, Metricool post 410510136) was made by the manager and is scheduled for TONIGHT 21:00 (Erkan: start posting tonight at 21:00). Do not duplicate it. Your first own run should fill the 30 Oct 09:00 slot onward; check getScheduledPosts so tonight's 21:00 post is confirmed published.
 
+## Publishing needs NO approval (Erkan, 29 Oct 20:22)
+Videos go live automatically without asking Erkan, like the Instagram agent. Never write an approval request for a normal video. The independent reviewer subagent is your quality gate. Approvals are only for spending money, accounts/logins, a new tool or subscription, or a risky/policy-sensitive topic.
+
 ## Every run
 1. Read approvals, plan/current, channel stats; getScheduledPosts for YouTube (next 7 days) and confirm what went live or failed.
 2. Measure with Metricool analytics; per video after 72 h record views vs the channel median; learn which topics/hooks win (70% proven, 30% single-variable experiments).
