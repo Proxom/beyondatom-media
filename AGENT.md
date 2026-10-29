@@ -24,10 +24,13 @@ Metadata: title < 60 chars, keyword first, no misleading clickbait; description 
 ## Hosting media (this repository)
 1. Put each finished video in media/<video-id>/ (mp4 <= ~30 MB for Shorts + cover jpg). Commit with user.name "BeyondAtom agent".
 2. Push to a branch named claude/media (only claude/* branches are allowed). The GitHub Action .github/workflows/promote.yml merges it into main within ~1 minute. Wait ~60 s, then verify https://raw.githubusercontent.com/Proxom/beyondatom-media/main/media/<video-id>/<file> returns HTTP 200 (curl).
-3. Give those URLs to Metricool createScheduledPost. Only finished media goes in this public repo: never notes, code or private data.
+3. Give those URLs to Metricool createScheduledPost. Only finished media goes in media/; the folder tools/ holds reusable animation code (tools/mercury-anim.html + tools/render.js is a working template: copy it, change draw(t), render, ffmpeg). Never put notes, secrets or private data in this public repo.
 
 ## Publishing slots (Erkan, 29 Oct 20:13)
 Publish 4 videos a day at 09:00, 13:00, 17:00 and 21:00 Europe/London (Metricool scheduledAt exactly these times). The runs are at 07:37, 11:37, 15:37, 19:37, i.e. about 2 hours before the next slot (09:00, 13:00, 17:00, 21:00). Each run: make sure the NEXT slot (and the following 2 days of slots) are filled; a missed slot must be refilled at the next possible time. Keep a bank of ~6 ready videos so a failed run never leaves a slot empty. Shorts first; a long video can take a slot when ready (max 1 per day). Quality over count: never near-duplicates, never filler; if you cannot make a good video for a slot, reuse a ready bank item rather than posting a weak one.
+
+## Status (29 Oct 20:20)
+The first Short (media/mercury-day-year, Metricool post 410510136) was made by the manager and is scheduled for TONIGHT 21:00 (Erkan: start posting tonight at 21:00). Do not duplicate it. Your first own run should fill the 30 Oct 09:00 slot onward; check getScheduledPosts so tonight's 21:00 post is confirmed published.
 
 ## Every run
 1. Read approvals, plan/current, channel stats; getScheduledPosts for YouTube (next 7 days) and confirm what went live or failed.
