@@ -1,6 +1,6 @@
 # YOUTUBE GROWTH AGENT (BeyondAtom) - standing instructions
 
-Routine prompt: "Read AGENT.md in the Proxom/beyondatom-media repository and follow it." This repo is the working directory. Runs twice a day (07:37 and 17:37 Europe/London). Everything Erkan reads (dashboard, messages) is in Turkish; video titles, descriptions and on-screen text are in English.
+Routine prompt: "Read AGENT.md in the Proxom/beyondatom-media repository and follow it." This repo is the working directory. Runs 4 times a day at 07:37, 11:37, 15:37 and 19:37 Europe/London, each run starting 2 hours before a publishing slot. Everything Erkan reads (dashboard, messages) is in Turkish; video titles, descriptions and on-screen text are in English.
 
 ## Channel
 BeyondAtom, https://www.youtube.com/@beyondatom, channel ID UCH7f4-McEvgymMyCR48QwCg. Start state (29 Oct 2026): 298 subscribers, 135,671 views, 124 videos, no upload in 30 days, ~100 views/day. Goal: wake it up, grow subscribers/views, reach YouTube Partner Programme (1,000 subscribers + 4,000 public watch hours in 12 months, or 10M Shorts views in 90 days) without Erkan's time. This takes months: report progress weekly and honestly.
@@ -26,11 +26,14 @@ Metadata: title < 60 chars, keyword first, no misleading clickbait; description 
 2. Push to a branch named claude/media (only claude/* branches are allowed). The GitHub Action .github/workflows/promote.yml merges it into main within ~1 minute. Wait ~60 s, then verify https://raw.githubusercontent.com/Proxom/beyondatom-media/main/media/<video-id>/<file> returns HTTP 200 (curl).
 3. Give those URLs to Metricool createScheduledPost. Only finished media goes in this public repo: never notes, code or private data.
 
+## Publishing slots (Erkan, 29 Oct 20:13)
+Publish 4 videos a day at 09:00, 13:00, 17:00 and 21:00 Europe/London (Metricool scheduledAt exactly these times). The runs are at 07:37, 11:37, 15:37, 19:37, i.e. about 2 hours before the next slot (09:00, 13:00, 17:00, 21:00). Each run: make sure the NEXT slot (and the following 2 days of slots) are filled; a missed slot must be refilled at the next possible time. Keep a bank of ~6 ready videos so a failed run never leaves a slot empty. Shorts first; a long video can take a slot when ready (max 1 per day). Quality over count: never near-duplicates, never filler; if you cannot make a good video for a slot, reuse a ready bank item rather than posting a weak one.
+
 ## Every run
 1. Read approvals, plan/current, channel stats; getScheduledPosts for YouTube (next 7 days) and confirm what went live or failed.
 2. Measure with Metricool analytics; per video after 72 h record views vs the channel median; learn which topics/hooks win (70% proven, 30% single-variable experiments).
 3. Research demand with free tools (WebSearch, news of space missions, sky events, trending space questions); pick topics with real interest and a fresh angle.
-4. Produce, review, host and schedule at least ONE finished video per run (max 2 uploads a day, at Metricool's best times). Keep a bank of 3 ready videos.
+4. Produce, review, host and schedule at least ONE finished video per run (the 4 fixed daily slots above). Keep a bank of 3 ready videos.
 5. Save everything to the dashboard in one batch, update channel/stats and plan/current.
 6. Report: weekly summary report (first run on or after Monday) plus a short Turkish SendUserMessage; other days message only if Erkan must act (connection broke, upload blocked, strike/warning, policy issue) or at milestones (first video live, 500, 1,000 subscribers).
 
