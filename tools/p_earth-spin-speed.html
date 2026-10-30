@@ -1,0 +1,144 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=g width=1080 height=1920 style="display:none"></canvas><canvas id=c width=1080 height=1920></canvas>
+<script id=fs type=x-shader>
+precision highp float;
+uniform vec2 R;uniform float T;uniform vec3 SUN;uniform vec3 CP;uniform mat3 CM;uniform float FOV;
+uniform vec4 S0,S1;uniform mat3 M0,M1;uniform float TY0,TY1,SP0,SP1;
+uniform vec3 RN;uniform vec2 RR;uniform float RA,EXPO,SHOWAX,GA,RTY;uniform vec3 OFF,ER,SLD;uniform sampler2D TEX,CLD;
+float h1(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
+float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h1(i),h1(i+vec3(1,0,0)),f.x),mix(h1(i+vec3(0,1,0)),h1(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h1(i+vec3(0,0,1)),h1(i+vec3(1,0,1)),f.x),mix(h1(i+vec3(0,1,1)),h1(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*n3(p);p*=2.02;a*=.5;}return s;}
+vec3 sky(vec3 d){vec3 c=vec3(0.);
+ for(int l=0;l<2;l++){float sc=l==0?160.:320.;vec3 q=d*sc;vec3 id=floor(q);float hs=h1(id+float(l)*7.);
+  if(hs>.88){vec3 sp=id+.5+.35*(vec3(h1(id+1.),h1(id+2.),h1(id+3.))-.5);float dd=length(q-sp);
+   c+=pow(hs-.88,1.5)*34.*exp(-dd*dd*30.)*mix(vec3(1.,.85,.7),vec3(.75,.85,1.),h1(id+9.));}}
+ c+=vec3(.035,.03,.06)*pow(fbm(d*2.5+3.),2.5)*2.;return c;}
+// planet surface albedo by type; p = unit vector in planet frame (y = spin axis)
+vec3 alb(float ty,vec3 p){
+ float lat=p.y;
+ if(ty<.5){ // earth (Blue Marble texture)
+  vec2 uv=vec2(atan(p.z,-p.x)/6.28318+.5,acos(clamp(p.y,-1.,1.))/3.14159);
+  vec3 c=pow(texture2D(TEX,uv).rgb,vec3(1.9))*1.45;
+  float cl=texture2D(CLD,vec2(uv.x,uv.y)).a;return mix(c,vec3(.97),smoothstep(.04,.75,cl)*.85);}
+ if(ty<1.5){ // jupiter
+  float tw=fbm(p*5.+vec3(T*.01,0.,0.));float w=lat+.05*(tw-.5)+.02*(fbm(p*18.)-.5)+.006*(fbm(p*60.)-.5);
+  float b=sin(w*24.)*.5+.5,b2=sin(w*58.+1.)*.5+.5,b3=fbm(vec3(p.x*3.,w*40.,p.z*3.));
+  vec3 c=mix(vec3(.93,.86,.74),vec3(.62,.40,.25),pow(b,1.6));c=mix(c,vec3(.98,.95,.88),b2*.3);c*=.82+.36*b3;
+  c=mix(c,vec3(.75,.55,.40),smoothstep(.35,.55,abs(sin(w*9.+.6)))*.25);
+  c=mix(c,vec3(.55,.52,.52),smoothstep(.78,.95,abs(lat)));
+  vec2 q=vec2(atan(p.x,p.z),asin(clamp(lat,-1.,1.))+.384);vec2 ab=vec2(GA,.086);float e=length(q/ab);
+  float ang=atan(q.y/ab.y,q.x/ab.x)+3.*(1.-e)+T*.25*(1.2-e);float sw=fbm(vec3(cos(ang)*e*3.,sin(ang)*e*3.,1.));
+  vec3 rs=mix(vec3(.70,.24,.12),vec3(.88,.46,.26),sw);c=mix(c,rs,smoothstep(1.02,.9,e));
+  c=mix(c,vec3(.96,.90,.80),smoothstep(1.3,1.05,e)*smoothstep(.95,1.08,e)*.7);return c;}
+ if(ty<2.5){ // saturn
+  float w=lat+.02*(fbm(p*5.)-.5);float b=sin(w*22.)*.5+.5,b2=sin(w*57.)*.5+.5;
+  vec3 c=mix(vec3(.86,.76,.55),vec3(.74,.62,.42),b);c=mix(c,vec3(.93,.87,.70),b2*.3);
+  return mix(c,vec3(.62,.66,.66),smoothstep(.75,.97,abs(lat)));}
+ // uranus
+ float w=lat+.015*(fbm(p*4.)-.5);vec3 c=mix(vec3(.55,.80,.86),vec3(.66,.88,.91),sin(w*12.)*.5+.5);c*=.94+.08*fbm(p*9.);
+ return mix(c,vec3(.80,.94,.95),smoothstep(.55,.85,lat)*.6);}
+vec3 atm(float ty){return ty<.5?vec3(.3,.55,1.):ty<1.5?vec3(.9,.8,.6):ty<2.5?vec3(.95,.85,.6):vec3(.5,.9,1.);}
+float isph(vec3 ro,vec3 rd,vec4 s){vec3 o=ro-s.xyz;float b=dot(o,rd),c=dot(o,o)-s.w*s.w,h=b*b-c;if(h<0.)return -1.;return -b-sqrt(h);}
+float ringD(float r){ // ring optical density vs radius in planet radii
+ float d=0.;
+ if(RTY>.5){float rs[9];rs[0]=1.64;rs[1]=1.68;rs[2]=1.75;rs[3]=1.79;rs[4]=1.84;rs[5]=1.86;rs[6]=1.88;rs[7]=1.91;rs[8]=2.0;
+  for(int i=0;i<9;i++){float wd=i==8?.012:.004;d+=smoothstep(wd,wd*.3,abs(r-rs[i]))*(i==8?.75:.45);}return clamp(d,0.,1.);}
+ d+=smoothstep(1.24,1.26,r)*smoothstep(1.53,1.51,r)*.25;   // C ring
+ d+=smoothstep(1.52,1.53,r)*smoothstep(1.95,1.94,r)*.95;   // B ring
+ d+=smoothstep(2.025,2.035,r)*smoothstep(2.27,2.26,r)*.6;  // A ring
+ d*=.75+.25*n3(vec3(r*90.,0.,0.))+.15*(n3(vec3(r*300.,1.,0.))-.5);return clamp(d,0.,1.);}
+vec3 ringC(float r){if(RTY>.5)return vec3(.30,.34,.37);return mix(vec3(.88,.74,.52),vec3(1.,.93,.78),smoothstep(1.5,2.2,r))*1.35;}
+float ringHit(vec3 ro,vec3 rd,out float rr){rr=0.;if(RA<.001)return -1.;float dn=dot(rd,RN);if(abs(dn)<1e-5)return -1.;
+ float t=dot(S0.xyz-ro,RN)/dn;if(t<0.)return -1.;vec3 q=ro+rd*t-S0.xyz;rr=length(q)/S0.w;if(rr<1.2||rr>2.3)return -1.;return t;}
+vec3 shadeP(vec3 ro,vec3 rd,float t,vec4 S,mat3 M,float ty,float sp,bool rings){
+ vec3 pos=ro+rd*t;vec3 n=normalize(pos-S.xyz);vec3 lp=M*n;float ca=cos(sp),sa=sin(sp);lp=vec3(ca*lp.x+sa*lp.z,lp.y,-sa*lp.x+ca*lp.z);
+ vec3 a=alb(ty,lp);float ndl=dot(n,SUN);float dif=smoothstep(-.08,.35,ndl)*max(ndl+.08,0.)/1.08;
+ float mu=max(dot(n,-rd),0.);dif*=.55+.45*pow(mu,.4); // limb darkening
+ if(rings){float rr;float tr=ringHit(pos+n*.001,SUN,rr);if(tr>0.)dif*=1.-.85*ringD(rr);}
+ vec3 c=a*dif*1.25;
+ if(ty<.5){vec3 hv=normalize(SUN-rd);c+=vec3(.6,.7,.8)*pow(max(dot(n,hv),0.),60.)*.4*(1.-smoothstep(.5,.6,fbm(lp*2.2+vec3(1.7))))*0.*step(0.,ndl);}
+ float rim=pow(1.-mu,3.)*smoothstep(-.2,.5,ndl);c+=atm(ty)*rim*.55;
+ return c;}
+void main(){
+ vec2 uv=(gl_FragCoord.xy-.5*R)/R.x;vec3 rd=normalize(CM*vec3(uv*FOV,-1.));vec3 ro=CP;
+ vec3 col=sky(rd);float tmax=1e9;
+ float t0=isph(ro,rd,S0),t1=-1.;vec4 S1h=S1;for(int k=0;k<3;k++){float sc=k==0?ER.x:k==1?ER.y:ER.z;if(S1.w*sc<=1e-4)continue;float sl=k==0?SLD.x:k==1?SLD.y:SLD.z;vec4 Sk=vec4(S1.xyz+OFF*float(k)+vec3(sl,0.,0.),S1.w*sc);float tk=isph(ro,rd,Sk);if(tk>0.&&(t1<0.||tk<t1)){t1=tk;S1h=Sk;}}
+ // halo glow around planets
+ for(int k=0;k<2;k++){vec4 S=k==0?S0:S1;if(S.w<=0.)continue;vec3 o=S.xyz-ro;float tc=dot(o,rd);float dd=length(o-rd*tc)/S.w;
+  if(tc>0.)col+=atm(k==0?TY0:TY1)*exp(-max(dd-1.,0.)*9.)*.12*smoothstep(-.3,.6,dot(normalize(ro+rd*tc-S.xyz),SUN));}
+ if(t0>0.&&(t1<0.||t0<t1)){col=shadeP(ro,rd,t0,S0,M0,TY0,SP0,RA>.001);tmax=t0;}
+ else if(t1>0.){col=shadeP(ro,rd,t1,S1h,M1,TY1,SP1,false);tmax=t1;}
+ // rings (front of or without planet)
+ float rr;float tr=ringHit(ro,rd,rr);
+ if(tr>0.&&tr<tmax){float dn=ringD(rr)*RA;vec3 q=ro+rd*tr;
+  float sh=isph(q,SUN,S0)>0.?0.06:1.;float lit=.55+.45*abs(dot(RN,SUN));
+  float side=sign(dot(RN,SUN))*sign(dot(RN,-rd));vec3 rc=ringC(rr)*lit*sh*1.15*(side<0.?.72:1.)*(tmax<1e8?.82:1.);float fw=pow(1.-abs(dot(rd,RN)),6.);// forward scatter brightening near edge-on
+  col=mix(col,rc,clamp(dn*(1.+fw*.6),0.,.98));}
+ // spin-axis line for sphere 0/1
+ if(SHOWAX>0.){for(int k=0;k<2;k++){vec4 S=k==0?S0:S1;if(S.w<=0.)continue;mat3 M=k==0?M0:M1;vec3 ax=normalize(vec3(M[0][1],M[1][1],M[2][1]));
+  // closest approach between ray and axis line
+  vec3 w0=ro-S.xyz;float b=dot(rd,ax),d=dot(rd,w0),e=dot(ax,w0);float den=1.-b*b;float sc=(b*e-d)/den,tc=(e-b*d)/den;
+  float dist=length(w0+rd*sc-ax*tc);float lim=S.w*1.6;if(abs(tc)<lim&&sc>0.&&(abs(tc)>S.w*.98||sc<tmax)){
+   float wdt=.018*S.w;col=mix(col,vec3(1.,.85,.4),SHOWAX*smoothstep(wdt,wdt*.3,dist)*smoothstep(lim,lim*.85,abs(tc)));}}}
+ col*=EXPO;col=1.-exp(-col*1.1);col=pow(col,vec3(.95));gl_FragColor=vec4(col,1.);}
+</script>
+<script src="tex.js"></script><script>
+const W=1080,H=1920;const g=document.getElementById('g'),gl=g.getContext('webgl',{preserveDrawingBuffer:true});
+function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o}
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,'attribute vec2 a;void main(){gl_Position=vec4(a,0,1);}'));
+gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,document.getElementById('fs').text));gl.linkProgram(pr);gl.useProgram(pr);
+const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+const U=n=>gl.getUniformLocation(pr,n);
+function mkTex(src,unit,cb){const im=new Image();im.onload=()=>{const t=gl.createTexture();gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,t);
+ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
+ gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);cb()};im.src=src;}
+let _tl=0;mkTex(TEXA,0,()=>{_tl++;window.TEXREADY=_tl==2});mkTex(TEXC,1,()=>{_tl++;window.TEXREADY=_tl==2});
+gl.uniform1i(gl.getUniformLocation(pr,'TEX'),0);gl.uniform1i(gl.getUniformLocation(pr,'CLD'),1);
+const c=document.getElementById('c'),x=c.getContext('2d');
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+const lerp=(a,b,t)=>a+(b-a)*t;
+function norm(v){const l=Math.hypot(...v);return v.map(a=>a/l)}
+function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}
+function look(eye,tgt){const f=norm(tgt.map((v,i)=>v-eye[i]));const r=norm(cross(f,[0,1,0]));const u=cross(r,f);
+ return [r[0],r[1],r[2],u[0],u[1],u[2],-f[0],-f[1],-f[2]]} // column-major: columns r,u,-f
+// planet frame matrix: world normal -> planet local (rows), tilt about z then yaw
+function tiltM(tiltDeg,yawDeg){const a=tiltDeg*Math.PI/180,b=(yawDeg||0)*Math.PI/180;
+ const ca=Math.cos(a),sa=Math.sin(a),cb=Math.cos(b),sb=Math.sin(b);
+ // world->local = Rz(-a)*Ry(-b); GLSL mat3 is column-major, uploading transpose(Ml) gives M*n = Ml*n when we pass rows as columns
+ const Ry=[[cb,0,-sb],[0,1,0],[sb,0,cb]];const Rz=[[ca,sa,0],[-sa,ca,0],[0,0,1]];
+ const Ml=[0,1,2].map(i=>[0,1,2].map(j=>Rz[i][0]*Ry[0][j]+Rz[i][1]*Ry[1][j]+Rz[i][2]*Ry[2][j]));
+ return [Ml[0][0],Ml[1][0],Ml[2][0],Ml[0][1],Ml[1][1],Ml[2][1],Ml[0][2],Ml[1][2],Ml[2][2]];}
+const F='"DejaVu Sans",Arial,sans-serif';
+function card(lines,y,size,alpha,dy){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.textAlign='center';
+ let mw=0;x.font='900 '+size+'px '+F;lines.forEach(l=>{mw=Math.max(mw,x.measureText(typeof l==='string'?l:l[0]).width)});
+ if(mw>940){size=Math.floor(size*940/mw);x.font='900 '+size+'px '+F}x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=24;
+ lines.forEach((l,i)=>{x.fillStyle=typeof l==='string'?'#fff':l[1];x.fillText(typeof l==='string'?l:l[0],W/2,y+i*size*1.18+(dy||0))});x.restore()}
+function label(s,px,py,alpha,col,size){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.font='800 '+(size||40)+'px '+F;x.textAlign='center';
+ x.fillStyle=col||'#fff';x.shadowColor='#000';x.shadowBlur=12;x.fillText(s,px,py);x.restore()}
+// project world point to canvas px
+let CAM=null;function proj(p){const m=CAM.m,e=CAM.e;const d=[p[0]-e[0],p[1]-e[1],p[2]-e[2]];
+ const xr=d[0]*m[0]+d[1]*m[1]+d[2]*m[2],yu=d[0]*m[3]+d[1]*m[4]+d[2]*m[5],zf=-(d[0]*m[6]+d[1]*m[7]+d[2]*m[8]);
+ return [W/2+xr/zf/CAM.fov*W,H/2-yu/zf/CAM.fov*W]}
+let SC=null;
+function draw(t){
+ const s=SC.scene(t);CAM={m:look(s.eye,s.tgt),e:s.eye,fov:s.fov||.9};
+ gl.viewport(0,0,W,H);gl.uniform2f(U('R'),W,H);gl.uniform1f(U('T'),t);gl.uniform3fv(U('SUN'),norm(s.sun||[1,.2,.6]));
+ gl.uniform3fv(U('CP'),s.eye);gl.uniformMatrix3fv(U('CM'),false,CAM.m);gl.uniform1f(U('FOV'),CAM.fov);
+ const P=s.p,Q=s.q||{c:[0,0,0],r:0,ty:0,tilt:0,spin:0};
+ gl.uniform4f(U('S0'),...P.c,P.r);gl.uniform4f(U('S1'),...Q.c,Q.r);gl.uniformMatrix3fv(U('M0'),false,tiltM(P.tilt,P.yaw));gl.uniformMatrix3fv(U('M1'),false,tiltM(Q.tilt,Q.yaw));
+ gl.uniform1f(U('TY0'),P.ty);gl.uniform1f(U('TY1'),Q.ty);gl.uniform1f(U('SP0'),P.spin);gl.uniform1f(U('SP1'),Q.spin);
+ const ring=s.ring||{n:[0,1,0],a:0};gl.uniform3fv(U('RN'),norm(ring.n));gl.uniform1f(U('RA'),ring.a);gl.uniform1f(U('RTY'),ring.ty||0);gl.uniform2f(U('RR'),1.2,2.3);
+ gl.uniform1f(U('EXPO'),s.expo||1);gl.uniform1f(U('GA'),s.ga||.127);gl.uniform3fv(U('OFF'),s.off||[0,0,0]);gl.uniform3fv(U('ER'),s.er||[1,0,0]);gl.uniform3fv(U('SLD'),s.slide||[0,0,0]);gl.uniform1f(U('SHOWAX'),s.axis||0);
+ gl.drawArrays(gl.TRIANGLES,0,3);
+ x.globalCompositeOperation='source-over';x.globalAlpha=1;x.drawImage(g,0,0);
+ x.save();x.globalCompositeOperation='lighter';x.filter='blur(40px)';x.globalAlpha=.30;x.drawImage(g,0,0);x.filter='blur(10px)';x.globalAlpha=.15;x.drawImage(g,0,0);x.restore();
+ const vg=x.createRadialGradient(W/2,H*.5,H*.28,W/2,H*.5,H*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+ for(const cd of SC.cards){const [a,b,l,sz]=cd;if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=SC.D?1:ease((b-t)/.3);card(l,430,sz,Math.min(fi,fo),(1-fi)*30)}}
+ if(SC.overlay)SC.overlay(t);
+}
+window.draw=draw;
+</script>
+<script src="earth-spin-speed.js"></script>
