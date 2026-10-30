@@ -11,7 +11,7 @@ SC={D:30,
   const az=0.10*Math.sin(2*Math.PI*t/30)+0.05;
   const eye=[d*Math.sin(az)+0.015*Math.sin(2*Math.PI*t/15),0.35+0.015*Math.sin(2*Math.PI*t/10),d*Math.cos(az)];
   return {eye,tgt:[0,0.36,0],fov:.9,sun:[-1,0.08,0.45],
-   p:{c:[0,0,0],r:1,ty:0,tilt:23.44,yaw,spin:t*0.35},ring:{n:[0,1,0],a:0},axis:axA(t),expo:1.15};},
+   p:{c:[0,0,0],r:1,ty:0,tilt:23.44,yaw,spin:t*2*Math.PI/30},ring:{n:[0,1,0],a:0},axis:axA(t),expo:1.15};},
  cards:[
   [0,3.5,[["EARTH'S CLOSEST",'#fff'],['TO THE SUN','#fff'],['IN JANUARY','#ffd36b']],124],
   [3.5,7.5,['Early January:',['147 million km','#ffd36b']],100],
