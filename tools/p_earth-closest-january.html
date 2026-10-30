@@ -21,7 +21,7 @@ vec3 alb(float ty,vec3 p){
  if(ty<.5){ // earth (Blue Marble texture)
   vec2 uv=vec2(atan(p.z,-p.x)/6.28318+.5,acos(clamp(p.y,-1.,1.))/3.14159);
   vec3 c=pow(texture2D(TEX,uv).rgb,vec3(1.9))*1.45;
-  float cl=texture2D(CLD,vec2(fract(uv.x+T*.0015),uv.y)).a;return mix(c,vec3(.97),smoothstep(.04,.75,cl)*.85);}
+  float cl=texture2D(CLD,vec2(uv.x,uv.y)).a;return mix(c,vec3(.97),smoothstep(.04,.75,cl)*.85);}
  if(ty<1.5){ // jupiter
   float tw=fbm(p*5.+vec3(T*.01,0.,0.));float w=lat+.05*(tw-.5)+.02*(fbm(p*18.)-.5)+.006*(fbm(p*60.)-.5);
   float b=sin(w*24.)*.5+.5,b2=sin(w*58.+1.)*.5+.5,b3=fbm(vec3(p.x*3.,w*40.,p.z*3.));
