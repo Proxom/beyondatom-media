@@ -1,0 +1,122 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=g width=720 height=1280 style="display:none"></canvas><canvas id=c width=1080 height=1920></canvas>
+<script id=fs type=x-shader>
+precision highp float;
+uniform vec2 R;uniform float T,K,AZ,EL,DIST,SWX,SWY;
+float h1(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
+float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h1(i),h1(i+vec3(1,0,0)),f.x),mix(h1(i+vec3(0,1,0)),h1(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h1(i+vec3(0,0,1)),h1(i+vec3(1,0,1)),f.x),mix(h1(i+vec3(0,1,1)),h1(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*n3(p);p*=2.03;a*=.5;}return s;}
+vec3 bb(float t){ // temperature -> color, deep orange to white-hot
+ t=clamp(t,0.,3.);return vec3(1.,.28+.62*smoothstep(.25,1.5,t),.06+.9*smoothstep(.9,2.4,t))*t*t*.8;}
+vec3 sky(vec3 d){
+ vec3 c=vec3(0.);
+ // stars
+ for(int l=0;l<2;l++){float sc=l==0?140.:300.;vec3 q=d*sc;vec3 id=floor(q);float hs=h1(id+float(l)*7.);
+  if(hs>.86){vec3 sp=id+.5+.35*(vec3(h1(id+1.),h1(id+2.),h1(id+3.))-.5);float dd=length(q-sp);
+   float b=pow(hs-.86,1.5)*40.*exp(-dd*dd*(l==0?28.:40.));vec3 tint=mix(vec3(1.,.8,.6),vec3(.7,.8,1.),h1(id+9.));c+=b*tint;}}
+ // milky band + nebula
+ float band=exp(-pow(dot(d,normalize(vec3(.3,1.,.2)))*3.2,2.));
+ float nb=fbm(d*3.5+vec3(4.))*fbm(d*7.+vec3(1.,2.,3.));
+ c+=band*(vec3(.10,.08,.12)*nb*1.6+vec3(.02,.02,.035));
+ c+=vec3(.05,.025,.07)*pow(fbm(d*2.2+9.),3.)*1.2;
+ return c;}
+void main(){
+ vec2 uv=(gl_FragCoord.xy-.5*R)/R.x;float Tp=T+(h1(vec3(gl_FragCoord.xy,T*60.))-.5)/30.;
+ vec3 cam=DIST*vec3(cos(EL)*sin(AZ),sin(EL),cos(EL)*cos(AZ));
+ vec3 fw=normalize(-cam+vec3(SWX,SWY+2.2,0.)),rt=normalize(cross(fw,vec3(0,1,0))),up=cross(rt,fw);
+ vec3 dir=normalize(fw*1.15+uv.x*rt+uv.y*up);
+ vec3 p=cam,v=dir;float RB=24.;{float bq=dot(p,v),cq=dot(p,p)-RB*RB,ds=bq*bq-cq;if(ds>0.&&cq>0.)p+=v*(-bq-sqrt(ds));}float h2=dot(cross(p,v),cross(p,v));
+ vec3 col=vec3(0.);float trans=1.;bool hit=false;
+ for(int i=0;i<520;i++){
+  float r=length(p);float dt=clamp(.045*r,.02,1.1);
+  float r2=r*r;vec3 a=-1.5*h2*p/(r2*r2*r)*K;
+  vec3 pn=p+v*dt+.5*a*dt*dt;vec3 vn=v+a*dt;
+  if(p.y*pn.y<0.){float f=p.y/(p.y-pn.y);vec3 q=mix(p,pn,f);float rq=length(q);
+   if(rq>3.&&rq<15.){
+    float phi=atan(q.z,q.x);float w=.55/pow(rq,1.5);float ph=phi+w*Tp*2.6;
+    vec3 qq=vec3(cos(ph)*rq,sin(ph)*rq,rq*.7);
+    float tex=fbm(qq*.9+vec3(0.,0.,Tp*.05))*.7+fbm(vec3(rq*2.4,cos(ph)*2.,sin(ph)*2.))*.6;
+    tex=pow(clamp(tex,0.,1.3),1.6);
+    float tp=pow(3./rq,.75)*pow(max(1.-sqrt(3./rq),0.),.25)*2.2;
+    float vs=clamp(sqrt(.5/(rq-1.)),0.,.9);vec3 vv=vs*normalize(vec3(-q.z,0.,q.x));
+    vec3 n=-normalize(vn);float gam=1./sqrt(1.-vs*vs);float D=1./(gam*(1.-dot(vv,n)));
+    D*=sqrt(1.-1./rq);
+    float edge=smoothstep(3.,3.6,rq)*smoothstep(15.,10.,rq);
+    vec3 e=bb(tp*D*1.1)*pow(D,3.)*(.35+tex*1.4)*edge*1.6;
+    float al=clamp(edge*(.55+.45*tex),0.,.97);
+    col+=trans*e*al;trans*=1.-al;if(trans<.03){hit=true;break;}}}
+  p=pn;v=normalize(vn)*length(v);
+  if(length(p)<1.0){hit=true;break;}
+  if(length(p)>RB+.5&&dot(p,v)>0.)break;
+ }
+ if(!hit) col+=trans*sky(normalize(v));
+ col=1.-exp(-col*1.0);col=pow(col,vec3(1.05));
+ gl_FragColor=vec4(col,1.);}
+</script>
+<script>
+const g=document.getElementById('g'),gl=g.getContext('webgl',{preserveDrawingBuffer:true,antialias:false});
+const W=1080,H=1920,GW=720,GH=1280;let SS=1;
+function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o}
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,'attribute vec2 a;void main(){gl_Position=vec4(a,0,1);}'));
+gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,document.getElementById('fs').text));gl.linkProgram(pr);gl.useProgram(pr);
+const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+const U={};for(const n of['R','T','K','AZ','EL','DIST','SWX','SWY'])U[n]=gl.getUniformLocation(pr,n);
+const c=document.getElementById('c'),x=c.getContext('2d');
+const ease=t=>t<0?0:t>1?1:t*t*(3-2*t), eio=t=>{t=Math.max(0,Math.min(1,t));return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+function lens(t){ // 1 -> 0 (3.4..6.2) -> 1 (10..13.6)
+ if(t<3.4)return 1; if(t<6.2)return 1-eio((t-3.4)/2.8); if(t<10)return 0; return eio((t-10)/3.6);}
+function camAt(t){
+ const L=30; // loop: params at t=0 and t=L match
+ const u=t/L;
+ const dolly=30-5.5*Math.sin(Math.PI*u)**2;            // 30 -> 24.5 -> 30
+ const el=(7+2.2*(Math.sin(2*Math.PI*u-1.2)+Math.sin(1.2)))*Math.PI/180; // returns to start
+ const az=0.35*Math.sin(2*Math.PI*u);
+ const swx=.18*Math.sin(t*1.3)+.1*Math.sin(t*2.9+1), swy=.12*Math.sin(t*1.7+2)+.07*Math.sin(t*3.7);
+ return {dolly,el,az,swx,swy};}
+function gpu(t){const k=camAt(t);gl.viewport(0,0,GW,GH);gl.uniform2f(U.R,GW,GH);gl.uniform1f(U.T,t);gl.uniform1f(U.K,lens(t));
+ gl.uniform1f(U.AZ,k.az);gl.uniform1f(U.EL,k.el);gl.uniform1f(U.DIST,k.dolly);gl.uniform1f(U.SWX,k.swx);gl.uniform1f(U.SWY,k.swy);
+ gl.drawArrays(gl.TRIANGLES,0,3);}
+const F='"DejaVu Sans",Arial,sans-serif';
+function card(lines,y,size,alpha,col,dy){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.textAlign='center';
+ let mw=0;x.font='900 '+size+'px '+F;lines.forEach(l=>{mw=Math.max(mw,x.measureText(typeof l==='string'?l:l[0]).width)});if(mw>940){size=Math.floor(size*940/mw);x.font='900 '+size+'px '+F;}x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=24;
+ lines.forEach((l,i)=>{const yy=y+i*size*1.18+(dy||0);
+  if(typeof l==='string'){x.fillStyle=col||'#fff';x.fillText(l,W/2,yy)}
+  else{ // [text, highlightColor]
+   x.fillStyle=l[1];x.fillText(l[0],W/2,yy)}});x.restore()}
+const CARDS=[
+ [0,3.3,[['YOU CAN SEE','#fff'],['BEHIND','#ffb347'],['A BLACK HOLE','#fff']],118],
+ [3.3,6.6,['Switch off','light bending...'],96],
+ [6.6,9.8,['...and the disk','is just flat.'],96],
+ [9.8,13.9,[['Back ON:','#ffb347'],'light from behind','bends around it'],92],
+ [13.9,17.6,['The far side','appears above',['AND below.','#ffb347']],92],
+ [17.6,22,['One side','glows brighter:',['gas rushing','#ffd27a'],['toward us','#ffd27a']],92],
+ [22,26.4,[['2019, first','#ffd27a'],['real image:','#ffd27a'],'M87* is','lopsided too.'],90],
+ [26.4,30.01,[['YOU CAN SEE','#fff'],['BEHIND','#ffb347'],['A BLACK HOLE','#fff']],118],
+];
+function draw(t){
+ // temporal sub-samples for motion blur are averaged on the GPU canvas copy
+ x.globalAlpha=1;x.globalCompositeOperation='source-over';
+ x.imageSmoothingQuality='high';gpu(t);x.drawImage(g,0,0,W,H);
+ x.save();x.globalCompositeOperation='lighter';x.filter='blur(46px)';x.globalAlpha=.42;x.drawImage(g,0,0,W,H);
+ x.filter='blur(12px)';x.globalAlpha=.22;x.drawImage(g,0,0,W,H);x.restore();
+ const vg=x.createRadialGradient(W/2,H*.52,H*.25,W/2,H*.52,H*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.6)');
+ x.fillStyle=vg;x.fillRect(0,0,W,H);
+ for(const cd of CARDS){const [a,b2,l,sz]=cd;if(t>=a&&t<b2){
+  let al=1,dy=0;const fi=a===0?1:ease((t-a)/.35),fo=b2>30?1:ease((b2-t)/.3);al=Math.min(fi,fo);dy=(1-fi)*30;
+  card(l,350,sz,al,null,dy)}}
+ // light-bending toggle
+ const tg=Math.min(ease((t-3.0)/.4),ease((17.6-t)/.4));if(tg>0){const k=t<3.5?1:t<3.9?1-eio((t-3.5)/.4):t<9.6?0:eio((t-9.6)/.4);x.save();x.globalAlpha=tg;
+  x.fillStyle='rgba(10,8,20,.55)';x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=3;x.beginPath();x.roundRect(250,1340,580,86,43);x.fill();x.stroke();
+  x.font='800 38px '+F;x.textAlign='left';x.fillStyle='#fff';x.fillText('LIGHT BENDING',290,1397);
+  x.fillStyle=k>.5?'#ffb347':'#555';x.beginPath();x.roundRect(640,1356,160,54,27);x.fill();
+  x.fillStyle='#fff';x.beginPath();x.arc(667+106*k,1383,22,0,6.283);x.fill();
+  x.font='800 26px '+F;x.textAlign='center';x.globalAlpha=tg*Math.pow(Math.abs(k-.5)*2,3);x.fillStyle=k>.5?'#2a1600':'#ddd';x.fillText(k>.5?'ON':'OFF',k>.5?700:745,1393);x.restore()}
+ // honesty label, inside safe area
+ x.save();x.globalAlpha=.75;x.font='600 30px '+F;x.textAlign='center';x.fillStyle='#d8d2e8';x.shadowColor='#000';x.shadowBlur=10;
+ x.fillText('Simulation: non-spinning black hole',W/2,1480);x.restore();
+}
+window.draw=draw;window.setSS=n=>SS=n;
+</script>
