@@ -37,9 +37,9 @@ SC={D:30,
   // outline the six sides one by one
   const oa=t<3.6?0:t<8?1:t<8.5?1-ease((t-8)/.5):0;
   // in the wide shot, trace the hexagon so it stays readable
-  const wa=t<18.4?0:t<19?ease((t-18.4)/.6):t<21.6?1:t<22.2?1-ease((t-21.6)/.6):0;
-  if(wa>0){x.save();x.globalAlpha=wa;x.strokeStyle='#ffe2a0';x.lineWidth=4;x.shadowColor='#ffcf6b';x.shadowBlur=16;x.beginPath();for(let i=0;i<=144;i++){const q=proj(hexPt(i/24,sp));i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]);}x.stroke();x.restore();
-   const top=proj(hexPt(1.5,sp));label('THE HEXAGON',top[0],top[1]-60,wa,'#ffe2a0',34);}
+  const wa=t<18.4?0:t<19?ease((t-18.4)/.6):t<21.6?1:t<22.2?1-ease((t-21.6)/.6):t<23.8?0:t<24.3?.8*ease((t-23.8)/.5):t<26.8?.8:t<27.3?.8-.8*ease((t-26.8)/.5):0;
+  if(wa>0){x.save();x.globalAlpha=wa;x.strokeStyle='#ffe2a0';x.lineWidth=t<23?4:3;x.shadowColor='#ffcf6b';x.shadowBlur=t<23?16:8;x.beginPath();for(let i=0;i<=144;i++){const q=proj(hexPt(i/24,sp));i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]);}x.stroke();x.restore();
+   if(t<23){const top=proj(hexPt(1.5,sp));label('THE HEXAGON',top[0],top[1]-60,wa,'#ffe2a0',34);}}
   // year tag while the colour shifts
   const ya=t<22.4?0:t<22.8?ease((t-22.4)/.4):t<24.2?1:t<24.6?1-ease((t-24.2)/.4):0;
   if(ya>0){const yr=t<23.2?2012:2016;label('Cassini, '+yr,W/2,1300,ya,yr===2012?'#9fd0ff':'#ffcf6b',40);}
