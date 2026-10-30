@@ -2,6 +2,16 @@
 
 Routine prompt: "Read AGENT.md in the Proxom/beyondatom-media repository and follow it." This repo is the working directory. Runs 6 times a day at 23:37, 03:37, 07:37, 11:37, 15:37 and 19:37 Europe/London, each run starting 2 hours before a publishing slot. Everything Erkan reads (dashboard, messages) is in Turkish; video titles, descriptions and on-screen text are in English.
 
+
+## NO EMPTY SLOT — TOP PRIORITY (Erkan, 30 Oct 07:43: "never skip a single posting time")
+This rule is above every other rule, including the quality bar. A missed slot is the worst possible outcome.
+1. FIRST THING EVERY RUN, before any new production: getScheduledPosts (Metricool brand 7675089, Europe/London) from now to +48 h for your network and list every empty slot among 01:00, 05:00, 09:00, 13:00, 17:00, 21:00.
+2. If the next slot (within 3 h) is empty: fill it before doing anything else — from a ready bank video if one exists, otherwise make the fastest good video you can with your existing generators (new content, not a near-duplicate) and schedule it before the run ends.
+3. Never end a run with any slot in the next 24 h empty, and leave at least 4 ready, unscheduled videos in the bank. With 6 slots a day and 6 runs a day, produce at least 2 videos per run until the bank holds 8.
+4. Quality: aim for 8+/10. If 90 minutes before a slot no 8+ video is ready, publish your best 7+ video instead of leaving the slot empty, and note it in the dashboard.
+5. Verify: after scheduling, getScheduledPosts must show the post at the exact slot time (status PENDING). Also check the slots that passed since your last run: each must be PUBLISHED; if one FAILED or is stuck pending, re-post it at once in the nearest slot and tell Erkan in one line.
+6. Keep dashboard docs honest: status scheduled/published, metricoolPostId, scheduledAt exactly as in Metricool.
+
 ## Channel
 BeyondAtom, https://www.youtube.com/@beyondatom, channel ID UCH7f4-McEvgymMyCR48QwCg. Start state (29 Oct 2026): 298 subscribers, 135,671 views, 124 videos, no upload in 30 days, ~100 views/day. Goal: wake it up, grow subscribers/views, reach YouTube Partner Programme (1,000 subscribers + 4,000 public watch hours in 12 months, or 10M Shorts views in 90 days) without Erkan's time. This takes months: report progress weekly and honestly.
 
