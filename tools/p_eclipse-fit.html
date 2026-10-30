@@ -1,0 +1,112 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000"><canvas id=c width=1080 height=1920></canvas><script>
+// Why the Moon fits the Sun: Sun ~400x wider, ~400x farther -> same apparent size; annular at apogee; next total eclipse 2 Aug 2027.
+const c=document.getElementById('c'),x=c.getContext('2d'),W=1080,H=1920,F='"DejaVu Sans",Arial,sans-serif';
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2},lerp=(a,b,t)=>a+(b-a)*t;
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+const mk=(w,h)=>{const o=document.createElement('canvas');o.width=w;o.height=h;return o};
+const R0=150; // apparent solar radius in the sky shots (px)
+// --- corona (precomputed): streamers falling off ~r^-2.5, plus inner K-corona glow and pink prominences
+const COR=mk(1600,1600),cx=COR.getContext('2d');(function(){const C=800;cx.globalCompositeOperation='lighter';
+ const g=cx.createRadialGradient(C,C,R0*.98,C,C,R0*2.2);g.addColorStop(0,'rgba(255,250,240,.95)');g.addColorStop(.12,'rgba(235,240,255,.55)');g.addColorStop(.4,'rgba(200,215,255,.16)');g.addColorStop(1,'rgba(160,180,255,0)');cx.fillStyle=g;cx.fillRect(0,0,1600,1600);
+ for(let i=0;i<190;i++){const eq=rnd()<.6;let a=eq?(rnd()<.5?0:Math.PI)+(rnd()-.5)*1.2:rnd()*Math.PI*2;// longer streamers near the solar equator
+  const w=.03+rnd()*.16,L=R0*(eq?1.2+rnd()*3.4:.5+rnd()*1.3),b=.05+rnd()*.14;
+  const gr=cx.createRadialGradient(C,C,R0*.95,C,C,R0+L);gr.addColorStop(0,'rgba(255,252,245,'+b*3+')');gr.addColorStop(.25,'rgba(225,232,255,'+b+')');gr.addColorStop(1,'rgba(190,205,255,0)');
+  cx.fillStyle=gr;cx.beginPath();const p=(r,aa)=>[C+Math.cos(aa)*r,C+Math.sin(aa)*r];
+  let q=p(R0*.97,a-w/2);cx.moveTo(q[0],q[1]);const bend=(rnd()-.5)*.25;q=p(R0+L*.5,a-w*.25+bend*.5);const q2=p(R0+L,a+bend);cx.quadraticCurveTo(q[0],q[1],q2[0],q2[1]);
+  q=p(R0+L*.5,a+w*.25+bend*.5);const q3=p(R0*.97,a+w/2);cx.quadraticCurveTo(q[0],q[1],q3[0],q3[1]);cx.closePath();cx.fill();}
+ // fine polar plumes
+ for(let i=0;i<60;i++){const a=(rnd()<.5?-Math.PI/2:Math.PI/2)+(rnd()-.5)*.9;cx.strokeStyle='rgba(225,235,255,'+(.05+rnd()*.07)+')';cx.lineWidth=1.5+rnd()*2.5;cx.beginPath();
+  cx.moveTo(C+Math.cos(a)*R0,C+Math.sin(a)*R0);cx.lineTo(C+Math.cos(a)*R0*(1.6+rnd()*.8),C+Math.sin(a)*R0*(1.6+rnd()*.8));cx.stroke();}
+ cx.globalCompositeOperation='source-over';cx.filter='blur(3px)';cx.drawImage(COR,0,0);cx.filter='none';
+ // prominences (pink, hydrogen-alpha) just outside the limb
+ cx.globalCompositeOperation='lighter';[[.6,.10],[2.4,.07],[4.1,.12],[5.3,.06]].forEach(([a,s])=>{for(let k=0;k<26;k++){const aa=a+(rnd()-.5)*s,r=R0*(1+rnd()*.07);
+  const gg=cx.createRadialGradient(C+Math.cos(aa)*r,C+Math.sin(aa)*r,0,C+Math.cos(aa)*r,C+Math.sin(aa)*r,6+rnd()*6);gg.addColorStop(0,'rgba(255,90,140,.55)');gg.addColorStop(1,'rgba(255,60,120,0)');cx.fillStyle=gg;cx.fillRect(0,0,1600,1600);}});})();
+// --- Moon (earthshine-lit, very dark) texture
+const MOON=mk(400,400),mx=MOON.getContext('2d');(function(){const im=mx.createImageData(400,400);
+ const h=(i,j)=>{const s=Math.sin(i*127.1+j*311.7)*43758.5453;return s-Math.floor(s)};
+ const n=(u,v)=>{const i=Math.floor(u),j=Math.floor(v),f=u-i,g=v-j,a=h(i,j),b=h(i+1,j),c2=h(i,j+1),d=h(i+1,j+1),sf=f*f*(3-2*f),sg=g*g*(3-2*g);return lerp(lerp(a,b,sf),lerp(c2,d,sf),sg)};
+ for(let y=0;y<400;y++)for(let X=0;X<400;X++){const u=X/400*6,v=y/400*6;let s=0,a=.5,f=1;for(let o=0;o<5;o++){s+=a*n(u*f+3,v*f+7);a*=.5;f*=2.1;}
+  const mar=s<.47?.55:1;const val=(10+16*s)*mar;const i=(y*400+X)*4;im.data[i]=val;im.data[i+1]=val*1.02;im.data[i+2]=val*1.1;im.data[i+3]=255;}mx.putImageData(im,0,0);})();
+// --- stars and horizon
+const ST=[];for(let i=0;i<260;i++)ST.push([rnd()*W,rnd()*H*.85,rnd()*1.7+.3,rnd()*6.28,rnd()]);
+const HILL=[];for(let i=0;i<=54;i++){HILL.push(1690+Math.sin(i*.37)*28+Math.sin(i*1.31+1)*14+(rnd()-.5)*10)}
+function sky(sk,t){ // sk = 1: twilight sky during totality, 0: space
+ x.fillStyle='#02030a';x.fillRect(0,0,W,H);
+ if(sk>0){const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(8,14,40,'+sk+')');g.addColorStop(.62,'rgba(22,30,70,'+sk+')');g.addColorStop(.82,'rgba(120,70,70,'+sk+')');g.addColorStop(.88,'rgba(240,150,80,'+sk+')');g.addColorStop(1,'rgba(30,20,30,'+sk+')');x.fillStyle=g;x.fillRect(0,0,W,H);}
+ for(const s of ST){const a=(1-sk*.7)*(.35+.35*Math.sin(t*1.3+s[3]))*(s[4]<.2||sk<.5?1:.4);if(a<=.02)continue;x.globalAlpha=a;x.fillStyle='#fff';x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill();}x.globalAlpha=1;
+ if(sk>0){x.save();x.globalAlpha=sk;x.fillStyle='#05050a';x.beginPath();x.moveTo(0,H);HILL.forEach((y,i)=>x.lineTo(i*W/54,y));x.lineTo(W,H);x.fill();x.restore();}}
+function sun(px,py,r,a){if(a<=0)return;x.save();x.globalAlpha=a;x.globalCompositeOperation='lighter';
+ const gl=x.createRadialGradient(px,py,r*.5,px,py,r*4);gl.addColorStop(0,'rgba(255,240,200,.9)');gl.addColorStop(.3,'rgba(255,200,120,.25)');gl.addColorStop(1,'rgba(255,160,80,0)');x.fillStyle=gl;x.fillRect(px-r*4,py-r*4,r*8,r*8);
+ x.globalCompositeOperation='source-over';const g=x.createRadialGradient(px,py,0,px,py,r);g.addColorStop(0,'#fffef6');g.addColorStop(.7,'#fff3d0');g.addColorStop(1,'#ffc878');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill();x.restore();}
+function corona(px,py,r,a,t){if(a<=0)return;x.save();x.globalAlpha=a;x.globalCompositeOperation='lighter';x.translate(px,py);x.rotate(.02*Math.sin(t*.4));const s=r/R0*(1+.012*Math.sin(t*1.1));x.scale(s,s);x.drawImage(COR,-800,-800);x.restore();}
+function moon(px,py,r,a){if(a<=0)return;x.save();x.globalAlpha=a;x.beginPath();x.arc(px,py,r,0,7);x.clip();x.drawImage(MOON,px-r,py-r,2*r,2*r);
+ const g=x.createRadialGradient(px-r*.3,py-r*.3,0,px,py,r);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=g;x.fillRect(px-r,py-r,2*r,2*r);x.restore();}
+function flare(px,py,s,a){if(a<=0)return;x.save();x.globalCompositeOperation='lighter';x.globalAlpha=a;
+ const g=x.createRadialGradient(px,py,0,px,py,s);g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.08,'rgba(255,250,230,.9)');g.addColorStop(.3,'rgba(255,220,170,.25)');g.addColorStop(1,'rgba(255,200,150,0)');x.fillStyle=g;x.fillRect(px-s,py-s,2*s,2*s);
+ x.strokeStyle='rgba(255,250,235,.55)';for(let k=0;k<4;k++){const an=k*Math.PI/4+.3;x.lineWidth=k%2?2:3;x.beginPath();x.moveTo(px-Math.cos(an)*s*1.4,py-Math.sin(an)*s*1.4);x.lineTo(px+Math.cos(an)*s*1.4,py+Math.sin(an)*s*1.4);x.stroke();}x.restore();}
+function card(lines,y,size,alpha,dy){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.textAlign='center';
+ let mw=0;x.font='900 '+size+'px '+F;lines.forEach(l=>{mw=Math.max(mw,x.measureText(typeof l==='string'?l:l[0]).width)});
+ if(mw>780){size=Math.floor(size*780/mw);x.font='900 '+size+'px '+F}x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=24;
+ lines.forEach((l,i)=>{x.fillStyle=typeof l==='string'?'#fff':l[1];x.fillText(typeof l==='string'?l:l[0],W/2,y+i*size*1.18+(dy||0))});x.restore()}
+function label(s,px,py,alpha,col,size){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.font='800 '+(size||40)+'px '+F;x.textAlign='center';x.fillStyle=col||'#fff';x.shadowColor='#000';x.shadowBlur=12;x.fillText(s,px,py);x.restore()}
+const CARDS=[
+ [0,3.3,['WHY THE MOON','FITS THE SUN',['PERFECTLY','#ffd36b']],116],
+ [3.3,8.9,['The Sun is',['400x WIDER','#ffb04a']],116],
+ [8.9,14.4,['...but about',['400x FARTHER','#7fd4ff']],116],
+ [14.4,19.4,['So in our sky:',['SAME SIZE','#ffd36b']],116],
+ [19.4,24.4,['Moon a bit farther?',['RING OF FIRE','#ffb04a']],108],
+ [24.4,27.6,['Next total eclipse:',['2 AUG 2027','#7fd4ff']],112],
+ [27.6,30.01,['WHY THE MOON','FITS THE SUN',['PERFECTLY','#ffd36b']],116]];
+const SX=540,SY=930; // sky position of the Sun
+// beats: sky totality [0,3.4], space diagram [3.4,14.6], sky again [14.6,30]
+const skyA=t=>t<3.0?1:t<3.8?1-ease((t-3)/.8):t<14.2?0:t<15.0?ease((t-14.2)/.8):1;
+function draw(t){
+ const sk=skyA(t);
+ // the Moon's offset from the Sun centre in the sky shots (in units of solar radius) and its size ratio
+ let off,mr;
+ if(t<15){off=t<2.6?0:t<3.4?lerp(0,.14,eio((t-2.6)/.8)):.14;mr=1.035;}
+ else if(t<19.4){off=t<15.6?2.4:t<18.6?lerp(2.4,0,eio((t-15.6)/3)):0;mr=1.035;}
+ else if(t<24.4){off=0;mr=t<20.2?1.035:t<21.4?lerp(1.035,.94,eio((t-20.2)/1.2)):t<23.4?.94:lerp(.94,1.035,eio((t-23.4)/1))}
+ else {off=0;mr=1.035}
+ // side-by-side intro of beat D: Sun and Moon apart, same size
+ sky(sk,t);
+ if(sk>0){x.save();x.globalAlpha=1;
+  const ox=t>=15&&t<19.4?-off*R0*.5:0; // in beat D both move: Sun left, Moon right, then merge
+  const sx=SX+(t>=15&&t<19.4?-off*R0*.5:0),mxp=SX+(t>=15&&t<19.4?off*R0*.5:off*R0),r=R0;
+  const cov=Math.hypot(mxp-sx,0)/r; // centre distance in solar radii
+  const tot=mr>=1&&cov<mr-1+.002?1:0;const totS=cl(1-(cov-(mr-1))/.25)*cl((mr-.995)/.02);
+  corona(sx,SY,r,sk*(mr<1?.04:totS),t);if(mr<1){x.save();x.globalCompositeOperation='lighter';x.globalAlpha=sk*cl((1-mr)/.06);const gg=x.createRadialGradient(sx,SY,r*.9,sx,SY,r*3.2);gg.addColorStop(0,'rgba(255,230,180,.85)');gg.addColorStop(.25,'rgba(255,190,110,.3)');gg.addColorStop(1,'rgba(255,150,80,0)');x.fillStyle=gg;x.fillRect(0,0,W,H);x.restore();}
+  sun(sx,SY,r,sk);
+  moon(mxp,SY,r*mr,sk);
+  // diamond ring / bead at the uncovered limb point
+  const gap=cov+1-mr; // >0 means some photosphere shows
+  if(gap>-.01&&cov<1.6&&mr>=1){const a=cl(1-Math.abs(gap-.02)/.12);flare(sx-r*(mxp>=sx?1:-1)*.99,SY,90+260*a,sk*a);}
+  if(t>=15.6&&t<18.4){label('SUN',sx,SY+r+70,sk*ease((t-15.7)/.4)*ease((18.2-t)/.6),'#ffd9a0',34);label('MOON',mxp,SY+r*mr+70,sk*ease((t-15.7)/.4)*ease((18.2-t)/.6),'#cfd8ff',34)}
+  if(t>=20.2&&t<24.2){const a=ease((t-21.2)/.5)*ease((24.2-t)/.5);label('MOON NEAR APOGEE',SX,SY+r+120,a*sk,'#ffd9a0',32)}
+  x.restore();}
+ // ---- diagram (space)
+ const da=1-sk;if(da>0){x.save();x.globalAlpha=da;
+  if(t<9.2){ // size comparison: the Sun grows from Moon size to 400x (drawn on a compressed scale)
+   const u=eio((t-4.0)/4.0),k=Math.round(Math.pow(400,u));const sr=lerp(46,330,u);
+   sun(560,1000,sr,1);moon(t<8.6?560+sr+80:560+sr+80,1000+sr-46,46,1);
+   const g=cl((t-3.8)/.4)*ease((9.2-t)/.3);x.globalAlpha=da*g;
+   label(k.toLocaleString('en-US')+'x',560,1000+12,1,'#3a1a00',96);label('MOON',560+sr+80,1000+sr+40,1,'#cfd8ff',30);label('SUN DIAMETER vs MOON',W/2,1395,.85,'#d8d2e8',32);}
+  else { // distance + sight lines: eye at bottom, Moon close, Sun far; tangent lines touch both
+   const ey=1290,mY=1160,sY=770,sR=180,mR=sR*(ey-mY)/(ey-sY);const u=eio((t-9.4)/3);
+   const sYd=lerp(mY-60,sY,u),sRd=sR*(ey-sYd)/(ey-sY)*lerp(.45,1,u);
+   sun(540,sYd,sRd,1);moon(540,mY,mR,1);
+   const la=cl((t-12)/.6);x.save();x.globalAlpha=da*la;x.strokeStyle='rgba(255,230,160,.8)';x.lineWidth=3;x.setLineDash([12,10]);
+   [-1,1].forEach(s=>{x.beginPath();x.moveTo(540,ey);x.lineTo(540+s*sR*1.0,sY);x.stroke();});x.restore();
+   x.save();x.globalAlpha=da;x.fillStyle='#7fd4ff';x.beginPath();x.arc(540,ey,12,0,7);x.fill();x.restore();
+   label('YOU',540,ey+52,da,'#7fd4ff',30);label('MOON',540+mR+70,mY+10,da,'#cfd8ff',28);label('SUN',540+sRd+70,sYd+10,da*cl((t-10.5)/.5),'#ffd9a0',30);
+   const k=Math.round(lerp(1,400,Math.pow(u,1.6)));label(k.toLocaleString('en-US')+'x farther',W/2,1335+150,0,'#7fd4ff',34);
+   label('SUN DISTANCE: '+k+'x MOON DISTANCE',W/2,1395,da*cl((t-9.4)/.4),'#7fd4ff',30);}
+  x.restore();}
+ // cards
+ for(const cd of CARDS){const [a,b,l,sz]=cd;if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=30?1:ease((b-t)/.3);card(l,430,sz,Math.min(fi,fo),(1-fi)*30)}}
+ label(sk>.5?'Simulation. Never look at the Sun without eclipse glasses':'Not to scale. Ratios: Sun ~400x wider, ~390x farther',W/2,1432,.6,'#d8d2e8',24);
+ // grade: vignette + grain
+ const vg=x.createRadialGradient(W/2,H*.5,H*.3,W/2,H*.5,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+}
+window.draw=draw;window.TEXREADY=true;
+</script>
