@@ -4,7 +4,7 @@
 precision highp float;
 uniform vec2 R;uniform float T;uniform vec3 SUN;uniform vec3 CP;uniform mat3 CM;uniform float FOV;
 uniform vec4 S0,S1;uniform mat3 M0,M1;uniform float TY0,TY1,SP0,SP1;
-uniform vec3 RN;uniform vec2 RR;uniform float RA,EXPO,SHOWAX,GA,RTY;uniform vec3 OFF,ER;
+uniform vec3 RN;uniform vec2 RR;uniform float RA,EXPO,SHOWAX,GA,RTY;uniform vec3 OFF,ER,SLD;
 float h1(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
 float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(mix(h1(i),h1(i+vec3(1,0,0)),f.x),mix(h1(i+vec3(0,1,0)),h1(i+vec3(1,1,0)),f.x),f.y),
@@ -32,7 +32,7 @@ vec3 alb(float ty,vec3 p){
   c=mix(c,vec3(.55,.52,.52),smoothstep(.78,.95,abs(lat)));
   vec2 q=vec2(atan(p.x,p.z),asin(clamp(lat,-1.,1.))+.384);vec2 ab=vec2(GA,.086);float e=length(q/ab);
   float ang=atan(q.y/ab.y,q.x/ab.x)+3.*(1.-e)+T*.25*(1.2-e);float sw=fbm(vec3(cos(ang)*e*3.,sin(ang)*e*3.,1.));
-  vec3 rs=mix(vec3(.70,.24,.12),vec3(.88,.46,.26),sw);c=mix(c,rs,smoothstep(1.05,.7,e));
+  vec3 rs=mix(vec3(.70,.24,.12),vec3(.88,.46,.26),sw);c=mix(c,rs,smoothstep(1.02,.9,e));
   c=mix(c,vec3(.96,.90,.80),smoothstep(1.3,1.05,e)*smoothstep(.95,1.08,e)*.7);return c;}
  if(ty<2.5){ // saturn
   float w=lat+.02*(fbm(p*5.)-.5);float b=sin(w*22.)*.5+.5,b2=sin(w*57.)*.5+.5;
@@ -66,7 +66,7 @@ vec3 shadeP(vec3 ro,vec3 rd,float t,vec4 S,mat3 M,float ty,float sp,bool rings){
 void main(){
  vec2 uv=(gl_FragCoord.xy-.5*R)/R.x;vec3 rd=normalize(CM*vec3(uv*FOV,-1.));vec3 ro=CP;
  vec3 col=sky(rd);float tmax=1e9;
- float t0=isph(ro,rd,S0),t1=-1.;vec4 S1h=S1;for(int k=0;k<3;k++){float sc=k==0?ER.x:k==1?ER.y:ER.z;if(S1.w*sc<=1e-4)continue;vec4 Sk=vec4(S1.xyz+OFF*float(k),S1.w*sc);float tk=isph(ro,rd,Sk);if(tk>0.&&(t1<0.||tk<t1)){t1=tk;S1h=Sk;}}
+ float t0=isph(ro,rd,S0),t1=-1.;vec4 S1h=S1;for(int k=0;k<3;k++){float sc=k==0?ER.x:k==1?ER.y:ER.z;if(S1.w*sc<=1e-4)continue;float sl=k==0?SLD.x:k==1?SLD.y:SLD.z;vec4 Sk=vec4(S1.xyz+OFF*float(k)+vec3(sl,0.,0.),S1.w*sc);float tk=isph(ro,rd,Sk);if(tk>0.&&(t1<0.||tk<t1)){t1=tk;S1h=Sk;}}
  // halo glow around planets
  for(int k=0;k<2;k++){vec4 S=k==0?S0:S1;if(S.w<=0.)continue;vec3 o=S.xyz-ro;float tc=dot(o,rd);float dd=length(o-rd*tc)/S.w;
   if(tc>0.)col+=atm(k==0?TY0:TY1)*exp(-max(dd-1.,0.)*9.)*.12*smoothstep(-.3,.6,dot(normalize(ro+rd*tc-S.xyz),SUN));}
@@ -76,7 +76,7 @@ void main(){
  float rr;float tr=ringHit(ro,rd,rr);
  if(tr>0.&&tr<tmax){float dn=ringD(rr)*RA;vec3 q=ro+rd*tr;
   float sh=isph(q,SUN,S0)>0.?0.06:1.;float lit=.55+.45*abs(dot(RN,SUN));
-  vec3 rc=ringC(rr)*lit*sh*1.15;float fw=pow(1.-abs(dot(rd,RN)),6.);// forward scatter brightening near edge-on
+  float side=sign(dot(RN,SUN))*sign(dot(RN,-rd));vec3 rc=ringC(rr)*lit*sh*1.15*(side<0.?.72:1.)*(tmax<1e8?.82:1.);float fw=pow(1.-abs(dot(rd,RN)),6.);// forward scatter brightening near edge-on
   col=mix(col,rc,clamp(dn*(1.+fw*.6),0.,.98));}
  // spin-axis line for sphere 0/1
  if(SHOWAX>0.){for(int k=0;k<2;k++){vec4 S=k==0?S0:S1;if(S.w<=0.)continue;mat3 M=k==0?M0:M1;vec3 ax=normalize(vec3(M[0][1],M[1][1],M[2][1]));
@@ -128,7 +128,7 @@ function draw(t){
  gl.uniform4f(U('S0'),...P.c,P.r);gl.uniform4f(U('S1'),...Q.c,Q.r);gl.uniformMatrix3fv(U('M0'),false,tiltM(P.tilt,P.yaw));gl.uniformMatrix3fv(U('M1'),false,tiltM(Q.tilt,Q.yaw));
  gl.uniform1f(U('TY0'),P.ty);gl.uniform1f(U('TY1'),Q.ty);gl.uniform1f(U('SP0'),P.spin);gl.uniform1f(U('SP1'),Q.spin);
  const ring=s.ring||{n:[0,1,0],a:0};gl.uniform3fv(U('RN'),norm(ring.n));gl.uniform1f(U('RA'),ring.a);gl.uniform1f(U('RTY'),ring.ty||0);gl.uniform2f(U('RR'),1.2,2.3);
- gl.uniform1f(U('EXPO'),s.expo||1);gl.uniform1f(U('GA'),s.ga||.127);gl.uniform3fv(U('OFF'),s.off||[0,0,0]);gl.uniform3fv(U('ER'),s.er||[1,0,0]);gl.uniform1f(U('SHOWAX'),s.axis||0);
+ gl.uniform1f(U('EXPO'),s.expo||1);gl.uniform1f(U('GA'),s.ga||.127);gl.uniform3fv(U('OFF'),s.off||[0,0,0]);gl.uniform3fv(U('ER'),s.er||[1,0,0]);gl.uniform3fv(U('SLD'),s.slide||[0,0,0]);gl.uniform1f(U('SHOWAX'),s.axis||0);
  gl.drawArrays(gl.TRIANGLES,0,3);
  x.globalCompositeOperation='source-over';x.globalAlpha=1;x.drawImage(g,0,0);
  x.save();x.globalCompositeOperation='lighter';x.filter='blur(40px)';x.globalAlpha=.30;x.drawImage(g,0,0);x.filter='blur(10px)';x.globalAlpha=.15;x.drawImage(g,0,0);x.restore();
