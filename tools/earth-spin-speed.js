@@ -4,8 +4,8 @@ const TILT=23.44,YAW=150,LON=Math.PI; // texture longitude 0 (Greenwich): London
 const SPIN=t=>-t*2*Math.PI/10; // negative = west-to-east as seen with north up
 function distAt(t){return t<20.5?3.05:t<22.5?lerp(3.05,7.2,eio((t-20.5)/2)):t<26.6?7.2:lerp(7.2,3.05,eio((t-26.6)/2.2))}
 function speedAt(t){
- if(t<16)return 1674;if(t<17.2)return lerp(1674,1042,eio((t-16)/1.2));if(t<20.5)return 1042;
- if(t<23)return lerp(1042,107000,Math.pow(cl((t-20.5)/2.5),2.2));if(t<26.6)return 107000;
+ if(t<15.8)return 1674;if(t<16.3)return lerp(1674,1042,eio((t-15.8)/.5));if(t<20.6)return 1042;
+ if(t<22.5)return lerp(1042,107000,Math.pow(cl((t-20.6)/1.9),2.2));if(t<26.6)return 107000;
  return lerp(107000,1674,eio((t-26.6)/1.2));}
 function wv(M,v){return [M[0]*v[0]+M[1]*v[1]+M[2]*v[2],M[3]*v[0]+M[4]*v[1]+M[5]*v[2],M[6]*v[0]+M[7]*v[1]+M[8]*v[2]]}
 const st0=t=>t<20.8?0:t<22.6?ease((t-20.8)/1.8):t<26.4?1:1-ease((t-26.4)/.8);
@@ -19,9 +19,10 @@ SC={D:30,
   [0,3.5,[["EARTH'S EQUATOR",'#fff'],['SPINS AT','#fff'],['1,674 km/h','#7fd4ff']],116],
   [3.5,8,['One full turn:',['23 h 56 min','#7fd4ff']],104],
   [8,12,['Around the equator:',['40,075 km','#7fd4ff']],100],
-  [12,16,['40,075 km ÷ 23.93 h',['≈ 1,674 km/h','#7fd4ff']],96],
-  [16,20.5,['London, 51.5° N:',['about 1,040 km/h','#ffd36b']],96],
-  [20.5,26.6,['And around the Sun?',['107,000 km/h','#ff9d6b']],100],
+  [12,16,['40,075 km ÷ 23.934 h',['≈ 1,674 km/h','#7fd4ff']],96],
+  [16,20.5,['London, 51.5° N:',['1,042 km/h','#ffd36b']],96],
+  [20.5,22.6,['And around','the Sun?'],104],
+  [22.6,26.6,['Around the Sun:',['107,000 km/h','#ff9d6b']],100],
   [26.6,30.01,[["EARTH'S EQUATOR",'#fff'],['SPINS AT','#fff'],['1,674 km/h','#7fd4ff']],116]],
  overlay(t){
   const s=SC.scene(t);const M=tiltM(TILT,YAW);const sp=SPIN(t),ca=Math.cos(sp),sa=Math.sin(sp);
@@ -33,8 +34,8 @@ SC={D:30,
    for(let i=0;i<=240;i++){const a=i/240*2*Math.PI;const p=toW([Math.cos(a)*1.004,0,Math.sin(a)*1.004]);if(vis(p)){const q=proj(p);on?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]);on=true}else on=false;}
    x.stroke();x.restore();}
   // a point fixed on the ground at the equator (or at 51.5 N) that rides the spin
-  const lat=t<16?0:t<17.2?lerp(0,51.5,eio((t-16)/1.2)):51.5;const la=lat*Math.PI/180;
-  const da=t<3.5?ease((t-0.2)/.5):t<20.5?1:t<21.2?1-ease((t-20.5)/.7):t<27.2?0:ease((t-27.2)/.5);
+  const lat=t<15.8?0:t<16.3?lerp(0,51.5,eio((t-15.8)/.5)):51.5;const la=lat*Math.PI/180;
+  const da=t<3.5?ease((t-0.2)/.5):t<20.5?1:t<21.2?1-ease((t-20.5)/.7):0;
   if(da>0){for(let k=0;k<14;k++){const sk=SPIN(t-k*0.035);const c2=Math.cos(sk),s2=Math.sin(sk);const q0=[Math.cos(la)*Math.cos(LON),Math.sin(la),Math.cos(la)*Math.sin(LON)];
     // texture point q0 -> local l = R(-spin) q0
     const l=[c2*q0[0]-s2*q0[2],q0[1],s2*q0[0]+c2*q0[2]].map(v=>v*1.006);const p=toW(l);if(!vis(p))continue;const q=proj(p);
@@ -47,9 +48,9 @@ SC={D:30,
     const gr=x.createLinearGradient(xx-len,yy,xx,yy);gr.addColorStop(0,'rgba(180,210,255,0)');gr.addColorStop(1,'rgba(200,225,255,'+(.35*st*(.4+.6*fs))+')');
     x.strokeStyle=gr;x.lineWidth=1.5+2*fs;x.beginPath();x.moveTo(xx-len,yy);x.lineTo(xx,yy);x.stroke();}x.restore();}
   // speed gauge (always on, loop-safe)
-  const v=speedAt(t);x.save();x.fillStyle='rgba(8,10,24,.72)';x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=3;x.beginPath();x.roundRect(200,1232,680,160,30);x.fill();x.stroke();x.restore();
-  const lab=t<16.6?'SPIN SPEED AT THE EQUATOR':t<20.8?'SPIN SPEED IN LONDON':t<26.8?'ORBIT SPEED AROUND THE SUN':'SPIN SPEED AT THE EQUATOR';
-  const col=t<16.6?'#7fd4ff':t<20.8?'#ffd36b':t<26.8?'#ff9d6b':'#7fd4ff';
-  const n=v>5000?Math.round(v/1000)*1000:Math.round(v);label(lab,W/2,1282,.85,'#d8d2e8',30);label(n.toLocaleString('en-US')+' km/h',W/2,1360,1,col,68);
+  const v=speedAt(t);const ga=t<3.3?0:t<3.7?ease((t-3.3)/.4):t<26.4?1:1-ease((t-26.4)/.4);if(ga>0){x.save();x.globalAlpha=ga;x.fillStyle='rgba(8,10,24,.72)';x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=3;x.beginPath();x.roundRect(200,1232,680,160,30);x.fill();x.stroke();x.restore();
+  const lab=t<16?'SPIN SPEED AT THE EQUATOR':t<20.6?'SPIN SPEED IN LONDON':t<26.8?'ORBIT SPEED AROUND THE SUN':'SPIN SPEED AT THE EQUATOR';
+  const col=t<16?'#7fd4ff':t<20.6?'#ffd36b':t<26.8?'#ff9d6b':'#7fd4ff';
+  const n=v>5000?Math.round(v/1000)*1000:Math.round(v);label(lab,W/2,1282,.85*ga,'#d8d2e8',30);label(n.toLocaleString('en-US')+' km/h',W/2,1360,ga,col,68);}
   label('Simulated view. Spin sped up',W/2,1428,.7,'#d8d2e8',26)}
 };

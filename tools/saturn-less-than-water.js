@@ -2,7 +2,7 @@ function rowY(tilt,yaw){const M=tiltM(tilt,yaw);return [M[1],M[4],M[7]]}
 const eout=u=>{u=cl(u);return 1-Math.pow(1-u,3)};
 const TILT=-24,YAW=90;
 // water level: 0 = off-screen below, 1 = waterline at 0.26 R above centre (a sphere with 0.69 of its volume submerged)
-function wAt(t){return t<20.6?0:t<22.8?eio((t-20.6)/2.2):t<26.4?1:t<27.6?1-eio((t-26.4)/1.2):0}
+function wAt(t){return t<20.6?0:t<22.8?eio((t-20.6)/2.2):t<25.6?1:t<26.6?1-eio((t-25.6)/1.0):0}
 SC={D:30,
  scene(t){
   const u=t/30,az=0.28*Math.sin(2*Math.PI*u),d=5.9-0.5*Math.sin(Math.PI*u)**2;
@@ -30,7 +30,7 @@ SC={D:30,
    // caustic shimmer
    x.save();x.globalCompositeOperation='lighter';for(let i=0;i<26;i++){const r=Math.sin(i*91.7)*4373.1,fx=r-Math.floor(r);const xx=(fx*W+t*40*(i%3-1))%W,yy=yl+30+((i*53)%300);
     x.globalAlpha=.10*wl*(.5+.5*Math.sin(t*3+i));x.fillStyle='#bfe8ff';x.beginPath();x.ellipse(xx,yy,60,6,0,0,7);x.fill();}x.restore();
-   const la=Math.min(ease((t-22.2)/.5),1-ease((t-26.2)/.4));label('69% of its volume',W/2,1250,la,'#ffffff',52);label('below the waterline',W/2,1316,la,'#ffffff',52);}
+   const la=Math.min(ease((t-22.2)/.5),1-ease((t-25.4)/.4));label('69% of its volume',W/2,1250,la,'#ffffff',52);label('below the waterline',W/2,1316,la,'#ffffff',52);}
   // stat box
   const box=(a)=>{x.save();x.globalAlpha=a;x.fillStyle='rgba(8,10,24,.74)';x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=3;x.beginPath();x.roundRect(130,1200,820,210,30);x.fill();x.stroke();x.restore();};
   const bar=(nm,txt,frac,col,y,a)=>{if(a<=0)return;x.save();x.globalAlpha=a;x.fillStyle='rgba(255,255,255,.12)';x.fillRect(330,y,420,36);x.fillStyle=col;x.fillRect(330,y,420*cl(frac),36);

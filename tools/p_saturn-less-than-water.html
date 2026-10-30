@@ -114,7 +114,7 @@ function tiltM(tiltDeg,yawDeg){const a=tiltDeg*Math.PI/180,b=(yawDeg||0)*Math.PI
 const F='"DejaVu Sans",Arial,sans-serif';
 function card(lines,y,size,alpha,dy){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.textAlign='center';
  let mw=0;x.font='900 '+size+'px '+F;lines.forEach(l=>{mw=Math.max(mw,x.measureText(typeof l==='string'?l:l[0]).width)});
- if(mw>940){size=Math.floor(size*940/mw);x.font='900 '+size+'px '+F}x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=24;
+ if(mw>780){size=Math.floor(size*780/mw);x.font='900 '+size+'px '+F}x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=24;
  lines.forEach((l,i)=>{x.fillStyle=typeof l==='string'?'#fff':l[1];x.fillText(typeof l==='string'?l:l[0],W/2,y+i*size*1.18+(dy||0))});x.restore()}
 function label(s,px,py,alpha,col,size){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.font='800 '+(size||40)+'px '+F;x.textAlign='center';
  x.fillStyle=col||'#fff';x.shadowColor='#000';x.shadowBlur=12;x.fillText(s,px,py);x.restore()}
