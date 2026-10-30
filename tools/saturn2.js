@@ -16,7 +16,7 @@ SC={D:30,
   [6.5,10.5,['...and they','almost vanish.'],104],
   [10.5,15,['Yet they span about',['270,000 km.','#ffcf6b']],100],
   [15,20,['Earth last lined up:',['March 2025.','#ffcf6b']],100],
-  [20,25,['It happens twice','per Saturn orbit','(29.4 years).'],96],
+  [20,25,['Twice per','Saturn orbit',['(29.4 years).','#ffcf6b']],100],
   [25,30.01,[["SATURN'S RINGS:",'#fff'],["TYPICALLY ONLY",'#fff'],['10 m THICK','#ffcf6b']],116]],
  overlay(t){label('Simulated view',W/2,1480,.75,'#d8d2e8',28)}
 };
