@@ -36,8 +36,8 @@ SC={D:30,
    const nc=t<12.4?0:Math.min(11,Math.floor((t-12.4)/0.09)+1);
    for(let i=0;i<nc;i++){if(i===5)continue;const py=-1+RE+i*2*RE*0.9993;earthSprite(c[0],c[1]-py*R,er,i+20,fade);}
    const txt=t<12.4?'11':t<13.6?'11 × 11':t<15?'11 × 11 × 11':'≈ '+Math.round(lerp(121,1321,eio((t-15)/1.6))).toLocaleString('en-US');
-   x.save();x.globalAlpha=fade;x.fillStyle='rgba(8,10,24,.75)';x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=3;x.beginPath();x.roundRect(170,1290,740,180,30);x.fill();x.stroke();x.restore();
-   label(txt,W/2,1385,fade,t<15?'#fff':'#ffb27a',64);label('Exact width ratio 10.97 → 10.97³ = 1,321',W/2,1442,fade*.85,'#d8d2e8',28);}
+   x.save();x.globalAlpha=fade;x.fillStyle='rgba(8,10,24,.75)';x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=3;x.beginPath();x.roundRect(170,1260,740,180,30);x.fill();x.stroke();x.restore();
+   label(txt,W/2,1352,fade,t<15?'#fff':'#ffb27a',64);label('Exact width ratio 10.97 → 10.97³ ≈ 1,321',W/2,1414,fade*.85,'#d8d2e8',32);}
   if(t>=18&&t<26.6){const a=Math.min(ease((t-18.3)/.5),ease((26.6-t)/.4));
    x.save();x.globalAlpha=a*.8;x.fillStyle='rgba(6,8,20,.75)';x.beginPath();x.roundRect(110,1060,860,440,30);x.fill();x.restore();
    const bars=[['VOLUME',1321,'#ffb27a',1150],['MASS',318,'#9fd0ff',1290]];
