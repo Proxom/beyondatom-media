@@ -3,11 +3,13 @@ const TILT=23.44,YAW=150;const OR=(6371+420)/6371; // ISS orbit radius in Earth 
 const PER=92; // minutes per orbit
 // simulated minutes per real second
 function rate(t){if(t<3.5)return 30;if(t<12)return 21.6;if(t<21.6)return lerp(21.6,PK,ease((t-12)/9.6));if(t<22.6)return lerp(PK,21.6,ease(t-21.6));if(t<26.6)return 21.6;return lerp(21.6,30,ease((t-26.6)/1));}
-let PK=200,TAU=[];function build(){TAU=[0];for(let i=1;i<=9000;i++){const t=(i-.5)/300;TAU.push(TAU[i-1]+rate(t)/300);}}
+let PK=200,TAU=[];function build(){TAU=[0];for(let i=1;i<=9000;i++){const t=(i-.5)/300;TAU.push(TAU[i-1]+rate(t)/300);}
+ // loop: make the whole 30 s span a whole number of orbits so the last frame matches the first
+ const dl=TAU[9000]%PER;for(let i=0;i<=9000;i++)TAU[i]-=dl*i/9000;}
 // peak speed chosen so the 24-hour clock completes at t = 21.9 s
-(function(){let lo=50,hi=1000;for(let k=0;k<40;k++){PK=(lo+hi)/2;build();(TAU[Math.round(21.9*300)]-TAU[Math.round(3.5*300)]>1440)?hi=PK:lo=PK;}})();
+(function(){let lo=50,hi=1000;for(let k=0;k<40;k++){PK=(lo+hi)/2;build();(TAU[Math.round(21.9*300)]>1440)?hi=PK:lo=PK;}})();
 const tau=t=>{const f=cl(t,0,30)*300,i=Math.floor(f);return i>=9000?TAU[9000]:lerp(TAU[i],TAU[i+1],f-i)};
-const T0=tau(3.5);
+const DFR=TAU[9000]/1440-Math.round(TAU[9000]/1440);const T0=0; // the 24-hour clock starts at the first frame
 const SUN=norm([0.9,0.25,0.35]);
 // orbit plane: Earth's spin axis tilted by 51.6 deg (the ISS inclination), opened toward the camera
 function rowY(tilt,yaw){const M=tiltM(tilt,yaw);return [M[1],M[4],M[7]]}
@@ -16,8 +18,8 @@ const N=norm(AX.map((a,i)=>a*Math.cos(INC)-Wv[i]*Math.sin(INC)));
 const E1=norm(cross(N,[0,1,0].map((v,i)=>v+0.001*i)));const E2=cross(N,E1);
 let PH0=0;const isP=(m)=>{const a=PH0+2*Math.PI*m/PER;return [0,1,2].map(i=>OR*(E1[i]*Math.cos(a)+E2[i]*Math.sin(a)))};
 const lit=m=>{const p=isP(m);return p[0]*SUN[0]+p[1]*SUN[1]+p[2]*SUN[2]};
-// choose the start phase so the first sunrise comes 10 simulated minutes after the clock starts, and it happens on the camera side
-(function(){let best=0,bs=1e9;for(let k=0;k<720;k++){PH0=k/720*2*Math.PI;const m=T0+10;if(lit(m-0.5)<0&&lit(m+0.5)>0){const z=isP(m)[2];if(z>0&&Math.abs(lit(m))<bs){bs=Math.abs(lit(m));best=PH0;}}}PH0=best;})();
+// choose the start phase so the first sunrise comes ~4.5 simulated minutes (0.15 s) after the first frame, on the camera side
+(function(){let best=0,bs=1e9;for(let k=0;k<720;k++){PH0=k/720*2*Math.PI;const m=4.5;if(lit(m-0.5)<0&&lit(m+0.5)>0){const z=isP(m)[2];if(z>0&&Math.abs(lit(m))<bs){bs=Math.abs(lit(m));best=PH0;}}}PH0=best;})();
 // sunrise times in real seconds (for counter, flashes and sound)
 const SR=[];for(let i=1;i<=9000;i++){const a=lit(TAU[i-1]),b=lit(TAU[i]);if(a<0&&b>=0)SR.push(i/300);}
 window.SUNRISES=SR;
@@ -28,14 +30,14 @@ SC={D:30,
   const az=0.10*Math.sin(2*Math.PI*t/30);const d=2.95-0.1*Math.sin(Math.PI*t/30)**2;
   const eye=[d*Math.sin(az)+0.012*Math.sin(2*Math.PI*t/15),-0.02+0.012*Math.sin(2*Math.PI*t/10),d*Math.cos(az)];
   return {eye,tgt:[0,-0.06,0],fov:.9,sun:SUN,
-   p:{c:[0,0,0],r:1,ty:0,tilt:TILT,yaw:YAW,spin:-tau(t)/1440*2*Math.PI},ring:{n:[0,1,0],a:0},expo:1.2};},
+   p:{c:[0,0,0],r:1,ty:0,tilt:TILT,yaw:YAW,spin:-2*Math.PI*(tau(t)/1440-DFR*t/30)},ring:{n:[0,1,0],a:0},expo:1.38};},
  cards:[
-  [0,3.5,[['ASTRONAUTS SEE','#fff'],['16 SUNRISES','#ffcf6b'],['EVERY DAY','#fff']],112],
+  [0,3.5,[['ASTRONAUTS SEE','#fff'],['16 SUNRISES','#ffcf6b'],['EVERY DAY','#fff']],104],
   [3.5,8,['The space station',['circles Earth','#7fd4ff'],'every ~90 minutes'],92],
   [8,12,['Speed: about',['28,000 km/h','#7fd4ff']],104],
   [12,22.6,['24 hours in orbit:',['count the sunrises','#ffcf6b']],92],
-  [22.6,26.6,['Yet the crew still',['sleeps on a','#fff'],['24-hour clock','#7fd4ff']],96],
-  [26.6,30.01,[['ASTRONAUTS SEE','#fff'],['16 SUNRISES','#ffcf6b'],['EVERY DAY','#fff']],112]],
+  [22.6,26.6,['But they sleep on',['a 24-hour clock','#7fd4ff']],100],
+  [26.6,30.01,[['ASTRONAUTS SEE','#fff'],['16 SUNRISES','#ffcf6b'],['EVERY DAY','#fff']],104]],
  overlay(t){
   const s=SC.scene(t);const eye=s.eye;const m=tau(t);
   // orbit path (faint), front parts only
@@ -56,11 +58,11 @@ SC={D:30,
    x.fillStyle=sg;x.fillRect(q[0]-520,q[1]-3,1040,6);x.restore();}
   // counter box: clock + sunrise count
   const ga=t<3.4?0:t<3.8?ease((t-3.4)/.4):t<26.4?1:1-ease((t-26.4)/.4);
-  if(ga>0){x.save();x.globalAlpha=ga;x.fillStyle='rgba(8,10,24,.72)';x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=3;x.beginPath();x.roundRect(170,1222,740,180,30);x.fill();x.stroke();x.restore();
+  if(ga>0){x.save();x.globalAlpha=ga;x.fillStyle='rgba(8,10,24,.72)';x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=3;x.beginPath();x.roundRect(170,1190,740,180,30);x.fill();x.stroke();x.restore();
    const el=cl(m-T0,0,1440);const hh=Math.floor(el/60),mm=Math.floor(el%60);
-   label('TIME IN ORBIT',350,1272,.85*ga,'#d8d2e8',28);label(hh+' h '+String(mm).padStart(2,'0')+' min',350,1350,ga,'#7fd4ff',54);
+   label('TIME IN ORBIT',350,1240,.85*ga,'#d8d2e8',28);label(hh+' h '+String(mm).padStart(2,'0')+' min',350,1318,ga,'#7fd4ff',54);
    const n=cnt(t);let pop=0;for(const sr of SR){const dt=t-sr;if(dt>=0&&dt<.35)pop=1-dt/.35;}
-   label('SUNRISES',730,1272,.85*ga,'#d8d2e8',28);label(String(n),730,1352+0,ga,'#ffcf6b',62+18*pop);}
-  label('Simulated view. Time sped up',W/2,1440,.7,'#d8d2e8',26);
+   label('SUNRISES',730,1240,.85*ga,'#d8d2e8',28);label(String(n),730,1320+0,ga,'#ffcf6b',62+18*pop);}
+  x.save();x.globalAlpha=.75;x.fillStyle='rgba(0,0,0,.55)';x.beginPath();x.roundRect(W/2-230,1384,460,40,20);x.fill();x.restore();label('Simulated view. Time sped up',W/2,1413,.8,'#d8d2e8',26);
  }
 };
