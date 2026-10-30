@@ -40,13 +40,15 @@ vec3 alb(float ty,vec3 p){
   return mix(c,vec3(.62,.66,.66),smoothstep(.75,.97,abs(lat)));}
  // uranus
  float w=lat+.015*(fbm(p*4.)-.5);vec3 c=mix(vec3(.55,.80,.86),vec3(.66,.88,.91),sin(w*12.)*.5+.5);c*=.94+.08*fbm(p*9.);
- return mix(c,vec3(.80,.94,.95),smoothstep(.55,.85,lat)*.6);}
+ c=mix(c,vec3(.80,.94,.95),smoothstep(.55,.85,lat)*.6);
+ float cl=smoothstep(.72,.8,fbm(vec3(p.x*3.,lat*14.,p.z*3.)))*smoothstep(.15,.3,abs(lat))*smoothstep(.75,.6,abs(lat));
+ return mix(c,vec3(.97,1.,1.),cl*.7);}
 vec3 atm(float ty){return ty<.5?vec3(.3,.55,1.):ty<1.5?vec3(.9,.8,.6):ty<2.5?vec3(.95,.85,.6):vec3(.5,.9,1.);}
 float isph(vec3 ro,vec3 rd,vec4 s){vec3 o=ro-s.xyz;float b=dot(o,rd),c=dot(o,o)-s.w*s.w,h=b*b-c;if(h<0.)return -1.;return -b-sqrt(h);}
 float ringD(float r){ // ring optical density vs radius in planet radii
  float d=0.;
  if(RTY>.5){float rs[9];rs[0]=1.64;rs[1]=1.68;rs[2]=1.75;rs[3]=1.79;rs[4]=1.84;rs[5]=1.86;rs[6]=1.88;rs[7]=1.91;rs[8]=2.0;
-  for(int i=0;i<9;i++){float wd=i==8?.012:.004;d+=smoothstep(wd,wd*.3,abs(r-rs[i]))*(i==8?.75:.45);}return clamp(d,0.,1.);}
+  for(int i=0;i<9;i++){float wd=i==8?.012:.004;d+=smoothstep(wd,wd*.3,abs(r-rs[i]))*(i==8?.45:.27);}return clamp(d,0.,1.);}
  d+=smoothstep(1.24,1.26,r)*smoothstep(1.53,1.51,r)*.25;   // C ring
  d+=smoothstep(1.52,1.53,r)*smoothstep(1.95,1.94,r)*.95;   // B ring
  d+=smoothstep(2.025,2.035,r)*smoothstep(2.27,2.26,r)*.6;  // A ring
