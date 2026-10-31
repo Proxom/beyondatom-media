@@ -1,5 +1,5 @@
 // Moon tidal locking: spin period = orbit period, so the near side always faces Earth.
-const D=1.95,MR=0.31; // orbit radius / Moon radius in Earth radii (not to scale)
+const D=1.85,MR=0.30; // orbit radius / Moon radius in Earth radii (not to scale)
 const SUNV=[1,0.32,0.45];
 // orbit angle: integrate a speed profile, scaled so 30 s = exactly 3 orbits (seamless loop)
 function rate(t){if(t<3)return .12;if(t<5.5)return lerp(.12,1,ease((t-3)/2.5));if(t<26.5)return 1;if(t<28.5)return lerp(1,.12,ease((t-26.5)/2));return .12;}
@@ -11,11 +11,11 @@ const GA=14.2,GB=18.4;
 function off(t){if(t<GA)return 0;if(t<GB)return th(t)-th(GA);return (th(GB)-th(GA))*(1-eio((t-GB)/1.1));}
 const spin=t=>th(t)+Math.PI-off(t);
 // bar start time chosen so ORBIT and SPIN reach exactly 27.3 d (one full turn) at 14.05 s
-const B0=(function(){let lo=4,hi=8;for(let i=0;i<50;i++){const m=(lo+hi)/2;(th(14.05)-th(m)>2*Math.PI)?lo=m:hi=m;}return (lo+hi)/2})();
+const B0=(function(){let lo=4,hi=8;for(let i=0;i<50;i++){const m=(lo+hi)/2;(th(13.7)-th(m)>2*Math.PI)?lo=m:hi=m;}return (lo+hi)/2})();
 const mpos=t=>{const a=th(t);return [D*Math.cos(a),0,D*Math.sin(a)]};
 function nearDir(t){const s=spin(t);return [Math.cos(s),0,Math.sin(s)]} // world dir of the near-side centre
 // camera: hook = over Earth's limb looking at the Moon; overview = high 3/4 view
-function camHook(t){const m=mpos(t);const d=norm(m);return {eye:[d[0]*1.35,0.78,d[2]*1.35],tgt:[m[0],m[1]-0.06,m[2]],fov:1.1}}
+function camHook(t){const m=mpos(t);const d=norm(m);return {eye:[d[0]*1.05,0.1,d[2]*1.05],tgt:[m[0],m[1]+0.03,m[2]],fov:t<15?1.45-0.1*ease(t/3.2):1.45}}
 function camOver(t){const sw=0.03*Math.sin(2*Math.PI*t/10);return {eye:[sw,3.3,6.2],tgt:[0,-0.5,0.1],fov:.84}}
 function cam(t){const a=t<3?0:t<5.8?eio((t-3)/2.8):t<27?1:t<29.6?1-eio((t-27)/2.6):0;
  const h=camHook(t),o=camOver(t);if(a<=0)return h;if(a>=1)return o;
@@ -49,7 +49,7 @@ SC={D:30,
    const col=face>0.9?'#7dffb0':'#ff7a6a';
    const hid=(p)=>{const dv=p.map((v,i)=>v-eye[i]);const L=Math.hypot(...dv);const u=dv.map(v=>v/L);const b=eye[0]*u[0]+eye[1]*u[1]+eye[2]*u[2];const cc=eye[0]**2+eye[1]**2+eye[2]**2-1;const h=b*b-cc;if(h<0)return false;const t0=-b-Math.sqrt(h);return t0>0&&t0<L;};
    const occ=hid(m)?0:1;const q=proj(pm),qm=proj(m);
-   const tip=proj(m.map((v,i)=>v+nd[i]*MR*2.1));
+   const tip=proj(m.map((v,i)=>v+nd[i]*MR*1.85));
    x.save();x.globalAlpha=A*occ;x.strokeStyle=col;x.lineWidth=6;x.shadowColor=col;x.shadowBlur=14;x.beginPath();x.moveTo(q[0],q[1]);x.lineTo(tip[0],tip[1]);x.stroke();
    const ang=Math.atan2(tip[1]-q[1],tip[0]-q[0]);x.fillStyle=col;x.beginPath();x.moveTo(tip[0]+Math.cos(ang)*18,tip[1]+Math.sin(ang)*18);
    x.lineTo(tip[0]+Math.cos(ang+2.4)*16,tip[1]+Math.sin(ang+2.4)*16);x.lineTo(tip[0]+Math.cos(ang-2.4)*16,tip[1]+Math.sin(ang-2.4)*16);x.fill();
