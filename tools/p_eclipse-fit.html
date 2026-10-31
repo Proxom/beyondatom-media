@@ -1,6 +1,6 @@
 <!doctype html><meta charset=utf8><body style="margin:0;background:#000"><canvas id=c width=1080 height=1920></canvas><script>
 // Why the Moon fits the Sun: Sun ~400x wider, ~400x farther -> same apparent size; annular at apogee; next total eclipse 2 Aug 2027.
-const c=document.getElementById('c'),x=c.getContext('2d'),W=1080,H=1920,F='"DejaVu Sans",Arial,sans-serif';
+const c=document.getElementById('c');let x=c.getContext('2d');const MAIN=x;const LAY=document.createElement('canvas');LAY.width=1080;LAY.height=1920;const LX=LAY.getContext('2d');const W=1080,H=1920,F='"DejaVu Sans",Arial,sans-serif';
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2},lerp=(a,b,t)=>a+(b-a)*t;
 let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
 const mk=(w,h)=>{const o=document.createElement('canvas');o.width=w;o.height=h;return o};
@@ -30,10 +30,11 @@ const MOON=mk(400,400),mx=MOON.getContext('2d');(function(){const im=mx.createIm
 // --- stars and horizon
 const ST=[];for(let i=0;i<260;i++)ST.push([rnd()*W,rnd()*H*.85,rnd()*1.7+.3,rnd()*6.28,rnd()]);
 const HILL=[];for(let i=0;i<=54;i++){HILL.push(1690+Math.sin(i*.37)*28+Math.sin(i*1.31+1)*14+(rnd()-.5)*10)}
-function sky(sk,t){ // sk = 1: twilight sky during totality, 0: space
+function sky(sk,t,ann){ // sk = 1: twilight sky during totality, 0: space
  x.fillStyle='#02030a';x.fillRect(0,0,W,H);
  if(sk>0){const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(8,14,40,'+sk+')');g.addColorStop(.62,'rgba(22,30,70,'+sk+')');g.addColorStop(.82,'rgba(120,70,70,'+sk+')');g.addColorStop(.88,'rgba(240,150,80,'+sk+')');g.addColorStop(1,'rgba(30,20,30,'+sk+')');x.fillStyle=g;x.fillRect(0,0,W,H);}
- for(const s of ST){const a=(1-sk*.7)*(.35+.35*Math.sin(t*1.3+s[3]))*(s[4]<.2||sk<.5?1:.4);if(a<=.02)continue;x.globalAlpha=a;x.fillStyle='#fff';x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill();}x.globalAlpha=1;
+ if(ann>0){x.fillStyle='rgba(70,110,175,'+(.6*ann)+')';x.fillRect(0,0,W,H);}
+ for(const s of ST){const a=(1-sk*.7)*(1-(ann||0))*(.35+.35*Math.sin(t*1.3+s[3]))*(s[4]<.2||sk<.5?1:.4);if(a<=.02)continue;x.globalAlpha=a;x.fillStyle='#fff';x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill();}x.globalAlpha=1;
  if(sk>0){x.save();x.globalAlpha=sk;x.fillStyle='#05050a';x.beginPath();x.moveTo(0,H);HILL.forEach((y,i)=>x.lineTo(i*W/54,y));x.lineTo(W,H);x.fill();x.restore();}}
 function sun(px,py,r,a){if(a<=0)return;x.save();x.globalAlpha=a;x.globalCompositeOperation='lighter';
  const gl=x.createRadialGradient(px,py,r*.5,px,py,r*4);gl.addColorStop(0,'rgba(255,240,200,.9)');gl.addColorStop(.3,'rgba(255,200,120,.25)');gl.addColorStop(1,'rgba(255,160,80,0)');x.fillStyle=gl;x.fillRect(px-r*4,py-r*4,r*8,r*8);
@@ -62,19 +63,19 @@ const SX=540,SY=930; // sky position of the Sun
 // dip transitions (no cross-dissolve): sky out 3.3-3.7, diagram in 3.7-4.1; diagram out 14.0-14.4, sky in 14.4-14.8
 const skyA=t=>t<3.3?1:t<3.7?1-ease((t-3.3)/.4):t<14.4?0:t<14.8?ease((t-14.4)/.4):1;
 const diaA=t=>t<3.7?0:t<4.1?ease((t-3.7)/.4):t<14.0?1:t<14.4?1-ease((t-14)/.4):0;
-const sizeA=t=>t<8.7?1:t<9.1?1-ease((t-8.7)/.4):0, distA=t=>t<9.0?0:t<9.4?ease((t-9.0)/.4):1;
+const sizeA=t=>t<8.6?1:t<9.2?1-ease((t-8.6)/.6):0, distA=t=>t<8.8?0:t<9.4?ease((t-8.8)/.6):1;
+function layer(a,fn){if(a<=0)return;x=LX;x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.globalCompositeOperation='source-over';x.clearRect(0,0,W,H);fn();x=MAIN;x.save();x.globalAlpha=a;x.drawImage(LAY,0,0);x.restore();}
 function draw(t){
  const sk=skyA(t),da=diaA(t);
  let off,mr;
- if(t<15){off=t<2.4?0:t<3.3?lerp(0,.12,eio((t-2.4)/.9)):.12;mr=1.035;}
+ if(t<14){off=t<2.4?0:t<3.3?lerp(0,.12,eio((t-2.4)/.9)):.12;mr=1.035;}
  else if(t<19.4){off=t<15.6?2.4:t<18.6?lerp(2.4,0,eio((t-15.6)/3)):0;mr=1.035;}
  else {off=0;mr=t<20.2?1.035:t<21.4?lerp(1.035,.94,eio((t-20.2)/1.2)):t<24.5?.94:t<25.5?lerp(.94,1.035,eio((t-24.5)/1)):1.035}
  const ann=1-ease((mr-.94)/(1.035-.94)); // 0 = total, 1 = full annular look
  x.fillStyle='#02030a';x.fillRect(0,0,W,H);
- if(sk>0){x.save();x.globalAlpha=sk;sky(1,t);
-  if(ann>0){x.fillStyle='rgba(70,110,175,'+(.6*ann)+')';x.fillRect(0,0,W,1700);} // brighter sky, stars washed out during the annular phase
+ layer(sk,()=>{x.save();sky(1,t,ann);
   const push=t<3.3?1+.04*ease(t/3.3):1; // slow push-in on the hook
-  const sx=SX+(t>=15&&t<19.4?-off*R0*.5:0),mxp=SX+(t>=15&&t<19.4?off*R0*.5:off*R0*push),r=R0*push;
+  const sx=SX+(t>=14&&t<19.4?-off*R0*.5:0),mxp=SX+(t>=14&&t<19.4?off*R0*.5:off*R0*push),r=R0*push;
   const cov=Math.abs(mxp-sx)/r;const totS=cl(1-(cov-(mr-1))/.25)*(1-ann);
   corona(sx,SY,r,totS,t);
   if(ann>0){x.save();x.globalCompositeOperation='lighter';x.globalAlpha=ann;const gg=x.createRadialGradient(sx,SY,r*.9,sx,SY,r*3.2);gg.addColorStop(0,'rgba(255,230,180,.85)');gg.addColorStop(.25,'rgba(255,190,110,.3)');gg.addColorStop(1,'rgba(255,150,80,0)');x.fillStyle=gg;x.fillRect(0,0,W,H);x.restore();}
@@ -84,22 +85,20 @@ function draw(t){
   moon(mxp,SY,r*mr,1); // opaque Moon drawn over the bead glow
   if(t>=15.6&&t<18.4){const a=ease((t-15.7)/.4)*ease((18.2-t)/.6);label('SUN',sx,SY+r+70,a,'#ffd9a0',34);label('MOON',mxp,SY+r*mr+70,a,'#cfd8ff',34)}
   if(t>=20.4&&t<24.4){const a=ease((t-21.2)/.5)*ease((24.4-t)/.4);label('MOON NEAR APOGEE',SX,SY+r+120,a,'#ffd9a0',32)}
-  x.restore();}
- if(da>0){x.save();
-  const A1=da*sizeA(t);if(A1>0){x.globalAlpha=A1; // size comparison on a compressed scale
+  x.restore();});
+ {const A1=da*sizeA(t);layer(A1,()=>{const A1=1; // size comparison on a compressed scale
    const u=eio((t-4.1)/4.0),k=Math.round(Math.pow(400,u));const sr=lerp(46,270,u);
    sun(600,1000,sr,1);x.globalAlpha=A1;moon(600-sr-90,1000+sr-46,46,1);
-   label(k.toLocaleString('en-US')+'x',600,1000+(sr>110?24:sr+90),A1,sr>110?'#3a1a00':'#ffd9a0',sr>110?96:56);label('MOON',600-sr-90,1000+sr+40,A1,'#cfd8ff',30);label('SUN DIAMETER vs MOON',W/2,1395,.85*A1,'#d8d2e8',32);}
-  const A2=da*distA(t);if(A2>0){ // distance: Sun far, Moon near; tangent sight lines show equal apparent size
+   label(k.toLocaleString('en-US')+'x',600,1000+(sr>110?24:sr+90),A1,sr>110?'#3a1a00':'#ffd9a0',sr>110?96:56);label('MOON',600-sr-90,1000+sr+40,A1,'#cfd8ff',30);label('SUN DIAMETER vs MOON',W/2,1395,.85*A1,'#d8d2e8',32);});
+  const A2o=da*distA(t);layer(A2o,()=>{const A2=1; // distance: Sun far, Moon near; tangent sight lines show equal apparent size
    const ey=1290,mY=1160,sY=770,sR=180,mR=sR*(ey-mY)/(ey-sY);const u=eio((t-9.4)/3);
    x.globalAlpha=A2;sun(540,sY,sR,1);x.globalAlpha=A2;moon(540,mY,mR,1);
    const ll=eio((t-9.3)/1.4);x.save();x.globalAlpha=A2;x.strokeStyle='rgba(255,230,160,.85)';x.lineWidth=3;x.setLineDash([12,10]);
    [-1,1].forEach(s=>{x.beginPath();x.moveTo(540,ey);x.lineTo(540+s*sR*ll,ey-(ey-sY)*ll);x.stroke();});x.restore();
    x.save();x.globalAlpha=A2;x.fillStyle='#7fd4ff';x.beginPath();x.arc(540,ey,12,0,7);x.fill();x.restore();
    label('YOU',540,ey+52,A2,'#7fd4ff',30);label('MOON',540+mR+70,mY+10,A2,'#cfd8ff',28);label('SUN',540+sR+70,sY+10,A2,'#ffd9a0',30);
-   const k=Math.round(lerp(1,400,Math.pow(u,1.6)));
-   label('SUN DISTANCE: '+k+'x MOON DISTANCE',W/2,1395,A2,'#7fd4ff',30);}
-  x.restore();}
+   const k=Math.round(lerp(20,400,Math.pow(u,1.6)));
+   label('SUN DISTANCE: '+k+'x MOON DISTANCE',W/2,1395,cl((t-9.5)/.3),'#7fd4ff',30);});}
  // cards
  for(const cd of CARDS){const [a,b,l,sz]=cd;if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=30?1:ease((b-t)/.3);card(l,430,sz,Math.min(fi,fo),(1-fi)*30)}}
  label(sk>=da?'Simulation. Never look at the Sun without eclipse glasses':'Not to scale. Ratios: Sun ~400x wider, ~390x farther',W/2,1432,.6,'#d8d2e8',24);
