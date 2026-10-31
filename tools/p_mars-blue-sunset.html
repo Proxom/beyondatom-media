@@ -1,0 +1,122 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=g width=1080 height=1920 style="display:none"></canvas><canvas id=c width=1080 height=1920></canvas>
+<script id=fs type=x-shader>
+// Mars sunset: ray-cast ground plane + layered ridge silhouettes with aerial perspective, dusty sky with forward-scattering blue aureole.
+precision highp float;
+uniform vec2 R;uniform float T,SE,DAY,SC,FL,EXPO;uniform vec2 ANC,ANT;uniform vec3 CP;
+float h1(vec2 p){vec3 q=fract(vec3(p.xyx)*.1031);q+=dot(q,q.yzx+33.33);return fract((q.x+q.y)*q.z);}
+float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h1(i),h1(i+vec2(1,0)),f.x),mix(h1(i+vec2(0,1)),h1(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*n2(p);p=p*2.03+vec2(1.7,9.2);a*=.5;}return s;}
+float n1(float x){float i=floor(x),f=fract(x);f=f*f*(3.-2.*f);return mix(h1(vec2(i,.5)),h1(vec2(i+1.,.5)),f);}
+float fb1(float x,int o){float a=.5,s=0.;for(int i=0;i<7;i++){if(i>=o)break;s+=a*n1(x);x=x*2.07+3.1;a*=.5;}return s;}
+// rocks: cellular bumps
+float rocks(vec2 p){vec2 i=floor(p),f=fract(p);float h=0.;
+ for(int y=-1;y<=1;y++)for(int x=-1;x<=1;x++){vec2 g=vec2(x,y);float r=h1(i+g);if(r<.6)continue;vec2 o=vec2(h1(i+g+3.1),h1(i+g+7.7));
+  float sz=.12+.32*pow(h1(i+g+5.3),2.5);vec2 dv=g+o-f;float an=atan(dv.y,dv.x);
+  float d=length(dv)/sz*(1.+.28*(n2(vec2(an*1.6+r*40.,r*9.))-.5)+.12*(n2(vec2(an*5.+r*17.,1.))-.5));
+  float hh=sz*(.9+.8*h1(i+g+2.2))*pow(max(1.-d*d,0.),.75)*(.75+.5*n2((p+g)*7.))+.02*sz*n2((p+g)*31.)*step(d,1.);h=max(h,hh);}return h;}
+float gh(vec2 p){return .35*fbm(p*.08)+.06*fbm(p*.7)+rocks(p*.55)*1.6+rocks(p*1.9+11.)*.35+.015*n2(p*6.);}
+vec3 SUN;
+vec3 skyc(vec3 rd){
+ float th=acos(clamp(dot(rd,SUN),-1.,1.));float el=rd.y;
+ // day: butterscotch
+ vec3 dh=vec3(.80,.60,.42),dz=vec3(.55,.38,.27);vec3 day=mix(dh,dz,smoothstep(0.,.7,el));
+ day+=vec3(.95,.85,.70)*exp(-th/.22)*.55+vec3(1.,.95,.85)*exp(-th/.05)*.6;
+ // sunset: dusky brown sky, cool blue forward-scatter aureole elongated along the horizon
+ vec3 sh=vec3(.20,.13,.09),sz=vec3(.05,.04,.05);vec3 sun=mix(sh,sz,smoothstep(0.,.5,el));
+ vec3 dd=rd-SUN;float thA=length(vec2(dd.x*.62,dd.y*1.15));
+ sun+=vec3(.20,.42,.85)*(exp(-thA/.16)*.95)+vec3(.30,.55,1.)*exp(-thA/.055)*1.3+vec3(.75,.88,1.)*exp(-th/.012)*1.4;
+ sun+=vec3(.16,.12,.10)*exp(-th/.6)*.6;
+ vec3 c=mix(sun,day,DAY);
+ // sun disc (0.35 deg -> radius 0.00305 rad), limb darkened, with soft corona
+ float rs=.00305;float dk=th/rs;float lim=sqrt(max(1.-dk*dk,0.));
+ vec3 sd=mix(vec3(1.,.97,.93),vec3(.92,.96,1.),1.-DAY)*(9.+6.*DAY);c+=sd*smoothstep(1.02,.96,dk)*(.55+.45*lim);
+ c+=vec3(.8,.9,1.)*exp(-th/.0055)*.9*(1.-DAY*.5);
+ return c;}
+vec3 haze(vec3 rd){float th=acos(clamp(dot(rd,SUN),-1.,1.));
+ vec3 dh=vec3(.78,.58,.41)+vec3(.9,.8,.6)*exp(-th/.3)*.4;
+ vec3 sh=vec3(.19,.13,.10)+vec3(.22,.40,.80)*exp(-th/.16)*.85+vec3(.12,.09,.08)*exp(-th/.6);
+ return mix(sh,dh,DAY);}
+float ridgeH(int i,float u){
+ if(i==0)return 120.+380.*pow(fb1(u/3200.,7),1.6)*1.6;
+ if(i==1)return 30.+150.*pow(fb1(u/900.+11.,7),1.3)*1.4;
+ if(i==2)return 2.+40.*pow(fb1(u/300.+23.,6),1.5)*1.5;
+ return -1.5+11.*fb1(u/80.+37.,4);}
+float ridgeD(int i){return i==0?9000.:i==1?3200.:i==2?1100.:330.;}
+void main(){
+ vec2 px=vec2(gl_FragCoord.x,R.y-gl_FragCoord.y);
+ vec2 tp=ANT+vec2(px.x-ANC.x,-(px.y-ANC.y))*SC;      // tangent-plane coords (x right, y up), lens-shift camera facing -z
+ vec3 rd=normalize(vec3(tp,-1.));
+ SUN=normalize(vec3(0.,tan(SE),-1.));
+ vec3 ro=CP;float s=rd.y/length(rd.xz);
+ float dg=rd.y<0.?ro.y/-rd.y:1e9;
+ vec3 col;bool done=false;
+ // near to far ridge layers
+ for(int k=3;k>=0;k--){float D=ridgeD(k);
+  if(dg<D*1.04&&!done){break;}
+  float u=rd.x/(-rd.z)*D+ro.x*(1.+float(k))*.0;float zz=D+ro.z;
+  float top=(ridgeH(k,u+ro.x)-ro.y)/zz;
+  if(s<top&&!done){
+   float depth=(top-s)*zz; // metres below the crest
+   vec3 alb=vec3(.30,.19,.13)*(.75+.5*fbm(vec2(u*.02,depth*.08+float(k)*7.)));
+   float amb=mix(.10,.55,DAY);vec3 c=alb*amb;
+   c+=vec3(1.,.8,.6)*alb*exp(-depth/(.6+.004*D))*(.9-.6*DAY); // grazing light on the crest
+   float fogk=1.-exp(-D/mix(2400.,5200.,DAY));
+   col=mix(c,haze(rd),fogk);done=true;}
+ }
+ if(!done&&dg<1e8){
+  vec3 p=ro+rd*dg;vec2 q=p.xz;float e=.04+dg*.002;
+  float h=gh(q);vec3 n=normalize(vec3(h-gh(q+vec2(e,0.)),e,h-gh(q+vec2(0.,e))));
+  vec3 alb=mix(vec3(.36,.21,.13),vec3(.50,.32,.20),fbm(q*.35))*(.75+.3*n2(q*4.)+.25*n2(q*23.))*(.9+.2*smoothstep(.3,.7,n2(vec2(q.x*1.3+q.y*.4,q.y*.25)*3.)));
+  alb=mix(alb,vec3(.22,.16,.13),smoothstep(.15,.5,rocks(q*.55))*.7); // darker basalt rocks
+  float ndl=max(dot(n,SUN),0.);
+  // soft shadow from neighbouring rocks along the sun direction
+  float shd=1.;vec2 sd=normalize(SUN.xz);for(int j=1;j<=2;j++){float st=float(j)*.45;float hh=gh(q+sd*st);shd=min(shd,clamp(1.-(hh-h-st*tan(SE))*3.,0.,1.));}
+  float sky=.5+.5*n.y;vec3 skyamb=mix(vec3(.16,.13,.13),vec3(.70,.52,.38),DAY);
+  vec3 c=alb*(skyamb*sky*.75+vec3(1.,.86,.72)*ndl*shd*mix(1.6,2.6,DAY));
+  c+=alb*vec3(.5,.65,1.)*pow(max(dot(reflect(rd,n),SUN),0.),18.)*.25*(1.-DAY)*shd; // cool sheen toward the blue aureole
+  float fogk=1.-exp(-dg/mix(2400.,5200.,DAY));col=mix(c,haze(rd),fogk);done=true;}
+ if(!done)col=skyc(rd);
+ // drifting dust in the air: slight brightening toward the sun
+ col+=FL*vec3(.6,.75,1.)*exp(-acos(clamp(dot(rd,SUN),-1.,1.))/.08);
+ col*=EXPO;col=1.-exp(-col*1.15);col=pow(col,vec3(.97));gl_FragColor=vec4(col,1.);}
+</script>
+<script>
+const W=1080,H=1920;const g=document.getElementById('g'),gl=g.getContext('webgl',{preserveDrawingBuffer:true});
+function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o}
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,'attribute vec2 a;void main(){gl_Position=vec4(a,0,1);}'));
+gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,document.getElementById('fs').text));gl.linkProgram(pr);gl.useProgram(pr);
+const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+const U=n=>gl.getUniformLocation(pr,n);
+const c=document.getElementById('c'),x=c.getContext('2d');
+const tmp=document.createElement('canvas');tmp.width=W;tmp.height=H;const tx=tmp.getContext('2d');
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+const lerp=(a,b,t)=>a+(b-a)*t;
+const F='"DejaVu Sans",Arial,sans-serif';
+function card(lines,y,size,alpha,dy){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.textAlign='center';
+ let mw=0;x.font='900 '+size+'px '+F;lines.forEach(l=>{mw=Math.max(mw,x.measureText(typeof l==='string'?l:l[0]).width)});
+ if(mw>780){size=Math.floor(size*780/mw);x.font='900 '+size+'px '+F}x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=24;
+ lines.forEach((l,i)=>{x.fillStyle=typeof l==='string'?'#fff':l[1];x.fillText(typeof l==='string'?l:l[0],W/2,y+i*size*1.18+(dy||0))});x.restore()}
+function label(s,px,py,alpha,col,size){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.font='800 '+(size||40)+'px '+F;x.textAlign='center';
+ x.fillStyle=col||'#fff';x.shadowColor='#000';x.shadowBlur=12;x.fillText(s,px,py);x.restore()}
+let SC=null,VIEW=null;
+function gpass(t){const v=SC.view(t);VIEW=v;
+ gl.viewport(0,0,W,H);gl.uniform2f(U('R'),W,H);gl.uniform1f(U('T'),t);gl.uniform1f(U('SE'),v.se);gl.uniform1f(U('DAY'),v.day);
+ gl.uniform1f(U('SC'),v.sc);gl.uniform2f(U('ANC'),v.anc[0],v.anc[1]);gl.uniform2f(U('ANT'),v.ant[0],v.ant[1]);gl.uniform3fv(U('CP'),v.cp);gl.uniform1f(U('FL'),v.fl||0);gl.uniform1f(U('EXPO'),v.expo||1);
+ gl.drawArrays(gl.TRIANGLES,0,3);}
+// sun position on screen for the current VIEW
+function sunPx(){const v=VIEW;const ty=Math.tan(v.se);return [v.anc[0]+(0-v.ant[0])/v.sc,v.anc[1]-(ty-v.ant[1])/v.sc]}
+function draw(t){
+ const ns=SC.subs?SC.subs(t):1;
+ if(ns<=1){gpass(t);x.globalCompositeOperation='source-over';x.globalAlpha=1;x.drawImage(g,0,0);}
+ else{tx.clearRect(0,0,W,H);for(let i=0;i<ns;i++){gpass(t+(i/ns-.5)/30*0.9);tx.globalAlpha=1/(i+1);tx.drawImage(g,0,0);}gpass(t);x.globalAlpha=1;x.globalCompositeOperation='source-over';x.drawImage(tmp,0,0);}
+ x.save();x.globalCompositeOperation='lighter';const src=ns<=1?g:tmp;x.filter='blur(46px)';x.globalAlpha=.32;x.drawImage(src,0,0);x.filter='blur(12px)';x.globalAlpha=.14;x.drawImage(src,0,0);x.restore();
+ const vg=x.createRadialGradient(W/2,H*.5,H*.3,W/2,H*.5,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+ if(SC.under)SC.under(t);
+ for(const cd of SC.cards){const [a,b,l,sz]=cd;if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=SC.D?1:ease((b-t)/.3);card(l,440,sz,Math.min(fi,fo),(1-fi)*30)}}
+ if(SC.overlay)SC.overlay(t);
+}
+window.draw=draw;
+</script>
+<script src="mars-blue-sunset.js"></script><script>window.TEXREADY=true;</script>
