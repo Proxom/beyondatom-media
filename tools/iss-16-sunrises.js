@@ -50,7 +50,7 @@ SC={D:30,
   const p=isP(m);if(visible(p,eye)){const q=proj(p);const day=lit(m)>0;x.save();x.globalCompositeOperation='lighter';
    const g=x.createRadialGradient(q[0],q[1],0,q[0],q[1],46);g.addColorStop(0,day?'rgba(255,250,235,1)':'rgba(200,220,255,.9)');g.addColorStop(.25,day?'rgba(255,220,150,.6)':'rgba(140,170,255,.35)');g.addColorStop(1,'rgba(0,0,0,0)');
    x.fillStyle=g;x.beginPath();x.arc(q[0],q[1],46,0,7);x.fill();x.restore();
-   if(t<12)label('ISS',q[0],q[1]-40,ease((t-3.6)/.4)*(1-ease((t-11.5)/.5)),'#ffffff',34);}
+   if(t<12)label('ISS',Math.max(100,Math.min(q[0],895)),Math.max(360,Math.min(q[1]-40,1430)),ease((t-3.6)/.4)*(1-ease((t-11.5)/.5)),'#ffffff',34);}
   // sunrise flashes: horizontal anamorphic streak + glow at the ISS position
   for(const sr of SR){const dt=t-sr;if(dt<0||dt>0.9)continue;const pp=isP(tau(sr));if(!visible(pp,eye))continue;const q=proj(pp);const a=Math.exp(-dt*4.5);
    x.save();x.globalCompositeOperation='lighter';const g=x.createRadialGradient(q[0],q[1],0,q[0],q[1],260*(0.5+dt));g.addColorStop(0,'rgba(255,230,170,'+.9*a+')');g.addColorStop(.3,'rgba(255,170,80,'+.35*a+')');g.addColorStop(1,'rgba(0,0,0,0)');
