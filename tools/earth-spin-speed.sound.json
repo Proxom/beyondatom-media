@@ -1,0 +1,16 @@
+{"dur":30,"seed":21,"root":104,"bed":"space","bed_db":13,"wet":0.22,
+ "hits":[
+  {"t":0.03,"kind":"bell","note":0,"vel":0.5,"pan":0},
+  {"t":0.06,"kind":"marimba","note":0,"vel":0.5,"pan":-0.15},
+  {"t":3.5,"kind":"marimba","note":2,"vel":0.48,"pan":0.1},
+  {"t":7.7,"kind":"glass","note":4,"vel":0.3,"pan":-0.4},
+  {"t":8.0,"kind":"marimba","note":4,"vel":0.48,"pan":-0.1},
+  {"t":12.0,"kind":"wood","note":3,"vel":0.5,"pan":0.2},
+  {"t":16.0,"kind":"marimba","note":1,"vel":0.48,"pan":-0.1},
+  {"t":16.6,"kind":"glass","note":5,"vel":0.28,"pan":0.1},
+  {"t":20.0,"kind":"marimba","note":3,"vel":0.45,"pan":0},
+  {"t":22.6,"kind":"bell","note":2,"vel":0.4,"pan":0},
+  {"t":22.65,"kind":"marimba","note":5,"vel":0.45,"pan":0.1},
+  {"t":26.6,"kind":"marimba","note":2,"vel":0.45,"pan":-0.1}
+ ],
+ "swells":[[20.6,22.6,0.6]]}
