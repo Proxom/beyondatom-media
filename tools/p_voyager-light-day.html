@@ -70,7 +70,7 @@ function scene(t){
  for(const [Lt,s] of VM.TICKS){const y=ys(Lt,Lp);const a=fadeTop(y)*fadeBot(y);if(a<=0)continue;
   x.save();x.globalAlpha=.55*a;x.strokeStyle='#8fd0ff';x.lineWidth=2;x.beginPath();x.moveTo(AX-18,y);x.lineTo(AX+18,y);x.stroke();x.restore();
   if(LMK.some(m=>Math.abs(m.L-Lt)<0.12))continue;
-  LBL.push([s,AX-34,y+8,.62*a,'#bcd2ff',23,'right'])}
+  LBL.push([s,AX-34,y+8,.7*a,'#bcd2ff',28,'right'])}
  // lit trail Earth -> pulse
  {const ye=ys(L0-.2,Lp);const y1=Math.min(ye,1450);x.save();x.globalCompositeOperation='lighter';
   const g=x.createLinearGradient(0,y1,0,yp);g.addColorStop(0,'rgba(120,200,255,0)');g.addColorStop(.7,'rgba(150,215,255,.40)');g.addColorStop(1,'rgba(255,255,255,.95)');
@@ -98,8 +98,8 @@ function scene(t){
   if(reached){const la=vis*(m.n==='VOYAGER 1'?1:(0.55+0.45*prox));
    const dy=m.n==='VOYAGER 1'?-70:0;
    LBL.push([m.n,AX+m.r+(m.n==='VOYAGER 1'?100:38)+(m.n==='SUN'?18:0),y-14+dy,la,m.n==='VOYAGER 1'?GOLD:'#ffffff',m.n==='VOYAGER 1'?42:38,'left']);
-   LBL.push([m.d[0],AX+m.r+(m.n==='VOYAGER 1'?100:38)+(m.n==='SUN'?18:0),y+26+dy,la*.92,'#d9e4ff',30,'left']);
-   LBL.push([m.d[1],AX+m.r+(m.n==='VOYAGER 1'?100:38)+(m.n==='SUN'?18:0),y+64+dy,la*.92,m.n==='VOYAGER 1'?GOLD:BLUE,32,'left'])}
+   LBL.push([m.d[0],AX+m.r+(m.n==='VOYAGER 1'?100:38)+(m.n==='SUN'?18:0),y+28+dy,la*.92,'#d9e4ff',34,'left']);
+   LBL.push([m.d[1],AX+m.r+(m.n==='VOYAGER 1'?100:38)+(m.n==='SUN'?18:0),y+70+dy,la*.92,m.n==='VOYAGER 1'?GOLD:BLUE,36,'left'])}
   // arrival flash
   const ar=t-m.tA;if(ar>=0&&ar<1.1){const k=Math.exp(-ar*3.2);const big=m.n==='VOYAGER 1'?1.8:1;
    glow(AX,y,(70+210*(1-k))*big,[[0,'rgba(255,255,255,1)'],[.25,'rgba(190,230,255,.7)'],[1,'rgba(0,0,0,0)']],k);
@@ -109,17 +109,18 @@ function scene(t){
 }
 function overlay(t){
  const vg=x.createRadialGradient(W/2,H*.52,H*.3,W/2,H*.52,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');x.fillStyle=vg;x.fillRect(0,0,W,H);
- const HOOK=[['NOV. 18, 2026:',GOLD],'VOYAGER 1 HITS','1 LIGHT-DAY'];
+ const HOOK=[['NOV. 18, 2026:',GOLD],'VOYAGER 1 REACHES','1 LIGHT-DAY'];
  const CARDS=[
   [0,3.4,HOOK,76,382],
-  [3.4,6.2,['LIGHT TO THE MOON:',['1.3 SECONDS',BLUE]],80,410],
-  [6.2,8.6,['1 LIGHT-MINUTE =',['18 MILLION KM',GOLD]],80,410],
-  [8.6,13.0,['LIGHT TO THE SUN:',['8 MIN 20 S',GOLD]],80,410],
-  [13.0,16.0,['NEXT: NEPTUNE,',['THE LAST PLANET',BLUE]],80,410],
-  [16.0,20.0,['LIGHT TO NEPTUNE:',['4 H 10 MIN',BLUE]],80,410],
-  [20.0,24.0,['BUT VOYAGER 1',['IS FAR BEYOND',GOLD]],84,410],
+  [3.4,5.5,['LIGHT TO THE MOON:',['1.3 SECONDS',BLUE]],80,410],
+  [5.5,8.6,['1 LIGHT-MINUTE =',['18 MILLION KM',GOLD]],80,410],
+  [8.6,10.0,['FARTHER',['AND FARTHER',BLUE]],84,410],
+  [10.0,12.8,['LIGHT TO THE SUN:',['8 MIN 20 S',GOLD]],80,410],
+  [12.8,16.4,['NEXT: NEPTUNE,',['THE LAST PLANET',BLUE]],80,410],
+  [16.4,19.8,['LIGHT TO NEPTUNE:',['4 H 10 MIN',BLUE]],80,410],
+  [19.8,24.0,['BUT VOYAGER 1',['IS FAR BEYOND',GOLD]],84,410],
   [24.0,26.4,['ONE LIGHT-DAY =',['24 HOURS OF LIGHT',GOLD]],74,410],
-  [26.4,28.4,['THE FIRST HUMAN-MADE',['OBJECT TO GET THERE',BLUE]],66,410],
+  [26.4,28.4,['NO OTHER HUMAN-MADE',['OBJECT HAS GONE THIS FAR',BLUE]],64,410],
   [28.4,30.01,HOOK,76,382]];
  for(const [a,b,l,sz,yy] of CARDS){if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=30?1:ease((b-t)/.3);card(l,yy,sz,Math.min(fi,fo),(1-fi)*24)}}
  // light-travel readout panel
@@ -128,7 +129,7 @@ function overlay(t){
  if(pa>0){x.save();x.globalAlpha=pa;x.fillStyle='rgba(8,10,24,.74)';x.strokeStyle='rgba(255,255,255,.22)';x.lineWidth=2;x.beginPath();x.roundRect(110,636,820,112,24);x.fill();x.stroke();
   x.textAlign='left';x.font='800 22px '+F;x.fillStyle='#bcd2ff';x.fillText('LIGHT TRAVEL TIME',140,670);x.fillText('DISTANCE FROM EARTH',520,670);
   x.font='900 38px '+MONO;x.fillStyle='#fff';x.fillText(fmtT(T),140,722);x.font='900 32px '+MONO;x.fillStyle=GOLD;x.fillText(fmtD(T*C),520,722);x.restore()}
- label('Distance scale is logarithmic. Bodies not to scale.',540,1432,.62,'#d6d2e6',24);
+ label('Distance scale is logarithmic. Bodies not to scale.',540,1432,.7,'#d6d2e6',28);
 }
 const OFF=document.createElement('canvas');OFF.width=W;OFF.height=H;
 const ACC=document.createElement('canvas');ACC.width=W;ACC.height=H;const ax=ACC.getContext('2d');const MAIN=x;
@@ -136,7 +137,7 @@ function lblDraw(L,a){L.forEach(l=>{const q=l.slice();q[3]*=a;label(...q)})}
 function frameScene(t){ // returns labels; scene + loop dissolve
  LBL=[];scene(t);const L1=LBL;let dis=ease((t-28.4)/1.5);
  if(dis>0){const keep=x;const ctx=OFF.getContext('2d');x=ctx;LBL=[];scene(0);x=keep;x.globalAlpha=dis;x.drawImage(OFF,0,0);x.globalAlpha=1}
- return [L1,1-dis]}
+ return [L1,cl(1-dis*2.5)]}
 function draw(t){
  const NS=4;let L2=null,fl=1;
  for(let k=0;k<NS;k++){const r=frameScene(t+(k-1.5)/(30*NS));ax.globalAlpha=1/(k+1);ax.drawImage(c,0,0);}
