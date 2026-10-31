@@ -58,7 +58,8 @@ function panel(t){
  const r=t-RING0;let laps=null;if(r>=-0.3&&r<3.6){tm=cl(r,0,1);laps=cl(r,0,1)/LAP;sub='AROUND THE EQUATOR'}
  if(tm===null)return;
  const vis=(()=>{let a=1;for(const p of PULSES){}return a})();
- x.save();x.fillStyle='rgba(8,10,24,.72)';x.strokeStyle='rgba(255,255,255,.25)';x.lineWidth=3;x.beginPath();x.roundRect(560,1222,350,196,28);x.fill();x.stroke();
+ x.save();x.globalAlpha=t<0.25?ease(t/.25):t>29.6?ease((30-t)/.4):1; // loop point: panel hidden on first and last frame
+ x.fillStyle='rgba(8,10,24,.72)';x.strokeStyle='rgba(255,255,255,.25)';x.lineWidth=3;x.beginPath();x.roundRect(560,1222,350,196,28);x.fill();x.stroke();
  x.textAlign='left';x.font='800 26px '+F;x.fillStyle='#bcd2ff';x.fillText(sub,588,1264);
  x.font='900 74px "DejaVu Sans Mono",monospace';x.fillStyle='#ffffff';x.shadowColor='#7fd0ff';x.shadowBlur=18;x.fillText(tm.toFixed(2)+' s',586,1340);x.shadowBlur=0;
  x.font='800 30px '+F;x.fillStyle='#ffd36b';
@@ -101,5 +102,6 @@ SC={D:30,
   panel(t);
   const da=t<5.6?0:t<6.2?ease((t-5.6)/.6):t<16.3?1:t<16.8?1-ease((t-16.3)/.5):0;
   label('Sizes + distance to scale',735,1196,.7*da,'#d8d2e8',25);
-  label('Real-time light speed. Simulation',W/2,1196,.62*(1-da),'#d8d2e8',25);}
+  const ra=t<5.0?1:t<5.5?1-ease((t-5.0)/.5):t<16.8?0:t<17.3?ease((t-16.8)/.5):1; // never overlaps the to-scale label
+  label('Real-time light speed. Simulation',W/2,1196,.62*ra,'#d8d2e8',25);}
 };

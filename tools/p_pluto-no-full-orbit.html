@@ -1,0 +1,105 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=c width=1080 height=1920></canvas>
+<script src="pluto-model.js"></script><script>
+const W=1080,H=1920,c=document.getElementById('c'),x=c.getContext('2d');
+const F='"DejaVu Sans",Arial,sans-serif';const ease=t=>{t=cl(t);return t*t*(3-2*t)};const lerp=(a,b,t)=>a+(b-a)*t;
+// seeded random
+let sd=7;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647};
+// starfield + faint Milky Way band, prerendered larger than the frame for parallax
+const SF=document.createElement('canvas');SF.width=1240;SF.height=2080;{const s=SF.getContext('2d');
+ const g=s.createLinearGradient(0,0,0,2080);g.addColorStop(0,'#03040b');g.addColorStop(.5,'#070816');g.addColorStop(1,'#030409');s.fillStyle=g;s.fillRect(0,0,1240,2080);
+ for(let i=0;i<260;i++){const px=rnd()*1240,py=rnd()*2080,r=60+rnd()*220;const gg=s.createRadialGradient(px,py,0,px,py,r);
+  const band=Math.exp(-Math.pow((py-0.55*px-700)/380,2));const a=(0.010+0.03*band)*rnd();gg.addColorStop(0,'rgba('+(120+rnd()*60|0)+','+(110+rnd()*60|0)+',170,'+a+')');gg.addColorStop(1,'rgba(0,0,0,0)');s.fillStyle=gg;s.fillRect(px-r,py-r,2*r,2*r);}
+ for(let i=0;i<2300;i++){const px=rnd()*1240,py=rnd()*2080;const band=Math.exp(-Math.pow((py-0.55*px-700)/420,2));if(rnd()>0.35+0.65*band)continue;
+  const m=Math.pow(rnd(),6);const r=0.5+m*1.6;const a=0.25+0.75*m;const tint=rnd();s.fillStyle=tint<.2?'rgba(255,214,180,'+a+')':tint<.4?'rgba(190,210,255,'+a+')':'rgba(240,240,255,'+a+')';
+  s.beginPath();s.arc(px,py,r,0,7);s.fill();if(m>.5){const gg=s.createRadialGradient(px,py,0,px,py,r*6);gg.addColorStop(0,'rgba(220,230,255,'+(a*.35)+')');gg.addColorStop(1,'rgba(0,0,0,0)');s.fillStyle=gg;s.fillRect(px-r*6,py-r*6,r*12,r*12);}}}
+// camera: orbit plane tilted toward the viewer, gentle dolly and drift
+const CX=495,SY=1100,S0=9.3,D=2500;
+function camAt(t){const k=0.5-0.5*Math.cos(2*Math.PI*t/30);return {s:S0*(0.975+0.04*k),tilt:(36+2.5*Math.sin(2*Math.PI*t/30))*Math.PI/180,
+ rot:(-90-224.06676+1.6*Math.sin(2*Math.PI*t/30))*Math.PI/180,ox:6*Math.sin(2*Math.PI*t/15),oy:5*Math.sin(2*Math.PI*t/10+1)}}
+let CAM=camAt(0);
+function P2(r,lon){const th=lon+CAM.rot;const u=r*Math.cos(th),v=r*Math.sin(th);const z=v*Math.sin(CAM.tilt)*CAM.s;const f=D/(D+z);
+ return [CX+CAM.ox+u*CAM.s*f,SY+CAM.oy-v*Math.cos(CAM.tilt)*CAM.s*f,f]}
+function orbitPts(fn,y0,y1,n){const a=[];for(let i=0;i<=n;i++){const p=fn(y0+(y1-y0)*i/n);a.push(P2(p.r,p.lon))}return a}
+function glow(px,py,r,stops,a){x.save();x.globalCompositeOperation='lighter';x.globalAlpha=a;const g=x.createRadialGradient(px,py,0,px,py,r);stops.forEach(s=>g.addColorStop(s[0],s[1]));x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill();x.restore()}
+function sphere(px,py,r,base,dark,sx,sy,atm){ // lit from the Sun direction (sx,sy unit on screen)
+ x.save();x.beginPath();x.arc(px,py,r,0,7);x.clip();x.fillStyle=dark;x.fillRect(px-r,py-r,2*r,2*r);
+ const g=x.createRadialGradient(px+sx*r*.55,py+sy*r*.55,r*.1,px+sx*r*.2,py+sy*r*.2,r*1.25);g.addColorStop(0,base[0]);g.addColorStop(.55,base[1]);g.addColorStop(1,'rgba(0,0,0,0)');
+ x.fillStyle=g;x.fillRect(px-r,py-r,2*r,2*r);x.restore();
+ x.save();x.globalCompositeOperation='lighter';x.strokeStyle=atm;x.lineWidth=1.5;x.beginPath();x.arc(px,py,r-.5,Math.atan2(sy,sx)-1.2,Math.atan2(sy,sx)+1.2);x.stroke();x.restore()}
+function card(lines,y,size,alpha,dy){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.textAlign='center';
+ let mw=0;x.font='900 '+size+'px '+F;lines.forEach(l=>{mw=Math.max(mw,x.measureText(typeof l==='string'?l:l[0]).width)});
+ if(mw>760){size=Math.floor(size*760/mw);x.font='900 '+size+'px '+F}x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=26;
+ lines.forEach((l,i)=>{x.fillStyle=typeof l==='string'?'#fff':l[1];x.fillText(typeof l==='string'?l:l[0],CX,y+i*size*1.17+(dy||0))});x.restore()}
+function label(s,px,py,a,col,size,al){if(a<=0)return;x.save();x.globalAlpha=a;x.font='800 '+(size||30)+'px '+F;x.textAlign=al||'center';x.fillStyle=col||'#fff';x.shadowColor='#000';x.shadowBlur=10;x.fillText(s,px,py);x.restore()}
+const GOLD='#ffcf6e',BLUE='#8fd0ff';
+// times when Pluto is inside Neptune's distance (computed once)
+let TIN=null,TOUT=null;{let pv=false;for(let i=0;i<=900;i++){const t=i/30;if(t>13.5)break;const y=YEAR(t);const ins=PLUTO(y).r<NEPTUNE(y).r;if(ins&&!pv)TIN=t;if(!ins&&pv)TOUT=t;pv=ins}}
+window.TIN=TIN;window.TOUT=TOUT;
+const CARDS=[
+ [0,3.0,['SINCE 1930, PLUTO',"HASN'T FINISHED",['ONE ORBIT',GOLD]],84],
+ [3.0,TIN-0.2,['Discovered by',['Clyde Tombaugh',BLUE],'Feb. 18, 1930'],80],
+ [TIN-0.2,TOUT+1.2,['1979 to 1999:',['closer to the Sun',GOLD],'than Neptune'],82],
+ [TOUT+1.2,13.0,['Still going',['the long way around',BLUE]],80],
+ [13.0,15.2,['2026: only 39%',['of its 248-year orbit',GOLD]],82],
+ [15.2,17.0,['It moves faster',['near the Sun',BLUE]],86],
+ [17.0,23.5,['Its first full orbit',['since 1930?',BLUE]],82],
+ [23.5,26.0,['IN 2178:',['FULL CIRCLE',GOLD]],92],
+ [26.0,28.0,['1 Pluto year =',['248 Earth years',GOLD]],86],
+ [28.0,30.01,['SINCE 1930, PLUTO',"HASN'T FINISHED",['ONE ORBIT',GOLD]],84]];
+let LBL=[];
+function scene(t){
+ CAM=camAt(t);const y=YEAR(t);
+ x.globalCompositeOperation='source-over';x.globalAlpha=1;x.drawImage(SF,-80+CAM.ox*.4,-80+CAM.oy*.4);
+ // Sun
+ const sun=P2(0,0);glow(sun[0],sun[1],230,[[0,'rgba(255,240,200,.55)'],[.12,'rgba(255,200,110,.28)'],[.4,'rgba(255,150,60,.07)'],[1,'rgba(0,0,0,0)']],1);
+ glow(sun[0],sun[1],30,[[0,'rgba(255,255,250,1)'],[.5,'rgba(255,236,190,.9)'],[1,'rgba(255,200,120,0)']],1);
+ // Neptune orbit (faint) and Pluto orbit (faint full path)
+ const nv=t<3.6?0:t<4.6?ease((t-3.6)):t<22.2?1:t<23.2?1-ease(t-22.2):0; // Neptune fades out before the loop point
+ const ins=PLUTO(y).r<NEPTUNE(y).r&&t<14;const zone=TIN!==null&&t>TIN-0.4&&t<TOUT+0.8?ease(Math.min((t-TIN+0.4)/.5,(TOUT+0.8-t)/.5)):0;
+ const no=orbitPts(NEPTUNE,2000,2000+164.79,220);x.save();x.lineWidth=2;x.strokeStyle='rgba(120,180,255,'+(0.28*nv+0.25*zone)+')';x.beginPath();no.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.stroke();
+ if(zone>0){x.fillStyle='rgba(80,140,255,'+(0.06*zone)+')';x.fill()}x.restore();
+ const po=orbitPts(PLUTO,Y0,Y1,360);x.save();x.lineWidth=2;x.setLineDash([3,9]);x.strokeStyle='rgba(255,225,170,.30)';x.beginPath();po.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.stroke();x.restore();
+ // travelled arc since discovery: bright, warm gradient
+ if(y>Y0+0.05){const n=Math.max(2,Math.ceil((y-Y0)*1.6));const a=orbitPts(PLUTO,Y0,y,n);x.save();x.lineCap='round';x.lineJoin='round';x.globalCompositeOperation='lighter';x.globalAlpha=t>27.8?1-ease((t-27.8)/1.9):1;
+  const NC=24;for(let c=0;c<NC;c++){const i0=Math.floor(c*(a.length-1)/NC),i1=Math.floor((c+1)*(a.length-1)/NC);if(i1<=i0)continue;const k=(c+1)/NC;
+   x.strokeStyle='rgba(255,'+(170+60*k|0)+','+(90+60*k|0)+','+(0.35+0.55*k)+')';x.lineWidth=3+3*k;x.shadowColor='#ffb14a';x.shadowBlur=10;x.beginPath();x.moveTo(a[i0][0],a[i0][1]);for(let i=i0+1;i<=i1;i++)x.lineTo(a[i][0],a[i][1]);x.stroke()}x.restore();}
+ // discovery marker
+ const d0=PLUTO(Y0),dm=P2(d0.r,d0.lon);x.save();x.strokeStyle='rgba(255,255,255,.75)';x.lineWidth=2.5;x.beginPath();x.arc(dm[0],dm[1],22,0,7);x.stroke();x.restore();
+ LBL.push(['FOUND 1930',dm[0]+30,dm[1]-24,0.9,'#ffffff',26,'left']);
+ const ft=t;if(ft<0.9){const k=Math.exp(-ft*4);glow(dm[0],dm[1],60+180*(1-k),[[0,'rgba(255,255,255,1)'],[.25,'rgba(255,220,150,.7)'],[1,'rgba(0,0,0,0)']],k)}
+ const ar=t-23.5;if(ar>=0&&ar<1.2){const k=Math.exp(-ar*3.5);glow(dm[0],dm[1],60+220*(1-k),[[0,'rgba(255,255,255,1)'],[.25,'rgba(255,220,150,.7)'],[1,'rgba(0,0,0,0)']],k)}
+ // Neptune body
+ if(nv>0){const np=NEPTUNE(y),q=P2(np.r,np.lon);const L=Math.hypot(sun[0]-q[0],sun[1]-q[1]);x.save();x.globalAlpha=nv;
+  glow(q[0],q[1],46,[[0,'rgba(120,170,255,.45)'],[1,'rgba(0,0,0,0)']],nv);sphere(q[0],q[1],14*q[2],['#cfe6ff','#3f76d8'],'#0a1430',(sun[0]-q[0])/L,(sun[1]-q[1])/L,'rgba(160,210,255,.6)');x.restore();
+  {const rx=q[0]-sun[0],ry=q[1]-sun[1],rl=Math.hypot(rx,ry);LBL.push(['NEPTUNE',Math.min(870,Math.max(140,q[0]-rx/rl*48)),q[1]-ry/rl*48+10,nv*.9,BLUE,28])}}
+ // Pluto body
+ {const pp=PLUTO(y),q=P2(pp.r,pp.lon);const L=Math.hypot(sun[0]-q[0],sun[1]-q[1]);
+  glow(q[0],q[1],60,[[0,'rgba(255,215,160,'+(0.45+0.4*zone)+')'],[1,'rgba(0,0,0,0)']],1);
+  sphere(q[0],q[1],15*q[2],['#fff1dc','#b98a62'],'#1a120c',(sun[0]-q[0])/L,(sun[1]-q[1])/L,'rgba(255,230,200,.5)');
+  const nearM=Math.hypot(q[0]-dm[0],q[1]-dm[1])<120;const rx=q[0]-sun[0],ry=q[1]-sun[1],rl=Math.hypot(rx,ry);let lx=nearM?-1:q[0]+rx/rl*62,ly=nearM?-1:q[1]+ry/rl*62+10;if(ly<762){lx=q[0]-rx/rl*58;ly=q[1]-ry/rl*58+10;}LBL.push(['PLUTO',q[0]-rx/rl*84,q[1]-ry/rl*84+11,.95,GOLD,30])}
+ LBL.push(['SUN',sun[0],sun[1]+64,.8,'#ffe7b0',26]);
+}
+function overlay(t){
+ const vg=x.createRadialGradient(W/2,H*.52,H*.3,W/2,H*.52,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+ for(const cd of CARDS){const [a,b,l,sz]=cd;if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=30?1:ease((b-t)/.3);card(l,400,sz,Math.min(fi,fo),(1-fi)*24)}}
+ // year + progress readout
+ const y=YEAR(t);const pa=t<2.6?0:t<3.1?ease((t-2.6)/.5):t<26.4?1:t<26.9?1-ease((t-26.4)/.5):0;
+ if(pa>0){const pr=cl((y-Y0)/PER,0,1);x.save();x.globalAlpha=pa;x.fillStyle='rgba(8,10,24,.72)';x.strokeStyle='rgba(255,255,255,.22)';x.lineWidth=2;x.beginPath();x.roundRect(150,628,690,96,24);x.fill();x.stroke();
+  x.textAlign='left';x.font='800 24px '+F;x.fillStyle='#bcd2ff';x.fillText('YEAR',180,662);x.fillText('ORBIT DONE (TIME)',480,662);
+  x.font='900 46px "DejaVu Sans Mono",monospace';x.fillStyle='#fff';x.fillText(String(Math.floor(y+1e-6)),180,708);
+  x.fillStyle='rgba(255,255,255,.14)';x.fillRect(480,684,220,18);x.fillStyle=GOLD;x.fillRect(480,684,220*pr,18);
+  x.font='900 34px "DejaVu Sans Mono",monospace';x.fillStyle=GOLD;x.textAlign='right';x.fillText(Math.floor(pr*100+1e-6)+'%',815,704);x.restore();}
+ label('Orbits to scale, bodies enlarged, tilt not shown',CX,1428,.6,'#d6d2e6',24);
+}
+function lbox(l){x.save();x.font='800 '+l[5]+'px '+F;const w=x.measureText(l[0]).width;x.restore();const x0=l[6]==='left'?l[1]:l[1]-w/2;return [x0-8,l[2]-l[5]*0.8-6,x0+w+8,l[2]+8]}
+// fade the static FOUND 1930 label smoothly while a moving label passes over it (no overlapping text)
+function avoid(L){const f=L.find(l=>l[0]==='FOUND 1930');if(!f)return;const fb=lbox(f);let k=1;
+ for(const l of L){if(l===f||l[0]==='SUN')continue;const b=lbox(l);const dx=Math.min(fb[2],b[2])-Math.max(fb[0],b[0]),dy=Math.min(fb[3],b[3])-Math.max(fb[1],b[1]);
+  const d=Math.min(dx,dy);k=Math.min(k,1-ease((d+24)/18))}f[3]*=k;window.FOUNDA=k;}
+const ACC=document.createElement('canvas');ACC.width=W;ACC.height=H;const ax=ACC.getContext('2d');
+function draw(t){ // 4-sample motion blur on the scene, sharp overlay on top
+ const NS=4;for(let k=0;k<NS;k++){LBL=[];scene(t+(k-1.5)/(30*NS));ax.globalAlpha=1/(k+1);ax.drawImage(c,0,0)}LBL=[];CAM=camAt(t);scene(t);const L2=LBL;
+ x.globalAlpha=1;x.globalCompositeOperation='source-over';x.drawImage(ACC,0,0);avoid(L2);L2.forEach(l=>label(...l));overlay(t)}
+window.draw=draw;window.FA=t=>{LBL=[];CAM=camAt(t);scene(t);avoid(LBL);return window.FOUNDA};window.BBOX=()=>{let a=[1e9,-1e9,1e9,-1e9];for(let t=0;t<30;t+=.25){CAM=camAt(t);for(const f of [PLUTO,NEPTUNE])for(let y=2000;y<2250;y+=.5){const p=f(y),q=P2(p.r,p.lon);a=[Math.min(a[0],q[0]),Math.max(a[1],q[0]),Math.min(a[2],q[1]),Math.max(a[3],q[1])]}}return a};window.TEXREADY=true;
+</script>
