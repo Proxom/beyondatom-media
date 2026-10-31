@@ -13,12 +13,13 @@ const spin=t=>th(t)+Math.PI-off(t);
 const mpos=t=>{const a=th(t);return [D*Math.cos(a),0,D*Math.sin(a)]};
 function nearDir(t){const s=spin(t);return [Math.cos(s),0,Math.sin(s)]} // world dir of the near-side centre
 // camera: hook = over Earth's limb looking at the Moon; overview = high 3/4 view
-function camHook(t){const m=mpos(t);const d=norm(m);return {eye:[d[0]*1.2,0.12,d[2]*1.2],tgt:[m[0],m[1]+0.02,m[2]],fov:1.0}}
+function camHook(t){const m=mpos(t);const d=norm(m);return {eye:[d[0]*1.35,0.78,d[2]*1.35],tgt:[m[0],m[1]-0.06,m[2]],fov:.95}}
 function camOver(t){const sw=0.03*Math.sin(2*Math.PI*t/10);return {eye:[sw,3.3,6.2],tgt:[0,-0.55,0.1],fov:.76}}
 function cam(t){const a=t<3?0:t<5.8?eio((t-3)/2.8):t<27?1:t<29.6?1-eio((t-27)/2.6):0;
  const h=camHook(t),o=camOver(t);if(a<=0)return h;if(a>=1)return o;
  // interpolate eye/target and fov in log space so the move feels like one dolly
- return {eye:h.eye.map((v,i)=>lerp(v,o.eye[i],a)),tgt:h.tgt.map((v,i)=>lerp(v,o.tgt[i],a)),fov:Math.exp(lerp(Math.log(h.fov),Math.log(o.fov),a))}}
+ const dm=norm(mpos(t)),bp=Math.sin(Math.PI*a);const bump=[dm[0]*1.4*bp,1.5*bp,dm[2]*1.4*bp]; // arc away from Earth during the move
+ return {eye:h.eye.map((v,i)=>lerp(v,o.eye[i],a)+bump[i]),tgt:h.tgt.map((v,i)=>lerp(v,o.tgt[i],a)),fov:Math.exp(lerp(Math.log(h.fov),Math.log(o.fov),a))}}
 const ovA=t=>t<4.6?0:t<5.8?ease((t-4.6)/1.2):t<26.6?1:t<27.4?1-ease((t-26.6)/.8):0;
 SC={D:30,
  scene(t){const c=cam(t);const m=mpos(t);
@@ -43,17 +44,19 @@ SC={D:30,
    for(let i=0;i<=200;i++){const a=i/200*2*Math.PI;const q=proj([D*Math.cos(a),0,D*Math.sin(a)]);i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]);}x.stroke();x.restore();
    // near-side marker + sight line to Earth
    const pm=m.map((v,i)=>v+nd[i]*MR*1.02);const e=[eye[0]-pm[0],eye[1]-pm[1],eye[2]-pm[2]];const vis=nd[0]*e[0]+nd[1]*e[1]+nd[2]*e[2]>0;
-   const col=face>0.9?'#7dffb0':'#ff7a6a';const q=proj(pm),qm=proj(m);
+   const col=face>0.9?'#7dffb0':'#ff7a6a';
+   const hid=(p)=>{const dv=p.map((v,i)=>v-eye[i]);const L=Math.hypot(...dv);const u=dv.map(v=>v/L);const b=eye[0]*u[0]+eye[1]*u[1]+eye[2]*u[2];const cc=eye[0]**2+eye[1]**2+eye[2]**2-1;const h=b*b-cc;if(h<0)return false;const t0=-b-Math.sqrt(h);return t0>0&&t0<L;};
+   const occ=hid(m)?0:1;const q=proj(pm),qm=proj(m);
    const tip=proj(m.map((v,i)=>v+nd[i]*MR*2.1));
-   x.save();x.globalAlpha=A;x.strokeStyle=col;x.lineWidth=6;x.shadowColor=col;x.shadowBlur=14;x.beginPath();x.moveTo(q[0],q[1]);x.lineTo(tip[0],tip[1]);x.stroke();
+   x.save();x.globalAlpha=A*occ;x.strokeStyle=col;x.lineWidth=6;x.shadowColor=col;x.shadowBlur=14;x.beginPath();x.moveTo(q[0],q[1]);x.lineTo(tip[0],tip[1]);x.stroke();
    const ang=Math.atan2(tip[1]-q[1],tip[0]-q[0]);x.fillStyle=col;x.beginPath();x.moveTo(tip[0]+Math.cos(ang)*18,tip[1]+Math.sin(ang)*18);
    x.lineTo(tip[0]+Math.cos(ang+2.4)*16,tip[1]+Math.sin(ang+2.4)*16);x.lineTo(tip[0]+Math.cos(ang-2.4)*16,tip[1]+Math.sin(ang-2.4)*16);x.fill();
    if(vis){x.beginPath();x.arc(q[0],q[1],10,0,7);x.fill();}x.restore();
    // label
    const la=t<6.6?0:t<7.1?ease((t-6.6)/.5):t<13.9?1:t<14.3?1-ease((t-13.9)/.4):0;
-   label('NEAR SIDE',qm[0],qm[1]-95,la*A,'#7dffb0',32);
+   label('NEAR SIDE',qm[0],qm[1]-95,la*A*occ,'#7dffb0',32);
    const ga=t<GA+.6?0:t<GA+1?ease((t-GA-.6)/.4):t<GB?1:t<GB+.4?1-ease((t-GB)/.4):0;
-   label(face>0.9?'FACING EARTH':'FACING AWAY',qm[0],qm[1]+(qm[1]>proj([0,0,0])[1]?110:-95),ga*A,col,32);
+   label(face>0.9?'FACING EARTH':'FACING AWAY',qm[0],qm[1]+(qm[1]>proj([0,0,0])[1]?110:-95),ga*A*occ,col,32);
    const ea=t<5.4?0:t<6?ease((t-5.4)/.6):t<26.6?1:1-ease((t-26.6)/.6);const qe=proj([0,0,0]);label('EARTH',qe[0],qe[1]+proj([0,0,1])[1]-qe[1]+70,.85*ea*A,'#cfe3ff',34);
    // progress panel: orbit vs spin
    const pa=t<6.4?0:t<6.9?ease((t-6.4)/.5):t<GA-.2?1:t<GA+.2?1-ease((t-GA+.2)/.4):0;
