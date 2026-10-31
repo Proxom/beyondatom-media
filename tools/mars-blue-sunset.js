@@ -1,7 +1,7 @@
 // Mars blue sunset. Sun angular radius 0.00305 rad (0.35 deg diameter, ~2/3 of Earth's 0.53 deg).
 const D2R=Math.PI/180,SC0=0.9/1080,HOR=1250;           // default: 0.9 tan-units across the width, horizon at y=1250
 const SE_LOW=4.4*D2R,SE_DAY=24*D2R;
-function sunEl(t){if(t<1.7)return SE_LOW;if(t<3.8)return lerp(SE_LOW,SE_DAY,eio((t-1.7)/2.1));if(t<5.2)return SE_DAY;if(t<10.8)return lerp(SE_DAY,SE_LOW,eio((t-5.2)/5.6));return SE_LOW;}
+function sunEl(t){if(t<1.7)return SE_LOW;if(t<3.8)return lerp(SE_LOW,SE_DAY,eio((t-1.7)/2.1));if(t<4.6)return SE_DAY;if(t<7.6)return lerp(SE_DAY,SE_LOW,eio((t-4.6)/3.0));return SE_LOW;}
 function zoom(t){ // 1 = wide, 15 = telephoto on the Sun
  if(t<20.4||t>29.4)return 1;if(t<23.2)return Math.exp(Math.log(15)*eio((t-20.4)/2.8));if(t<26.7)return 15;return Math.exp(Math.log(15)*(1-eio((t-26.7)/2.7)));}
 SC={D:30,
@@ -16,16 +16,16 @@ SC={D:30,
   let anc,ant;
   if(z>1.0001){anc=[540+sway[0]*(1-zk),lerp(sy0,930,zk)+sway[1]*(1-zk)];ant=[0,Math.tan(se)];}
   else{anc=[540+sway[0],HOR+sway[1]];ant=[0,0];}
-  const fl=Math.exp(-t*5)*0.9+Math.exp(-(30-t)*12)*0.0;
+  const fl=Math.exp(-t*5)*0.9+Math.exp(-(30-t)*5)*0.9;   // glow pulse peaks at the loop seam
   const expo=lerp(1,0.22,zk);return {se,day,sc,anc,ant,cp,fl,expo};},
  cards:[
-  [0,1.7,[['MARS SUNSETS','#fff'],['ARE BLUE','#7fc4ff']],124],
-  [1.7,5.2,['By day, the sky is',['BUTTERSCOTCH','#ffc46b']],112],
-  [5.2,9.0,['At sunset, its glow',['TURNS BLUE','#7fc4ff']],116],
+  [0,2.6,[['MARS SUNSETS','#fff'],['ARE BLUE','#7fc4ff']],124],
+  [2.6,6.4,['By day, the sky is',['BUTTERSCOTCH','#ffc46b']],112],
+  [6.4,9.0,['At sunset, its glow',['TURNS BLUE','#7fc4ff']],116],
   [9.0,12.8,['Why? Fine dust',['scatters blue forward','#7fc4ff']],104],
   [12.8,16.6,['Blue light stays',['close to the Sun','#7fc4ff']],108],
   [16.6,20.4,['NASA Curiosity saw it',['April 15, 2015','#ffd36b']],100],
-  [20.4,23.4,['And the Sun',['looks smaller','#ffd36b']],116],
+  [20.4,23.4,['And the Sun',['looks smaller','#ffd36b']],100],
   [23.4,26.8,['Only 2/3 the size',['seen from Earth','#ffd36b']],108],
   [27.4,30.01,[['MARS SUNSETS','#fff'],['ARE BLUE','#7fc4ff']],124]],
  overlay(t){
