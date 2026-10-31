@@ -4,6 +4,27 @@ Routine prompt: "Read AGENT.md in the Proxom/beyondatom-media repository and fol
 
 
 
+## ZERO-DEFECT QUALITY GATE (Erkan, 31 Oct 09:02 — applies to EVERY video, overrides speed and slot pressure except that the slot is still never left empty)
+Erkan: videos must contain NO visual error, logic error, factual error, illusion error, motion error, alignment error, broken area, audio error, or any similar defect. One flaw makes a video worthless and costs the account its credibility. A video with a known defect is NEVER scheduled. Fix it, re-render, re-check. If a slot is close and a fix is impossible, use a previously approved, defect-free video from the backlog rather than ship a flawed one.
+
+BEFORE SCHEDULING, run this audit and log it in the dashboard db as qualityAudit (video id, each check pass/fail, what you looked at). Do not write "checked" unless you actually viewed the evidence:
+1. VISUAL: extract frames (start, every ~0.5 s through any action, the loop point, the last frame) and LOOK at them. No clipping/interpenetrating objects, no flicker, z-fighting, stretched or warped geometry, texture seams, floating or missing parts, popping, black/empty frames, text cut off or overlapping, wrong colours, aliasing artefacts, cropped subjects.
+2. MOTION AND PHYSICS: every motion follows its cause. Gravity, momentum, collisions, friction and rotation direction look plausible; speeds are consistent; no teleporting or jitter; the loop point is invisible (compare first and last frame).
+3. ALIGNMENT AND GEOMETRY: parts that should mate, mesh or touch actually do (pitch circles, shafts, pins, rails, gaps). Nothing drifts off its axis, nothing is off-centre by accident, all text and objects sit inside the safe zones.
+4. LOGIC: the cause-and-effect chain is complete and consistent from start to end. Input drives output in the right direction and ratio. No part moves without being driven; no impossible perpetual motion unless the video is explicitly labelled as an illusion.
+5. FACTS: every number, name, date, unit, claim and caption is verified against at least one reliable source you opened THIS run (note the source URL in the audit). If you cannot verify a claim, remove the claim. Never write a fact from memory alone.
+6. ILLUSIONS: no accidental optical illusion (moiré, wagon-wheel/strobe effect, shape that seems to reverse direction, misleading perspective). If an illusion is the point, say so in the caption.
+7. AUDIO: every sound is synced to its on-screen event (within about 1 frame), no clicks, pops, clipping, hiss or abrupt cut at the loop, level about -20 LUFS, true peak under -3 dBTP, nothing that sounds wrong for the material. Listen to or analyse the spectrogram and waveform of the final mixed file, not the source stems.
+8. TECHNICAL: final file plays; 1080x1920, correct duration, audio track present, no black first/last frame, caption and hashtags correct and free of typos.
+
+Rules around the audit:
+- Audit the FINAL exported file, not the script or the preview.
+- Check the whole video, not just the first seconds.
+- When you find any defect, fix the cause in the generator, not just that clip, and add a one-line lesson to agent/memory.lessons so the same defect never repeats.
+- Once per day (research mode counts) re-audit 2 videos that are already scheduled; if any has a defect, replace or fix it in the queue and report it.
+- FIRST RUN AFTER THIS RULE: audit EVERY video already in the Metricool queue with this checklist (final files, not scripts). Replace or re-render any that fail, even ones close to posting, and list the findings in the report.
+- The watchdog (Bekçi) spot-checks; a defect found there is a failure of this gate and is reported to Erkan.
+
 ## QUEUE CAP AND RESEARCH MODE (Erkan, 30 Oct 21:11 — overrides "always produce" wherever they conflict, except NO EMPTY SLOT)
 - QUEUE = videos of THIS platform already scheduled for a future time (count with Metricool getScheduledPosts, now → +30 days, this platform only; the video of a slot that is in progress does not count).
 - Never produce or schedule beyond 10 videos ahead. When QUEUE reaches 10 → switch to PAUSE mode: produce nothing. Stay in PAUSE until QUEUE falls to 5 or fewer (queue shrinks as slots publish). At 5 → switch to PRODUCE mode and fill the next empty slots in time order until QUEUE is 10 again. Between 6 and 9 keep the current mode (hysteresis).
