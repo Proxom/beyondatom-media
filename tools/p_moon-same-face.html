@@ -4,7 +4,7 @@
 precision highp float;
 uniform vec2 R;uniform float T;uniform vec3 SUN;uniform vec3 CP;uniform mat3 CM;uniform float FOV;
 uniform vec4 S0,S1;uniform mat3 M0,M1;uniform float TY0,TY1,SP0,SP1;
-uniform vec3 RN;uniform vec2 RR;uniform float RA,EXPO,SHOWAX,GA,RTY;uniform vec3 OFF,ER,SLD;uniform sampler2D TEX,CLD;
+uniform vec3 RN;uniform vec2 RR;uniform float RA,EXPO,SHOWAX,GA,RTY;uniform vec3 OFF,ER,SLD;uniform sampler2D TEX,CLD,MTX;
 float h1(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
 float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(mix(h1(i),h1(i+vec3(1,0,0)),f.x),mix(h1(i+vec3(0,1,0)),h1(i+vec3(1,1,0)),f.x),f.y),
@@ -36,14 +36,9 @@ vec3 alb(float ty,vec3 p){
   float w=lat+.02*(fbm(p*5.)-.5);float b=sin(w*22.)*.5+.5,b2=sin(w*57.)*.5+.5;
   vec3 c=mix(vec3(.86,.76,.55),vec3(.74,.62,.42),b);c=mix(c,vec3(.93,.87,.70),b2*.3);
   return mix(c,vec3(.62,.66,.66),smoothstep(.75,.97,abs(lat)));}
- if(ty>3.5){ // moon: dark maria mostly on the near side (local +x), craters
-  float near=smoothstep(-.25,.65,p.x);vec3 wq=p*1.6+vec3(4.1,1.3,.7);wq+=.55*vec3(fbm(wq*1.7),fbm(wq*1.7+3.3),fbm(wq*1.7+7.1));float m=fbm(wq);
-  float maria=smoothstep(.47,.58,m)*near*.9+smoothstep(.60,.66,m)*(1.-near)*.35;
-  vec3 c=mix(vec3(.72,.71,.68),vec3(.30,.30,.32),maria);c*=.84+.32*fbm(p*13.);c*=.93+.1*fbm(p*41.);
-  for(int l=0;l<3;l++){float sc=l==0?5.:l==1?11.:24.;vec3 q=p*sc;vec3 id=floor(q);vec3 f=fract(q);float h=h1(id+float(l)*3.1);
-   if(h>.55){vec3 cc=vec3(h1(id+1.),h1(id+2.),h1(id+3.))*.5+.25;float d=length(f-cc);float rr=.1+.18*h1(id+5.);
-    c*=1.-.28*smoothstep(rr,rr*.55,d)+.22*smoothstep(rr*.75,rr,d)*smoothstep(rr*1.35,rr,d);}}
-  return c;}
+ if(ty>3.5){ // moon: NASA LRO colour map, 0 deg longitude on local +x (the near side), east toward local -z
+  vec2 uv=vec2(atan(-p.z,p.x)/6.28318+.5,acos(clamp(p.y,-1.,1.))/3.14159);
+  vec3 m=texture2D(MTX,uv).rgb;m=pow(m,vec3(2.3))*1.35;return m;}
  // uranus
  float w=lat+.015*(fbm(p*4.)-.5);vec3 c=mix(vec3(.55,.80,.86),vec3(.66,.88,.91),sin(w*12.)*.5+.5);c*=.94+.08*fbm(p*9.);
  return mix(c,vec3(.80,.94,.95),smoothstep(.55,.85,lat)*.6);}
@@ -92,7 +87,7 @@ void main(){
    float wdt=.018*S.w;col=mix(col,vec3(1.,.85,.4),SHOWAX*smoothstep(wdt,wdt*.3,dist)*smoothstep(lim,lim*.85,abs(tc)));}}}
  col*=EXPO;col=1.-exp(-col*1.1);col=pow(col,vec3(.95));gl_FragColor=vec4(col,1.);}
 </script>
-<script src="tex.js"></script><script>
+<script src="tex.js"></script><script src="texm.js"></script><script>
 const W=1080,H=1920;const g=document.getElementById('g'),gl=g.getContext('webgl',{preserveDrawingBuffer:true});
 function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o}
 const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,'attribute vec2 a;void main(){gl_Position=vec4(a,0,1);}'));
@@ -103,8 +98,8 @@ const U=n=>gl.getUniformLocation(pr,n);
 function mkTex(src,unit,cb){const im=new Image();im.onload=()=>{const t=gl.createTexture();gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,t);
  gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,im);gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR);
  gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.REPEAT);cb()};im.src=src;}
-let _tl=0;mkTex(TEXA,0,()=>{_tl++;window.TEXREADY=_tl==2});mkTex(TEXC,1,()=>{_tl++;window.TEXREADY=_tl==2});
-gl.uniform1i(gl.getUniformLocation(pr,'TEX'),0);gl.uniform1i(gl.getUniformLocation(pr,'CLD'),1);
+let _tl=0;mkTex(TEXA,0,()=>{_tl++;window.TEXREADY=_tl==3});mkTex(TEXC,1,()=>{_tl++;window.TEXREADY=_tl==3});mkTex(TEXM,2,()=>{_tl++;window.TEXREADY=_tl==3});
+gl.uniform1i(gl.getUniformLocation(pr,'TEX'),0);gl.uniform1i(gl.getUniformLocation(pr,'CLD'),1);gl.uniform1i(gl.getUniformLocation(pr,'MTX'),2);
 const c=document.getElementById('c'),x=c.getContext('2d');
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
 const lerp=(a,b,t)=>a+(b-a)*t;

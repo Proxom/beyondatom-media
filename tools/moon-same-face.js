@@ -1,5 +1,5 @@
 // Moon tidal locking: spin period = orbit period, so the near side always faces Earth.
-const D=2.2,MR=0.33; // orbit radius / Moon radius in Earth radii (not to scale)
+const D=1.95,MR=0.31; // orbit radius / Moon radius in Earth radii (not to scale)
 const SUNV=[1,0.32,0.45];
 // orbit angle: integrate a speed profile, scaled so 30 s = exactly 3 orbits (seamless loop)
 function rate(t){if(t<3)return .12;if(t<5.5)return lerp(.12,1,ease((t-3)/2.5));if(t<26.5)return 1;if(t<28.5)return lerp(1,.12,ease((t-26.5)/2));return .12;}
@@ -7,14 +7,16 @@ const TH=[0];(function(){for(let i=1;i<=9000;i++)TH.push(TH[i-1]+rate((i-.5)/300
 const TH0=Math.atan2(-SUNV[2],-SUNV[0])+0.55; // start at full Moon: near side lit in the hook shot
 const th=t=>{const f=cl(t,0,30)*300,i=Math.floor(f);return TH0+(i>=9000?TH[9000]:lerp(TH[i],TH[i+1],f-i))};
 // spin offset: during 14-20 s the "what if" Moon stops spinning, then catches up
-const GA=14.2,GB=19.8;
-function off(t){if(t<GA)return 0;if(t<GB)return th(t)-th(GA);return (th(GB)-th(GA))*(1-eio((t-GB)/1.3));}
+const GA=14.2,GB=18.4;
+function off(t){if(t<GA)return 0;if(t<GB)return th(t)-th(GA);return (th(GB)-th(GA))*(1-eio((t-GB)/1.1));}
 const spin=t=>th(t)+Math.PI-off(t);
+// bar start time chosen so ORBIT and SPIN reach exactly 27.3 d (one full turn) at 14.05 s
+const B0=(function(){let lo=4,hi=8;for(let i=0;i<50;i++){const m=(lo+hi)/2;(th(14.05)-th(m)>2*Math.PI)?lo=m:hi=m;}return (lo+hi)/2})();
 const mpos=t=>{const a=th(t);return [D*Math.cos(a),0,D*Math.sin(a)]};
 function nearDir(t){const s=spin(t);return [Math.cos(s),0,Math.sin(s)]} // world dir of the near-side centre
 // camera: hook = over Earth's limb looking at the Moon; overview = high 3/4 view
-function camHook(t){const m=mpos(t);const d=norm(m);return {eye:[d[0]*1.35,0.78,d[2]*1.35],tgt:[m[0],m[1]-0.06,m[2]],fov:.95}}
-function camOver(t){const sw=0.03*Math.sin(2*Math.PI*t/10);return {eye:[sw,3.3,6.2],tgt:[0,-0.55,0.1],fov:.76}}
+function camHook(t){const m=mpos(t);const d=norm(m);return {eye:[d[0]*1.35,0.78,d[2]*1.35],tgt:[m[0],m[1]-0.06,m[2]],fov:1.1}}
+function camOver(t){const sw=0.03*Math.sin(2*Math.PI*t/10);return {eye:[sw,3.3,6.2],tgt:[0,-0.5,0.1],fov:.84}}
 function cam(t){const a=t<3?0:t<5.8?eio((t-3)/2.8):t<27?1:t<29.6?1-eio((t-27)/2.6):0;
  const h=camHook(t),o=camOver(t);if(a<=0)return h;if(a>=1)return o;
  // interpolate eye/target and fov in log space so the move feels like one dolly
@@ -25,16 +27,16 @@ SC={D:30,
  scene(t){const c=cam(t);const m=mpos(t);
   return {eye:c.eye,tgt:c.tgt,fov:c.fov,sun:SUNV,
    p:{c:[0,0,0],r:1,ty:0,tilt:23.44,yaw:150,spin:-t*0.35},
-   q:{c:m,r:MR,ty:4,tilt:0,yaw:0,spin:spin(t)},ring:{n:[0,1,0],a:0},axis:0,expo:1.12};},
+   q:{c:m,r:MR,ty:4,tilt:0,yaw:0,spin:spin(t)},ring:{n:[0,1,0],a:0},axis:0,expo:1.0};},
  cards:[
-  [0,3.2,[["YOU'VE ONLY",'#fff'],['EVER SEEN','#fff'],['HALF THE MOON','#ffd36b']],116],
+  [0,3.2,[["YOU'VE ONLY SEEN",'#fff'],['HALF THE MOON','#ffd36b']],116],
   [3.2,6.5,['The Moon',['does spin','#7fd4ff']],112],
   [6.5,10.4,['1 spin =',['27.3 days','#7fd4ff']],112],
   [10.4,14.2,['1 orbit =',['27.3 days','#7fd4ff']],112],
-  [14.2,19.8,["If it didn't spin...",["we'd see every side",'#ff8a7a']],96],
-  [19.8,24.4,['Spin = orbit:',['TIDAL LOCKING','#ffd36b']],108],
+  [14.2,18.4,['No spin?',["We'd see every side",'#ff8a7a']],104],
+  [18.4,24.4,['Spin = orbit:',['TIDAL LOCKING','#ffd36b']],108],
   [24.4,27.5,['Far side first seen:',['1959','#7fd4ff']],104],
-  [27.5,30.01,[["YOU'VE ONLY",'#fff'],['EVER SEEN','#fff'],['HALF THE MOON','#ffd36b']],116]],
+  [27.5,30.01,[["YOU'VE ONLY SEEN",'#fff'],['HALF THE MOON','#ffd36b']],116]],
  overlay(t){
   const s=SC.scene(t);const m=mpos(t),nd=nearDir(t),eye=s.eye;const A=ovA(t);
   const toE=norm(m.map(v=>-v));const face=nd[0]*toE[0]+nd[2]*toE[2]; // 1 = near side faces Earth
@@ -56,14 +58,14 @@ SC={D:30,
    const la=t<6.6?0:t<7.1?ease((t-6.6)/.5):t<13.9?1:t<14.3?1-ease((t-13.9)/.4):0;
    label('NEAR SIDE',qm[0],qm[1]-95,la*A*occ,'#7dffb0',32);
    const ga=t<GA+.6?0:t<GA+1?ease((t-GA-.6)/.4):t<GB?1:t<GB+.4?1-ease((t-GB)/.4):0;
-   label(face>0.9?'FACING EARTH':'FACING AWAY',qm[0],qm[1]+(qm[1]>proj([0,0,0])[1]?110:-95),ga*A*occ,col,32);
+   label(face>0.9?'FACING EARTH':face>0?'TURNING AWAY':'FACING AWAY',qm[0],qm[1]+(qm[1]>proj([0,0,0])[1]?110:-95),ga*A*occ,col,32);
    const ea=t<5.4?0:t<6?ease((t-5.4)/.6):t<26.6?1:1-ease((t-26.6)/.6);const qe=proj([0,0,0]);label('EARTH',qe[0],qe[1]+proj([0,0,1])[1]-qe[1]+70,.85*ea*A,'#cfe3ff',34);
    // progress panel: orbit vs spin
    const pa=t<6.4?0:t<6.9?ease((t-6.4)/.5):t<GA-.2?1:t<GA+.2?1-ease((t-GA+.2)/.4):0;
-   if(pa>0){const o=cl((th(t)-th(6.5))/(2*Math.PI),0,1);const sp=cl((spin(t)-spin(6.5))/(2*Math.PI),0,1);
+   if(pa>0){const o=cl((th(t)-th(B0))/(2*Math.PI),0,1);const sp=cl((spin(t)-spin(B0))/(2*Math.PI),0,1);
     const stopped=t>=GA&&t<GB;
     x.save();x.globalAlpha=pa;x.fillStyle='rgba(8,10,24,.74)';x.strokeStyle='rgba(255,255,255,.28)';x.lineWidth=3;x.beginPath();x.roundRect(170,1196,740,212,30);x.fill();x.stroke();
-    [['ORBIT',t<GA?o:cl((th(t)-th(6.5))/(2*Math.PI)%1,0,1),'#7fd4ff',1246],['SPIN',t<GA?sp:(stopped?0:cl(1-off(t)/(th(GB)-th(GA)),0,1)),stopped?'#ff7a6a':'#7dffb0',1336]].forEach(([n,v,c,y])=>{
+    [['ORBIT',t<GA?o:cl((th(t)-th(B0))/(2*Math.PI)%1,0,1),'#7fd4ff',1246],['SPIN',t<GA?sp:(stopped?0:cl(1-off(t)/(th(GB)-th(GA)),0,1)),stopped?'#ff7a6a':'#7dffb0',1336]].forEach(([n,v,c,y])=>{
      x.font='800 34px '+F;x.textAlign='left';x.fillStyle='#d8d2e8';x.fillText(n,205,y+12);
      x.fillStyle='rgba(255,255,255,.12)';x.beginPath();x.roundRect(345,y-14,420,30,15);x.fill();
      x.fillStyle=c;x.shadowColor=c;x.shadowBlur=12;x.beginPath();x.roundRect(345,y-14,Math.max(30,420*v),30,15);x.fill();x.shadowBlur=0;
