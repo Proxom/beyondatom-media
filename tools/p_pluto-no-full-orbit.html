@@ -55,7 +55,7 @@ function scene(t){
  const sun=P2(0,0);glow(sun[0],sun[1],230,[[0,'rgba(255,240,200,.55)'],[.12,'rgba(255,200,110,.28)'],[.4,'rgba(255,150,60,.07)'],[1,'rgba(0,0,0,0)']],1);
  glow(sun[0],sun[1],30,[[0,'rgba(255,255,250,1)'],[.5,'rgba(255,236,190,.9)'],[1,'rgba(255,200,120,0)']],1);
  // Neptune orbit (faint) and Pluto orbit (faint full path)
- const nv=t<3.6?0:t<4.6?ease((t-3.6)):t<22.2?1:t<23.2?1-ease(t-22.2):0; // Neptune fades out before the loop point
+ const nv=t<2.0?0:t<3.2?ease((t-2.0)/1.2):t<21.8?1:t<23.4?1-ease((t-21.8)/1.6):0; // Neptune fades out before the loop point
  const ins=PLUTO(y).r<NEPTUNE(y).r&&t<14;const zone=TIN!==null&&t>TIN-0.4&&t<TOUT+0.8?ease(Math.min((t-TIN+0.4)/.5,(TOUT+0.8-t)/.5)):0;
  const no=orbitPts(NEPTUNE,2000,2000+164.79,220);x.save();x.lineWidth=2;x.strokeStyle='rgba(120,180,255,'+(0.28*nv+0.25*zone)+')';x.beginPath();no.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.closePath();x.stroke();
  if(zone>0){x.fillStyle='rgba(80,140,255,'+(0.06*zone)+')';x.fill()}x.restore();
@@ -66,7 +66,7 @@ function scene(t){
    x.strokeStyle='rgba(255,'+(170+60*k|0)+','+(90+60*k|0)+','+(0.35+0.55*k)+')';x.lineWidth=3+3*k;x.shadowColor='#ffb14a';x.shadowBlur=10;x.beginPath();x.moveTo(a[i0][0],a[i0][1]);for(let i=i0+1;i<=i1;i++)x.lineTo(a[i][0],a[i][1]);x.stroke()}x.restore();}
  // discovery marker
  const d0=PLUTO(Y0),dm=P2(d0.r,d0.lon);x.save();x.strokeStyle='rgba(255,255,255,.75)';x.lineWidth=2.5;x.beginPath();x.arc(dm[0],dm[1],22,0,7);x.stroke();x.restore();
- LBL.push(['FOUND 1930',dm[0]+30,dm[1]-24,0.9,'#ffffff',26,'left']);
+ {const fa=t<3.6?1:t<4.4?1-ease((t-3.6)/.8):t<22.6?0:t<23.4?ease((t-22.6)/.8):1;if(fa>0)LBL.push(['FOUND 1930',dm[0]+30,dm[1]-24,0.9*fa,'#ffffff',26,'left']);} // label only while Pluto is near it
  const ft=t;if(ft<0.9){const k=Math.exp(-ft*4);glow(dm[0],dm[1],60+180*(1-k),[[0,'rgba(255,255,255,1)'],[.25,'rgba(255,220,150,.7)'],[1,'rgba(0,0,0,0)']],k)}
  const ar=t-23.5;if(ar>=0&&ar<1.2){const k=Math.exp(-ar*3.5);glow(dm[0],dm[1],60+220*(1-k),[[0,'rgba(255,255,255,1)'],[.25,'rgba(255,220,150,.7)'],[1,'rgba(0,0,0,0)']],k)}
  // Neptune body
@@ -84,7 +84,7 @@ function overlay(t){
  const vg=x.createRadialGradient(W/2,H*.52,H*.3,W/2,H*.52,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');x.fillStyle=vg;x.fillRect(0,0,W,H);
  for(const cd of CARDS){const [a,b,l,sz]=cd;if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=30?1:ease((b-t)/.3);card(l,400,sz,Math.min(fi,fo),(1-fi)*24)}}
  // year + progress readout
- const y=YEAR(t);const pa=t<2.6?0:t<3.1?ease((t-2.6)/.5):t<26.4?1:t<26.9?1-ease((t-26.4)/.5):0;
+ const y=YEAR(t);const pa=t<0.6?0:t<1.1?ease((t-0.6)/.5):t<26.4?1:t<26.9?1-ease((t-26.4)/.5):0;
  if(pa>0){const pr=cl((y-Y0)/PER,0,1);x.save();x.globalAlpha=pa;x.fillStyle='rgba(8,10,24,.72)';x.strokeStyle='rgba(255,255,255,.22)';x.lineWidth=2;x.beginPath();x.roundRect(150,628,690,96,24);x.fill();x.stroke();
   x.textAlign='left';x.font='800 24px '+F;x.fillStyle='#bcd2ff';x.fillText('YEAR',180,662);x.fillText('ORBIT DONE (TIME)',480,662);
   x.font='900 46px "DejaVu Sans Mono",monospace';x.fillStyle='#fff';x.fillText(String(Math.floor(y+1e-6)),180,708);
