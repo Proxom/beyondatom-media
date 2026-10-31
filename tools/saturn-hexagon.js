@@ -26,7 +26,7 @@ SC={D:30,
  cards:[
   [0,3.5,[['A HEXAGON','#fff'],['ON SATURN','#ffcf6b']],128],
   [3.5,8,['A jet stream with',['six straight sides','#ffcf6b']],100],
-  [8,12.2,['Winds: about',['360 km/h','#7fd4ff']],108],
+  [8,12.2,['Winds: about',['320 km/h','#7fd4ff']],108],
   [12.2,17.2,['Wider than',['two Earths','#7fd4ff']],116],
   [17.2,21.4,['First seen by Voyager,',['early 1980s','#ffcf6b']],92],
   [21.4,24,['Cassini, decades later:',['still there','#7fd4ff']],92],
@@ -53,6 +53,6 @@ SC={D:30,
     x.strokeStyle='rgba(200,235,255,'+(.5*ja)+')';x.lineWidth=3;x.shadowColor='#9fe0ff';x.shadowBlur=16;x.lineCap='round';x.beginPath();
     for(let j=0;j<=8;j++){const q=proj(hexPt((s0-j*0.03+6)%6,sp));j?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]);}x.stroke();}x.restore();}
   const la=eS(t);if(la>0.05&&t<17.4)label('Earths to scale',W/2,1300,Math.min(1,la),'#d8d2e8',34);
-  x.save();x.globalAlpha=.8;x.fillStyle='rgba(0,0,0,.6)';x.beginPath();x.roundRect(W/2-250,1370,500,42,21);x.fill();x.restore();label('Simulated view. Colours artistic',W/2,1400,.85,'#e8e2f0',26);
+  x.save();x.globalAlpha=.8;x.fillStyle='rgba(0,0,0,.6)';x.beginPath();x.roundRect(W/2-290,1370,580,42,21);x.fill();x.restore();label('Simulated view. Colors are artistic',W/2,1400,.85,'#e8e2f0',26);
  }
 };
