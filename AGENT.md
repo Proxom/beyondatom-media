@@ -1,5 +1,9 @@
 # YOUTUBE GROWTH AGENT (BeyondAtom) - standing instructions
 
+## PUBLISHING SCHEDULE — 4 PER DAY (Erkan, 1 Nov 08:57) — OVERRIDES EVERY OLDER SLOT RULE IN THIS FILE
+All three channels (Instagram, TikTok, YouTube) now publish exactly 4 videos per day at 03:00, 09:00, 15:00 and 21:00 Europe/London (Metricool publicationDate exactly these times, timezone Europe/London). Wherever this file says 6 per day, or names the old slots 01:00 / 05:00 / 09:00 / 13:00 / 17:00 / 21:00, read it as 4 per day at 03:00 / 09:00 / 15:00 / 21:00. Fewer videos means each one must be better: more time per video, the full quality gate, slower pacing, no filler. Rules that still apply: no empty slot (fill the next free slot of the new schedule), no double posts in a slot, queue cap and PRODUCE/PAUSE hysteresis (counts are in videos), the zero-defect gate.
+On 1 Nov 08:59 the existing queue was already moved to the new slots in the same order (nothing was dropped). Your first job in the next run: getScheduledPosts for the next 3 days, confirm every queued post of your network is on 03/09/15/21, move any stray post to the next free new slot with updateScheduledPost (keep the full original content), and then continue. Do not publish to the old times again. The old 6 runs per day are unchanged; they only check, repair and produce.
+
 Routine prompt: "Read AGENT.md in the Proxom/beyondatom-media repository and follow it." This repo is the working directory. Runs 6 times a day at 23:37, 03:37, 07:37, 11:37, 15:37 and 19:37 Europe/London, each run starting 2 hours before a publishing slot. Everything Erkan reads (dashboard, messages) is in Turkish; video titles, descriptions and on-screen text are in English.
 
 
@@ -91,7 +95,7 @@ Check: for every video, export the frame at 0.5 s and the frame with the most te
 
 ## NO EMPTY SLOT — TOP PRIORITY (Erkan, 30 Oct 07:43: "never skip a single posting time")
 This rule is above every other rule, including the quality bar. A missed slot is the worst possible outcome.
-1. FIRST THING EVERY RUN, before any new production: getScheduledPosts (Metricool brand 7675089, Europe/London) from now to +48 h for your network and list every empty slot among 01:00, 05:00, 09:00, 13:00, 17:00, 21:00.
+1. FIRST THING EVERY RUN, before any new production: getScheduledPosts (Metricool brand 7675089, Europe/London) from now to +48 h for your network and list every empty slot among 03:00, 09:00, 15:00, 21:00.
 2. If the next slot (within 3 h) is empty: fill it before doing anything else — from a ready bank video if one exists, otherwise make the fastest good video you can with your existing generators (new content, not a near-duplicate) and schedule it before the run ends.
 3. Never end a run with any slot in the next 24 h empty. (The old targets 'keep 4 ready videos in the bank' and 'produce 2 videos per run until the bank holds 8' are CANCELLED by the 30 Oct 21:11 QUEUE CAP: scheduled + ready-unscheduled videos together never exceed 10; produce only while in PRODUCE mode.)
 4. Quality: aim for 8+/10. If 90 minutes before a slot no 8+ video is ready, publish your best 7+ video instead of leaving the slot empty, and note it in the dashboard.
@@ -124,7 +128,7 @@ Metadata: title < 60 chars, keyword first, no misleading clickbait; description 
 3. Give those URLs to Metricool createScheduledPost. Only finished media goes in media/; the folder tools/ holds reusable animation code (tools/mercury-anim.html + tools/render.js is a working template: copy it, change draw(t), render, ffmpeg). Never put notes, secrets or private data in this public repo.
 
 ## Publishing slots (Erkan, 29 Oct 20:13)
-Publish 6 videos a day at 01:00, 05:00, 09:00, 13:00, 17:00 and 21:00 Europe/London (Erkan, 29 Oct 22:56) (Metricool scheduledAt exactly these times). The runs are at 23:37, 03:37, 07:37, 11:37, 15:37, 19:37, i.e. about 2 hours before the next slot. Each run: make sure the NEXT slot (and the following 2 days of slots) are filled; a missed slot must be refilled at the next possible time. Keep a bank of ~10 ready videos so a failed run never leaves a slot empty. Shorts first; a long video can take a slot when ready (max 1 per day). Quality over count: never near-duplicates, never filler; if you cannot make a good video for a slot, reuse a ready bank item rather than posting a weak one.
+Publish 4 videos a day at 03:00, 09:00, 15:00 and 21:00 Europe/London (Erkan, 29 Oct 22:56) (Metricool scheduledAt exactly these times). The runs are at 23:37, 03:37, 07:37, 11:37, 15:37, 19:37, i.e. about 2 hours before the next slot. Each run: make sure the NEXT slot (and the following 2 days of slots) are filled; a missed slot must be refilled at the next possible time. Keep a bank of ~10 ready videos so a failed run never leaves a slot empty. Shorts first; a long video can take a slot when ready (max 1 per day). Quality over count: never near-duplicates, never filler; if you cannot make a good video for a slot, reuse a ready bank item rather than posting a weak one.
 
 ## Status (29 Oct 20:20)
 The first Short (media/mercury-day-year, Metricool post 410510136) was made by the manager and is scheduled for TONIGHT 21:00 (Erkan: start posting tonight at 21:00). Do not duplicate it. Your first own run should fill the 30 Oct 09:00 slot onward; check getScheduledPosts so tonight's 21:00 post is confirmed published.
