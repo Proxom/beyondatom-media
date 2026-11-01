@@ -1,0 +1,128 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=c width=1080 height=1920></canvas>
+<script>
+// Olympus Mons "walk uphill": simplified flank profile, vertical stretch 10x -> true scale, walker + slope readout.
+const W=1080,H=1920,c=document.getElementById('c');let x=c.getContext('2d');
+const F='"DejaVu Sans",Arial,sans-serif',MONO='"DejaVu Sans Mono",monospace';
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));const ease=t=>{t=cl(t);return t*t*(3-2*t)};
+let sd=11;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647};
+const GOLD='#ffcf6e',BLUE='#8fd0ff',ORG='#ff9a5c';
+// ---- model (shared with the sound script through window.OM when loaded in node) ----
+const HALF=300,PLAT=50,PXKM=1.46,Y0=1070;   // km half width, flat summit half width, px per km, ground baseline
+const thDeg=r=>2.2+2.8*cl((r-PLAT)/(HALF-PLAT)); // flank slope (deg) at distance r from centre: 2.2 deg near summit to 5.0 deg at base
+const hKm=(()=>{const N=600,tab=[];let h=0;tab[N]=0;for(let i=N-1;i>=0;i--){const r0=HALF*i/N,r1=HALF*(i+1)/N,rm=(r0+r1)/2;h+=(r1-r0)*(rm<=PLAT?0:Math.tan(thDeg(rm)*Math.PI/180));tab[i]=h}
+ return r=>{const q=cl(r/HALF)*N,i=Math.min(N-1,Math.floor(q)),f=q-i;return tab[i]*(1-f)+tab[i+1]*f}})();
+// timeline
+const T_STRETCH_END=9.0,T_FLAT_END=15.0,T_WALK0=15.4,T_WALK1=26.0;
+const exagOf=t=>1+9*(1-ease((t-T_STRETCH_END)/(T_FLAT_END-T_STRETCH_END)));
+const walkS=t=>ease((t-T_WALK0)/(T_WALK1-T_WALK0)); // 0..1 progress
+const walkR=t=>HALF-0.12*HALF*0-(HALF-60)*walkS(t)-0; // distance from centre: 300 -> 60 km (stays on the flank)
+const grow=t=>0.55+0.45*ease(t/1.4);
+// starfield / sky
+const SF=document.createElement('canvas');SF.width=1080;SF.height=1920;{const s=SF.getContext('2d');
+ const g=s.createLinearGradient(0,0,0,1920);g.addColorStop(0,'#05060f');g.addColorStop(.40,'#1a1020');g.addColorStop(.62,'#6b3a2a');g.addColorStop(.74,'#c27a45');g.addColorStop(1,'#3b1a12');s.fillStyle=g;s.fillRect(0,0,1080,1920);
+ for(let i=0;i<420;i++){const px=rnd()*1080,py=rnd()*1050;const m=Math.pow(rnd(),5);const a=(.2+.8*m)*(1-py/1200);s.fillStyle='rgba(245,240,255,'+a+')';s.beginPath();s.arc(px,py,.5+m*1.3,0,7);s.fill()}}
+function glow(px,py,r,stops,a){x.save();x.globalCompositeOperation='lighter';x.globalAlpha=a;const g=x.createRadialGradient(px,py,0,px,py,r);stops.forEach(s=>g.addColorStop(s[0],s[1]));x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill();x.restore()}
+function card(lines,y,size,alpha,dy){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.textAlign='center';
+ let mw=0;x.font='900 '+size+'px '+F;lines.forEach(l=>{mw=Math.max(mw,x.measureText(typeof l==='string'?l:l[0]).width)});
+ if(mw>760){size=Math.floor(size*760/mw);x.font='900 '+size+'px '+F}x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=26;
+ lines.forEach((l,i)=>{x.fillStyle=typeof l==='string'?'#fff':l[1];x.fillText(typeof l==='string'?l:l[0],540,y+i*size*1.17+(dy||0))});x.restore()}
+function label(s,px,py,a,col,size,al,font){if(a<=0)return;x.save();x.globalAlpha=a;x.font=(font||('800 '+(size||30)+'px '+F));x.textAlign=al||'center';x.fillStyle=col||'#fff';x.shadowColor='#000';x.shadowBlur=10;x.fillText(s,px,py);x.restore()}
+let LBL=[];
+const px0=r=>540+r*PXKM; // x for signed r (km from centre, negative = left)
+function profPts(ex,gr){const pts=[];for(let k=-HALF;k<=HALF;k+=5){const r=Math.abs(k);pts.push([540+k*PXKM,Y0-hKm(r)*PXKM*ex*gr])}return pts}
+function scene(t){
+ x.globalCompositeOperation='source-over';x.globalAlpha=1;x.drawImage(SF,0,0);
+ const ex=exagOf(t),gr=grow(t);
+ // sun glow low on the horizon
+ glow(840,Y0-70,330,[[0,'rgba(255,220,160,.40)'],[.4,'rgba(255,150,80,.14)'],[1,'rgba(0,0,0,0)']],1);
+ // far plain
+ x.fillStyle='#5a2c1f';x.fillRect(0,Y0,W,H-Y0);
+ const gp=x.createLinearGradient(0,Y0,0,Y0+90);gp.addColorStop(0,'#8a4a2e');gp.addColorStop(1,'#4a2218');x.fillStyle=gp;x.fillRect(0,Y0,W,90);
+ // volcano body
+ const pts=profPts(ex,gr);
+ x.beginPath();x.moveTo(pts[0][0],Y0+2);pts.forEach(p=>x.lineTo(p[0],p[1]));x.lineTo(pts[pts.length-1][0],Y0+2);x.closePath();
+ const topY=Y0-hKm(0)*PXKM*ex*gr;const bg=x.createLinearGradient(0,topY,0,Y0);bg.addColorStop(0,'#d98a52');bg.addColorStop(1,'#9a5232');x.fillStyle=bg;x.fill();
+ // light edge
+ x.save();x.strokeStyle='rgba(255,225,170,.85)';x.lineWidth=3;x.shadowColor='#ffb070';x.shadowBlur=14;x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.stroke();x.restore();
+ // faint flank terraces (stretch with the picture)
+ x.save();x.globalAlpha=.18;x.strokeStyle='#3a1a10';x.lineWidth=2;for(let k=1;k<5;k++){const rr=HALF*k/5.5;x.beginPath();for(const s of [-1,1]){const y=Y0-hKm(rr)*PXKM*ex*gr;x.moveTo(540+s*rr*PXKM,y+1);x.lineTo(540+s*(rr-18)*PXKM,Y0-hKm(rr-18)*PXKM*ex*gr)}x.stroke()}x.restore();
+ // walker on the left flank
+ if(t>=T_WALK0-.5){const a=ease((t-T_WALK0+.5)/.5);const r=walkR(Math.max(t,T_WALK0));const xx=540-r*PXKM,yy=Y0-hKm(r)*PXKM*ex*gr-2;
+  glow(xx,yy,34,[[0,'rgba(255,255,255,.95)'],[.3,'rgba(255,214,120,.55)'],[1,'rgba(0,0,0,0)']],a);
+  x.save();x.globalAlpha=a;x.fillStyle='#fff';x.beginPath();x.arc(xx,yy,5,0,7);x.fill();x.restore();
+  LBL.push(['YOU',xx,yy-46,a*cl((T_WALK1+1.6-t)/.6),GOLD,34,'center'])}
+}
+function figure(t,cx,cy,ang,phase,a){ // walking astronaut, feet at (cx,cy), tilted by ang (rad, uphill to the right)
+ x.save();x.translate(cx,cy);x.rotate(-ang);x.globalAlpha=a;x.lineCap='round';x.lineJoin='round';
+ const sw=Math.sin(phase),sw2=Math.sin(phase+Math.PI);
+ // legs
+ x.strokeStyle='#e9ecf4';x.lineWidth=11;
+ for(const [s,sg] of [[sw,0],[sw2,1]]){const hipX=0,hipY=-52;const fx=s*17,fy=-Math.max(0,Math.cos(phase+sg*Math.PI))*9;
+  x.beginPath();x.moveTo(hipX,hipY);x.lineTo(fx*.7+hipX*.3,hipY+26-4);x.lineTo(fx,fy);x.stroke();
+  x.strokeStyle='#cfd3de';x.lineWidth=13;x.beginPath();x.moveTo(fx,fy);x.lineTo(fx+9,fy);x.stroke();x.strokeStyle='#e9ecf4';x.lineWidth=11}
+ // backpack + torso
+ x.fillStyle='#bfc4d2';x.beginPath();x.roundRect(-26,-112,16,50,6);x.fill();
+ x.fillStyle='#f4f6fb';x.beginPath();x.roundRect(-14,-118,32,68,12);x.fill();
+ // arms
+ x.strokeStyle='#e9ecf4';x.lineWidth=10;x.beginPath();x.moveTo(2,-104);x.lineTo(2+sw2*10,-84);x.lineTo(2+sw2*14,-68);x.stroke();
+ // helmet + visor
+ x.fillStyle='#f4f6fb';x.beginPath();x.arc(5,-134,19,0,7);x.fill();
+ const vg=x.createLinearGradient(5,-146,22,-124);vg.addColorStop(0,'#ffd8a0');vg.addColorStop(1,'#6a3a24');x.fillStyle=vg;x.beginPath();x.ellipse(13,-134,11,13,0,0,7);x.fill();
+ x.restore()}
+function inset(t){
+ const a=ease((t-14.8)/.6)*cl((28.4-t)/.5);if(a<=0)return;
+ const cx=540,cy=1282,R=112;const r=walkR(Math.max(t,T_WALK0)),th=thDeg(r)*Math.PI/180;
+ x.save();x.globalAlpha=a;x.beginPath();x.arc(cx,cy,R,0,7);x.clip();
+ const g=x.createLinearGradient(0,cy-R,0,cy+R);g.addColorStop(0,'#2a1a28');g.addColorStop(.5,'#c27a45');g.addColorStop(1,'#5a2c1f');x.fillStyle=g;x.fillRect(cx-R,cy-R,2*R,2*R);
+ // ground: rotated plane, rocks scroll backwards as the walker moves
+ x.save();x.translate(cx,cy+54);x.rotate(-th);x.fillStyle='#7a3f26';x.fillRect(-300,0,600,200);x.fillStyle='#a45a36';x.fillRect(-300,0,600,6);
+ const sc=(t-T_WALK0)*58;for(let i=0;i<14;i++){const rx=((i*83.1-sc)%600+600)%600-300,rs=5+(i%4)*3;x.fillStyle=i%2?'#5e2e1c':'#8f4c2d';x.beginPath();x.ellipse(rx,12+(i%3)*14,rs*1.6,rs,0,0,7);x.fill()}
+ x.restore();
+ // horizontal reference + angle arc
+ x.save();x.setLineDash([8,8]);x.strokeStyle='rgba(255,255,255,.55)';x.lineWidth=2;x.beginPath();x.moveTo(cx-R,cy+54);x.lineTo(cx+R,cy+54);x.stroke();x.restore();
+ figure(t,cx,cy+54,th,(t-T_WALK0)*7.5,1);
+ x.restore();
+ x.save();x.globalAlpha=a;x.strokeStyle='rgba(255,255,255,.85)';x.lineWidth=4;x.beginPath();x.arc(cx,cy,R,0,7);x.stroke();x.restore();
+ label('WALKING UPHILL',cx,cy+R+40,a*.9,'#fff',30);
+}
+function overlay(t){
+ const vg=x.createRadialGradient(W/2,H*.52,H*.3,W/2,H*.52,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.55)');x.fillStyle=vg;x.fillRect(0,0,W,H);
+ const HOOK=[['TALLEST VOLCANO',GOLD],'IN THE SOLAR SYSTEM'];
+ const CARDS=[
+  [0,3.4,[['TALLEST VOLCANO',GOLD],'IN THE SOLAR SYSTEM',['OLYMPUS MONS',BLUE]],70,370],
+  [3.4,6.4,['TALLER THAN',['MOUNT EVEREST',GOLD]],84,410],
+  [6.4,9.0,['BUT THIS DRAWING',['IS STRETCHED 10×',BLUE]],72,410],
+  [9.0,12.2,['SHRINK IT TO',['TRUE SCALE...',GOLD]],84,410],
+  [12.2,15.0,['IT IS A',['GENTLE RAMP',BLUE]],88,410],
+  [15.0,19.6,['SLOPES ARE ONLY',['2 TO 5 DEGREES',GOLD]],74,410],
+  [19.6,24.2,['YOU WOULD WALK',['UPHILL, NOT CLIMB',BLUE]],74,410],
+  [24.2,28.4,['TALLEST VOLCANO',['YOU COULD WALK UP',GOLD]],72,410],
+  [28.4,30.01,[['TALLEST VOLCANO',GOLD],'IN THE SOLAR SYSTEM',['OLYMPUS MONS',BLUE]],70,370]];
+ for(const [a,b,l,sz,yy] of CARDS){if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=30?1:ease((b-t)/.3);card(l,yy,sz,Math.min(fi,fo),(1-fi)*24)}}
+ // vertical stretch chip
+ const ex=exagOf(t);const ca=t<.9?0:t<1.4?ease((t-.9)/.5):t<28.0?1:t<28.6?1-ease((t-28.0)/.6):0;
+ if(ca>0){const txt=ex>1.03?'HEIGHT STRETCHED ×'+(ex<9.95?ex.toFixed(1):'10'):'TRUE SCALE (SIMPLIFIED)';
+  x.save();x.globalAlpha=ca;x.font='800 30px '+F;const w=x.measureText(txt).width+56;x.fillStyle='rgba(8,10,24,.74)';x.strokeStyle=ex>1.03?'rgba(255,154,92,.8)':'rgba(143,208,255,.8)';x.lineWidth=2;
+  x.beginPath();x.roundRect(540-w/2,1098,w,56,28);x.fill();x.stroke();x.fillStyle=ex>1.03?ORG:BLUE;x.textAlign='center';x.fillText(txt,540,1136);x.restore()}
+ // slope readout
+ const r=walkR(Math.max(t,T_WALK0));const pa=t<14.8?0:t<15.4?ease((t-14.8)/.6):t<27.8?1:t<28.4?1-ease((t-27.8)/.6):0;
+ if(pa>0){x.save();x.globalAlpha=pa;x.fillStyle='rgba(8,10,24,.74)';x.strokeStyle='rgba(255,255,255,.22)';x.lineWidth=2;x.beginPath();x.roundRect(160,640,760,100,24);x.fill();x.stroke();
+  x.textAlign='left';x.font='800 22px '+F;x.fillStyle='#bcd2ff';x.fillText('SLOPE UNDER YOU',190,674);x.fillText('REAL RANGE',620,674);
+  x.font='900 36px '+MONO;x.fillStyle='#fff';x.fillText(thDeg(r).toFixed(1)+'°',190,720);x.fillStyle=GOLD;x.fillText('2 TO 5°',620,720);x.restore()}
+}
+const OFF=document.createElement('canvas');OFF.width=W;OFF.height=H;
+const ACC=document.createElement('canvas');ACC.width=W;ACC.height=H;const ax=ACC.getContext('2d');
+function lblDraw(L,a){L.forEach(l=>{const q=l.slice();q[3]*=a;label(...q)})}
+function frameScene(t){
+ LBL=[];scene(t);const L1=LBL;let dis=ease((t-28.4)/1.5);
+ if(dis>0){const keep=x;const ctx=OFF.getContext('2d');x=ctx;LBL=[];scene(0);x=keep;x.globalAlpha=dis;x.drawImage(OFF,0,0);x.globalAlpha=1}
+ return [L1,cl(1-dis*2.5)]}
+function draw(t){
+ const NS=4;let L2=null,fl=1;
+ for(let k=0;k<NS;k++){frameScene(t+(k-1.5)/(30*NS));ax.globalAlpha=1/(k+1);ax.drawImage(c,0,0);}
+ {const r=frameScene(t);L2=r[0];fl=r[1]}
+ x.globalAlpha=1;x.globalCompositeOperation='source-over';x.drawImage(ACC,0,0);
+ lblDraw(L2,fl);inset(t);overlay(t)}
+window.draw=draw;window.TEXREADY=true;window.OM={thDeg,walkR,walkS,T_WALK0,T_WALK1};
+</script>
