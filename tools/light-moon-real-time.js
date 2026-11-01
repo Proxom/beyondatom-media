@@ -86,7 +86,7 @@ function panel(t){
 SC={D:30+S,
  scene(t){MP=DV.map(v=>v*dMoon(t));const c=cam(t);EYE=c.eye;
   return {eye:c.eye,tgt:c.tgt,fov:c.fov,sun:SUNV,
-   p:{c:[0,0,0],r:1,ty:0,tilt:0,yaw:200,spin:-t*0.004},
+   p:{c:[0,0,0],r:1,ty:0,tilt:0,yaw:200,spin:0}, // real time: Earth turns only ~0.2 deg in 43.5 s -> still; also makes the loop seam exact
    q:{c:MP,r:MR,ty:4,tilt:0,yaw:0,spin:Math.atan2(-MP[2],-MP[0])+Math.PI},ring:{n:[0,1,0],a:0},axis:0,expo:1.0};},
  cards:[
   [0,1.5,[['LIGHT TO THE MOON','#fff'],['REAL TIME','#7fd4ff']],112],
