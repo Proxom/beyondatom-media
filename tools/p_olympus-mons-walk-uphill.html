@@ -8,8 +8,8 @@ const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));const ease=t=>{t=cl(t);return t*
 let sd=11;const rnd=()=>{sd=(sd*16807)%2147483647;return sd/2147483647};
 const GOLD='#ffcf6e',BLUE='#8fd0ff',ORG='#ff9a5c';
 // ---- model (shared with the sound script through window.OM when loaded in node) ----
-const HALF=300,PLAT=50,PXKM=1.46,Y0=1070;   // km half width, flat summit half width, px per km, ground baseline
-const thDeg=r=>2.2+2.8*cl((r-PLAT)/(HALF-PLAT)); // flank slope (deg) at distance r from centre: 2.2 deg near summit to 5.0 deg at base
+const HALF=300,PLAT=20,PXKM=1.46,Y0=1070;   // km half width, flat summit half width, px per km, ground baseline
+const thDeg=r=>3.6+1.4*cl((r-PLAT)/(HALF-PLAT)); // flank slope (deg) at distance r from centre: 3.6 deg near summit to 5.0 deg at base (integrates to ~21 km relief)
 const hKm=(()=>{const N=600,tab=[];let h=0;tab[N]=0;for(let i=N-1;i>=0;i--){const r0=HALF*i/N,r1=HALF*(i+1)/N,rm=(r0+r1)/2;h+=(r1-r0)*(rm<=PLAT?0:Math.tan(thDeg(rm)*Math.PI/180));tab[i]=h}
  return r=>{const q=cl(r/HALF)*N,i=Math.min(N-1,Math.floor(q)),f=q-i;return tab[i]*(1-f)+tab[i+1]*f}})();
 // timeline
@@ -17,7 +17,7 @@ const T_STRETCH_END=9.0,T_FLAT_END=15.0,T_WALK0=15.4,T_WALK1=26.0;
 const exagOf=t=>1+9*(1-ease((t-T_STRETCH_END)/(T_FLAT_END-T_STRETCH_END)));
 const walkS=t=>ease((t-T_WALK0)/(T_WALK1-T_WALK0)); // 0..1 progress
 const walkR=t=>HALF-0.12*HALF*0-(HALF-60)*walkS(t)-0; // distance from centre: 300 -> 60 km (stays on the flank)
-const grow=t=>0.55+0.45*ease(t/1.4);
+const grow=t=>0.8+0.2*ease(t/0.9);
 // starfield / sky
 const SF=document.createElement('canvas');SF.width=1080;SF.height=1920;{const s=SF.getContext('2d');
  const g=s.createLinearGradient(0,0,0,1920);g.addColorStop(0,'#05060f');g.addColorStop(.40,'#1a1020');g.addColorStop(.62,'#6b3a2a');g.addColorStop(.74,'#c27a45');g.addColorStop(1,'#3b1a12');s.fillStyle=g;s.fillRect(0,0,1080,1920);
@@ -50,7 +50,7 @@ function scene(t){
  // walker on the left flank
  if(t>=T_WALK0-.5){const a=ease((t-T_WALK0+.5)/.5);const r=walkR(Math.max(t,T_WALK0));const xx=540-r*PXKM,yy=Y0-hKm(r)*PXKM*ex*gr-2;
   glow(xx,yy,34,[[0,'rgba(255,255,255,.95)'],[.3,'rgba(255,214,120,.55)'],[1,'rgba(0,0,0,0)']],a);
-  x.save();x.globalAlpha=a;x.fillStyle='#fff';x.beginPath();x.arc(xx,yy,5,0,7);x.fill();x.restore();
+  x.save();x.globalAlpha=a;x.fillStyle='#fff';x.beginPath();x.arc(xx,yy,7,0,7);x.fill();const pr=(t*1.2)%1;x.globalAlpha=a*(1-pr);x.strokeStyle='#ffd98a';x.lineWidth=3;x.beginPath();x.arc(xx,yy,10+pr*26,0,7);x.stroke();x.restore();
   LBL.push(['YOU',xx,yy-46,a*cl((T_WALK1+1.6-t)/.6),GOLD,34,'center'])}
 }
 function figure(t,cx,cy,ang,phase,a){ // walking astronaut, feet at (cx,cy), tilted by ang (rad, uphill to the right)
@@ -82,8 +82,10 @@ function inset(t){
  // horizontal reference + angle arc
  x.save();x.setLineDash([8,8]);x.strokeStyle='rgba(255,255,255,.55)';x.lineWidth=2;x.beginPath();x.moveTo(cx-R,cy+54);x.lineTo(cx+R,cy+54);x.stroke();x.restore();
  figure(t,cx,cy+54,th,(t-T_WALK0)*7.5,1);
- x.restore();
- x.save();x.globalAlpha=a;x.strokeStyle='rgba(255,255,255,.85)';x.lineWidth=4;x.beginPath();x.arc(cx,cy,R,0,7);x.stroke();x.restore();
+ x.strokeStyle='#ffd98a';x.lineWidth=4;x.beginPath();x.arc(cx+8,cy+54,66,-th,0);x.stroke();x.restore();
+ label(thDeg(r).toFixed(1)+'°',cx+24,cy+30,a,GOLD,32,'left');
+ x.save();x.globalAlpha=a;
+ x.strokeStyle='rgba(255,255,255,.85)';x.lineWidth=4;x.beginPath();x.arc(cx,cy,R,0,7);x.stroke();x.restore();
  label('WALKING UPHILL',cx,cy+R+40,a*.9,'#fff',30);
 }
 function overlay(t){
@@ -97,7 +99,7 @@ function overlay(t){
   [12.2,15.0,['IT IS A',['GENTLE RAMP',BLUE]],88,410],
   [15.0,19.6,['SLOPES ARE ONLY',['2 TO 5 DEGREES',GOLD]],74,410],
   [19.6,24.2,['YOU WOULD WALK',['UPHILL, NOT CLIMB',BLUE]],74,410],
-  [24.2,28.4,['TALLEST VOLCANO',['YOU COULD WALK UP',GOLD]],72,410],
+  [24.2,28.4,['ITS FLANKS ARE',['A GENTLE WALK UP',GOLD]],72,410],
   [28.4,30.01,[['TALLEST VOLCANO',GOLD],'IN THE SOLAR SYSTEM',['OLYMPUS MONS',BLUE]],70,370]];
  for(const [a,b,l,sz,yy] of CARDS){if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=30?1:ease((b-t)/.3);card(l,yy,sz,Math.min(fi,fo),(1-fi)*24)}}
  // vertical stretch chip
