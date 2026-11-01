@@ -20,16 +20,17 @@ function dMoon(t){if(t<16.6)return DM;if(t<18.4)return lerp(DM,DP,eio((t-16.6)/1
 const V1={eye:[-6,-2.5,2.2],tgt:[7.73,9.27,0],fov:0.7};            // hook: low beside Earth, beam rising to the Moon
 const V2={eye:[19.96,28.33,139.1],tgt:[19.96,28.33,0],fov:0.5};    // side view, to scale, straight-on
 const V3={eye:[0.9,1.55,3.55],tgt:[0,-0.25,0],fov:0.9};            // Earth close-up, equator
-function mix(a,b,u,arc){const k=eio(u);const e=a.eye.map((v,i)=>lerp(v,b.eye[i],k));const bp=Math.sin(Math.PI*k)*(arc||0);e[2]+=bp;
- return {eye:e,tgt:a.tgt.map((v,i)=>lerp(v,b.tgt[i],k)),fov:Math.exp(lerp(Math.log(a.fov),Math.log(b.fov),k))}}
-function sway(v,t,a){return {eye:v.eye.map((e,i)=>e+a*Math.sin(2*Math.PI*t/(10+i*5)+i)),tgt:v.tgt,fov:v.fov}}
+function mix(a,b,u,arc,ke,kt){const k=eio(u);const kE=ke?ke(k):k,kT=kt?kt(k):k;const e=a.eye.map((v,i)=>lerp(v,b.eye[i],kE));const bp=Math.sin(Math.PI*kE)*(arc||0);e[2]+=bp;
+ return {eye:e,tgt:a.tgt.map((v,i)=>lerp(v,b.tgt[i],kT)),fov:Math.exp(lerp(Math.log(a.fov),Math.log(b.fov),kE))}}
+const FRONT=k=>1-Math.pow(1-k,8),BACK=k=>Math.pow(k,4),LAG=k=>Math.pow(k,2.5);
+function sway(v,t,a){return {eye:v.eye.map((e,i)=>e+a*Math.sin(2*Math.PI*t*(4-i)/(30+S)+i)),tgt:v.tgt,fov:v.fov}} // whole periods over D: identical at the loop seam
 function cam(t){
  if(t<4.2)return sway(push(V1,t),t,.05);
- if(t<6.0)return mix(push(V1,4.2),V2,(t-4.2)/1.8,20);
+ if(t<6.0)return mix(push(V1,4.2),V2,(t-4.2)/1.8,20,BACK,BACK);      // stay close, then pull out fast (no long empty frames)
  if(t<16.5+S)return V2;
- if(t<18.3+S)return mix(V2,V3,(t-16.5-S)/1.8,10);
+ if(t<18.3+S)return mix(V2,V3,(t-16.5-S)/1.8,10,FRONT,FRONT);       // fly in fast, settle slowly: Earth is big early
  if(t<23.4+S)return sway(V3,t,.03);
- if(t<25.6+S)return mix(V3,push(V1,0),(t-23.4-S)/2.2,6);
+ if(t<25.6+S)return mix(V3,push(V1,0),(t-23.4-S)/2.2,6,null,LAG);   // target pans late so Earth never leaves the frame
  return sway(push(V1,0),t,.05);}
 function push(v,t){const k=t<4.2?0.08*ease(t/4.2):0;return {eye:v.eye.map((e,i)=>lerp(e,v.tgt[i],k)),tgt:v.tgt,fov:v.fov}}
 // pulse state: distance from Earth centre (in Earth radii) for a pulse launched at t0
@@ -42,19 +43,25 @@ function hidden(p){const eye=EYE;const dv=p.map((v,i)=>v-eye[i]);const L=Math.hy
 function glow(px,py,r,col,a){if(a<=0)return;x.save();x.globalCompositeOperation='lighter';x.globalAlpha=a;const g=x.createRadialGradient(px,py,0,px,py,r);
  g.addColorStop(0,'rgba(255,255,255,1)');g.addColorStop(.18,col);g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill();x.restore()}
 const BEAM='rgba(140,210,255,.9)';
+function strokeRun(run){ // one smooth path per visible run: no beads at segment joints
+ if(run.length<2)return;const [q0,a0]=run[0],[q1,a1]=run[run.length-1];
+ for(const [w,al,blur] of [[14,.35,22],[5,1,10]]){const g=x.createLinearGradient(q0[0],q0[1],q1[0],q1[1]);
+  g.addColorStop(0,'rgba(150,215,255,'+(al*(0.05+0.9*a0*a0*a0))+')');g.addColorStop(1,'rgba(170,225,255,'+(al*(0.05+0.9*a1*a1*a1))+')');
+  x.strokeStyle=g;x.lineWidth=w;x.shadowColor='#7fd0ff';x.shadowBlur=blur;x.beginPath();x.moveTo(q0[0],q0[1]);for(const [q] of run.slice(1))x.lineTo(q[0],q[1]);x.stroke();}}
 function drawBeam(t,p){
- const N=90;let prev=null;const TL=0.55;const D=p[2];
- x.save();x.globalCompositeOperation='lighter';x.lineCap='round';
- for(let i=0;i<=N;i++){const tt=t-TL*(1-i/N);const s=pulseD(tt,p);if(!s||s.d<1.0||(s.dir===0)){prev=null;continue;}
-  const P=DV.map(v=>v*s.d);if(s.d>D-MR&&s.dir===1){prev=null;continue;}
-  if(hidden(P)){prev=null;continue;}const q=proj(P);
-  if(prev){const a=i/N;x.strokeStyle='rgba(150,215,255,'+(0.08+0.85*a*a*a)+')';x.lineWidth=2+8*a*a;x.shadowColor='#7fd0ff';x.shadowBlur=16;x.beginPath();x.moveTo(prev[0],prev[1]);x.lineTo(q[0],q[1]);x.stroke();}
-  prev=q;}
- x.restore();
+ const N=90;const TL=0.55;const D=p[2];let run=[];
+ x.save();x.globalCompositeOperation='lighter';x.lineCap='round';x.lineJoin='round';
+ for(let i=0;i<=N;i++){const tt=t-TL*(1-i/N);const s=pulseD(tt,p);let ok=!!s&&s.d>=1.0&&s.dir!==0;let P;
+  if(ok){P=DV.map(v=>v*s.d);if(s.d>D-MR&&s.dir===1)ok=false;else if(hidden(P))ok=false;}
+  if(!ok){strokeRun(run);run=[];continue;}
+  // a direction change (bounce) starts a new run
+  if(run.length&&run[run.length-1][2]!==s.dir){strokeRun(run);run=[];}
+  run.push([proj(P),i/N,s.dir]);}
+ strokeRun(run);x.restore();
  const s=pulseD(t,p);if(s&&s.dir!==0&&s.d>=1&&!(s.dir===1&&s.d>D-MR)){const P=DV.map(v=>v*s.d);if(!hidden(P)){const q=proj(P);glow(q[0],q[1],46,BEAM,1);glow(q[0],q[1],16,'rgba(255,255,255,1)',1);}}
  const ta=p[0]+D/C;const fa=t-ta;if(fa>=0&&fa<0.9){const q=proj(DV.map(v=>v*D));const k=Math.exp(-fa*4.5);glow(q[0],q[1],40+170*(1-k),'rgba(255,230,170,.9)',k);}
  if(p[1]){const fb=t-(p[0]+2*D/C);if(fb>=0&&fb<0.9){const q=proj([0,0,0]);const k=Math.exp(-fb*4.5);glow(q[0],q[1],60+200*(1-k),'rgba(140,255,190,.8)',k*.8);}}
- const f0=t-p[0];if(f0>=0&&f0<0.6){const q=proj(DV);const k=Math.exp(-f0*6);glow(q[0],q[1],50+160*(1-k),BEAM,k)}
+ const f0=t-p[0];if(f0>=0&&f0<0.6){let q=null;for(let d=1.0;d<2.0;d+=0.005){const P=DV.map(v=>v*d);if(!hidden(P)){q=proj(P);break;}}if(q){const k=Math.exp(-f0*6);glow(q[0],q[1],50+160*(1-k),BEAM,k)}}
 }
 const PANEL_R=910;
 const FOOTX=690;                         // footnote centre: right of the hook beam's path (beam crosses y=1196 near x=390)
@@ -90,18 +97,18 @@ SC={D:30+S,
   [16.3,20.2,['But the distance',['CHANGES','#7fd4ff']],112],
   [20.2,23.0,['Average closest:',['1.21 SECONDS','#ffd36b']],108],
   [23.0,26.4,['And at its',['farthest point?','#7fd4ff']],108],
-  [26.4,29.8,['Average farthest:',['1.35 SECONDS','#ffd36b']],108],
-  [18.3+S,20.2+S,['Around Earth',['in 1 second?','#7fd4ff']],112],
+  [26.4,30.4,['Average farthest:',['1.35 SECONDS','#ffd36b']],108],
+  [30.4,20.2+S,['Around Earth',['in 1 second?','#7fd4ff']],112],
   [20.2+S,23.6+S,['7.5 TIMES',['around the equator','#ffd36b']],112],
-  [24.0+S,27.6+S,['Nothing travels faster.',['Still 1.28 s','#7fd4ff']],108],
+  [24.0+S,27.6+S,['Nothing travels',['faster than light','#7fd4ff']],108],
   [27.6+S,30.01+S,[['LIGHT TO THE MOON','#fff'],['REAL TIME','#7fd4ff']],112]],
  overlay(t){
   const s=SC.scene(t);
-  const sv=t<5.4?0:t<6?ease((t-5.4)/.6):t<16.3+S?1:t<16.8+S?1-ease((t-16.3-S)/.5):0;
+  const sv=t<5.7?0:t<6.0?ease((t-5.7)/.3):t<16.3+S?1:t<16.6+S?1-ease((t-16.3-S)/.3):0; // markers only while the camera is (nearly) still
   if(sv>0){const qe=proj([0,0,0]),qm=proj(MP);
    // faint marker of the average distance while the Moon is off it
    const off=Math.abs(dMoon(t)-DM)/(DM-DP);if(off>0.02){const q0=proj(DV.map(v=>v*DM));x.save();x.globalAlpha=sv*.45*Math.min(1,off*2);x.strokeStyle='#e8e2d0';x.lineWidth=2;x.setLineDash([5,7]);x.beginPath();x.arc(q0[0],q0[1],22,0,7);x.stroke();x.restore();}
-   x.save();x.globalAlpha=sv*.6;x.lineWidth=2.5;x.strokeStyle='#cfe3ff';x.beginPath();x.arc(qe[0],qe[1],34,0,7);x.stroke();x.strokeStyle='#e8e2d0';x.beginPath();x.arc(qm[0],qm[1],22,0,7);x.stroke();x.restore();label('EARTH',qe[0]+40,qe[1]-62,sv*.9,'#cfe3ff',30);label('MOON',qm[0]-6,qm[1]+62,sv*.9,'#e8e2d0',30);
+   x.save();x.globalAlpha=sv*.6;x.lineWidth=2.5;x.strokeStyle='#cfe3ff';x.beginPath();x.arc(qe[0],qe[1],34,0,7);x.stroke();x.strokeStyle='#e8e2d0';x.beginPath();x.arc(qm[0],qm[1],22,0,7);x.stroke();x.restore();label('EARTH',qe[0]-96,qe[1]+11,sv*.9,'#cfe3ff',30);label('MOON',qm[0]-100,qm[1]+11,sv*.9,'#e8e2d0',30); // left of the bodies: the beam and dashed line leave up-right
    x.save();x.globalAlpha=sv*.35;x.strokeStyle='#bcd2ff';x.setLineDash([6,12]);x.lineWidth=2;x.beginPath();x.moveTo(qe[0],qe[1]);x.lineTo(qm[0],qm[1]);x.stroke();x.restore();}
   {const qm=proj(MP);const rr=Math.max(10,MR/Math.hypot(...MP.map((v,i)=>v-EYE[i]))/CAM.fov*W);glow(qm[0],qm[1],rr*4,'rgba(255,240,215,.35)',.55);
    const ma=(t<4.6||t>25.6+S)?1:0;if(ma){x.save();x.globalAlpha=.55;x.strokeStyle='#e8e2d0';x.lineWidth=2;x.beginPath();x.arc(qm[0],qm[1],rr+16,0,7);x.stroke();x.restore();label('MOON',qm[0],qm[1]-rr-30,.8,'#e8e2d0',30);}}

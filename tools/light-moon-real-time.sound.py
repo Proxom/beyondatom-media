@@ -6,7 +6,7 @@ hits=[]
 for t0,b,km in P:
     hits.append(dict(t=t0+0.01,kind='glass',note=5,vel=.42,pan=-.35))          # launch at Earth (lower left)
     ta=t0+km/C; hits.append(dict(t=ta,kind='bell',note=7,vel=.5,pan=.35))       # arrival at the Moon (upper right)
-    if b: hits.append(dict(t=t0+2*km/C,kind='marimba',note=2,vel=.5,pan=-.35))  # echo back at Earth
+    if b: hits.append(dict(t=t0+2*km/C,kind='marimba',note=2,vel=.68,pan=-.35))  # echo back at Earth
 for k in range(1,8):                                                            # 7 full equator laps in the 1 s ring
     hits.append(dict(t=32.5+k*LAP,kind='marimba',note=3+k,vel=.36,pan=0))
 hits.append(dict(t=33.5,kind='bell',note=9,vel=.35,pan=0))                       # ring ends at exactly 1 s
