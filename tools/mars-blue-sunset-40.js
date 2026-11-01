@@ -2,11 +2,11 @@
 // Sun angular radius 0.00305 rad (0.35 deg diameter, ~2/3 of Earth's 0.53 deg).
 const D2R=Math.PI/180,SC0=0.9/1080,HOR=1250;           // default: 0.9 tan-units across the width, horizon at y=1250
 const SE_LOW=4.4*D2R,SE_DAY=24*D2R;
-function sunEl(t){if(t<1.7)return SE_LOW;if(t<3.8)return lerp(SE_LOW,SE_DAY,eio((t-1.7)/2.1));if(t<4.6)return SE_DAY;if(t<7.6)return lerp(SE_DAY,SE_LOW,eio((t-4.6)/3.0));return SE_LOW;}
+function sunEl(t){if(t<2.6)return SE_LOW;if(t<4.6)return SE_DAY;if(t<7.6)return lerp(SE_DAY,SE_LOW,eio((t-4.6)/3.0));return SE_LOW;} // hard cut to the day shot on the 2.6 s card change (a visible rise looked like a sunset played backwards)
 function zoom(t){ // 1 = wide, 15 = telephoto on the Sun
  if(t<30.4||t>39.4)return 1;if(t<33.2)return Math.exp(Math.log(15)*eio((t-30.4)/2.8));if(t<36.7)return 15;return Math.exp(Math.log(15)*(1-eio((t-36.7)/2.7)));}
 SC={D:40,
- subs(t){return (t>1.6&&t<3.9)?3:(t>30.4&&t<33.2)||(t>36.7&&t<39.4)?4:1},
+ subs(t){return (t>30.4&&t<33.2)||(t>36.7&&t<39.4)?4:1},
  view(t){const se=sunEl(t);const day=ease((se-5*D2R)/(15*D2R));const z=zoom(t);const zk=Math.log(z)/Math.log(15);
   const ph=2*Math.PI*t/40;
   const cp=[1.2*Math.sin(ph),1.7+0.08*Math.sin(2*ph),-4*Math.sin(ph)];          // slow periodic dolly (loops at 40 s)
@@ -29,11 +29,11 @@ SC={D:40,
   [21.4,26.6,['So our sunsets',['turn red','#ff9a6b']],116],
   [26.6,30.4,['NASA Curiosity saw it',['April 15, 2015','#ffd36b']],100],
   [30.4,33.4,['And the Sun',['looks smaller','#ffd36b']],100],
-  [33.4,36.8,['Only 2/3 the size',['seen from Earth','#ffd36b']],108],
+  [33.4,36.8,['Only 2/3 the size',['it looks from Earth','#ffd36b']],108],
   [37.4,40.01,[['MARS SUNSETS','#fff'],['ARE BLUE','#7fc4ff']],124]],
  under(t){ // dim the Mars scene while the Earth diagram is on (drawn before the cards)
   const ea=t<16.6?0:t<17.2?ease((t-16.6)/.6):t<26.0?1:t<26.6?1-ease((t-26.0)/.6):0;
-  if(ea>0){x.save();x.globalAlpha=ea*.62;x.fillStyle='#05060c';x.fillRect(0,0,W,H);x.restore();}},
+  if(ea>0){x.save();x.globalAlpha=ea*.93;x.fillStyle='#05060c';x.fillRect(0,0,W,H);x.restore();}},
  overlay(t){
   // dust-scattering diagram 9.2-16.6 s
   const da=t<9.2?0:t<9.8?ease((t-9.2)/.6):t<16.0?1:t<16.6?1-ease((t-16.0)/.6):0;
@@ -70,9 +70,9 @@ function diagram(t,a){
  x.save();x.globalAlpha=a;const gr=x.createRadialGradient(cx-12,cy-12,4,cx,cy,40);gr.addColorStop(0,'#e7b48a');gr.addColorStop(.6,'#9a5a36');gr.addColorStop(1,'#3a2016');
  x.fillStyle=gr;x.beginPath();for(let i=0;i<=40;i++){const q=i/40*2*Math.PI;const rr=34+4*Math.sin(q*5+1)+3*Math.sin(q*3);x.lineTo(cx+rr*Math.cos(q),cy+rr*Math.sin(q));}x.fill();x.restore();
  label('SUNLIGHT',160,cy-34,a*cl(tt/0.6),'#fff3dc',32);
- label('DUST GRAIN',160,cy+64,a*cl(tt/0.6),'#e7c9a8',30);
+ {const k=ease((tt-0.8)/0.6);label('DUST GRAIN',cx,lerp(cy+80,cy+LBL+24,k),a*cl(tt/0.6),'#e7c9a8',30);}
  label('BLUE: NARROW, FORWARD',600,cy-LBL,a*cl((tt-1.8)/.6),'#9fcbff',30);
- label('RED: SPREADS WIDE',470,cy+LBL+24,a*cl((tt-2.3)/.6),'#ffb08a',30);
+ label('RED: SPREADS WIDE',cx,cy+LBL+64,a*cl((tt-2.3)/.6),'#ffb08a',30);
 }
 
 // labels sit outside the longest ray (blue 398 px to the right, red <= 238 px + glow) so no ray ever crosses text
@@ -95,7 +95,7 @@ function diagramEarth(t,a){
  // the molecule: two small bonded spheres (N2), much smaller than a dust grain
  x.save();x.globalAlpha=a;for(const dx of [-9,9]){const gr=x.createRadialGradient(cx+dx-4,cy-4,2,cx+dx,cy,13);gr.addColorStop(0,'#e8f0ff');gr.addColorStop(1,'#5a6a90');x.fillStyle=gr;x.beginPath();x.arc(cx+dx,cy,12,0,7);x.fill();}x.restore();
  label('SUNLIGHT',150,cy-34,a*cl(tt/0.6),'#fff3dc',32);
- label('AIR MOLECULE',cx,cy+LBL+24,a*cl(tt/0.6),'#d6e2ff',30);
+ {const k=ease((tt-0.8)/0.6);label('AIR MOLECULE',cx,lerp(cy+64,cy+LBL+24,k),a*cl(tt/0.6),'#d6e2ff',30);}
  label('BLUE: SCATTERED ALL AROUND',540,cy-LBL,a*cl((tt-1.8)/.6),'#9fcbff',30);
  label('RED: GOES STRAIGHT ON',cx,cy+LBL+64,a*cl((tt-2.3)/.6),'#ffb08a',30);
 }
