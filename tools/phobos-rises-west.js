@@ -100,8 +100,8 @@ SC={D:DUR,
   if(fa2>0&&t>TI){const te=Math.min(t,TB),n=Math.max(2,Math.floor((te-TI)*60));const pts=[];for(let i=0;i<=n;i++){const u=TI+(te-TI)*i/n;pts.push(proj(pos(phAng(u),rIn(u))));}
    x.save();x.lineCap='round';for(let i=1;i<pts.length;i++){x.globalAlpha=fa2*(.25+.6*i/n)*(t<TB?1:1-ease((t-TB)/1.2));x.strokeStyle='#ff9a7a';x.lineWidth=2+4*i/n;x.beginPath();x.moveTo(pts[i-1][0],pts[i-1][1]);x.lineTo(pts[i][0],pts[i][1]);x.stroke();}x.restore();}
   if(t>TB){const sp=ease((t-TB)/2.4),da=fa2;const w=S*2*Math.PI/PP*Math.pow(A/RB,1.5);const base=phAng(TB)+w*(hrs(t)-hrs(TB));
-   x.save();x.globalCompositeOperation='lighter';for(let k=0;k<90;k++){const j=(k*0.618)%1,o=(j-.5)*2*Math.PI*sp,rr2=RB+(((k*37)%11)/11-.5)*0.10*sp;const q=proj(pos(base+o,rr2));
-    x.globalAlpha=da*(.45+.35*((k*7)%5)/5);x.fillStyle=k%3?'#d9c3a8':'#ffb38a';x.beginPath();x.arc(q[0],q[1],2.2+((k*13)%4)*.6,0,7);x.fill();}
+   x.save();for(let k=0;k<90;k++){const j=(k*0.618)%1,o=(j-.5)*2*Math.PI*sp,rr2=RB+(((k*37)%11)/11-.5)*0.10*sp;const q=proj(pos(base+o,rr2));
+    x.globalAlpha=da*(.3+.6*sp)*(.45+.35*((k*7)%5)/5);x.fillStyle=k%3?'#d9c3a8':'#ffb38a';x.beginPath();x.arc(q[0],q[1],2.2+((k*13)%4)*.6,0,7);x.fill();}
    const rq=proj(pos(0,RB))[0]-O[0];x.globalAlpha=da*.18*sp;x.strokeStyle='#d9c3a8';x.lineWidth=12;x.beginPath();x.arc(O[0],O[1],rq,0,7);x.stroke();x.restore();}
   // cards
   const CARDS=[[0,3.4,[['ON MARS, THIS MOON','#fff'],['RISES IN THE WEST','#ffd36b']]],
