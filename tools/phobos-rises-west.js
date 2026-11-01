@@ -27,7 +27,7 @@ const EYE=[0.39,10,0.37],TGT=[0.39,0,-0.23],FOV=0.711;
 const fa=(t,a,b,fi=.4,fo=.4)=>t<a?0:t<a+fi?ease((t-a)/fi):t<b-fo?1:t<b?1-ease((t-(b-fo))/fo):0;
 function cardY(lines,size,alpha,dy){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.textAlign='center';
  let mw=0;x.font='900 '+size+'px '+F;lines.forEach(l=>{mw=Math.max(mw,x.measureText(typeof l==='string'?l:l[0]).width)});
- if(mw>800){size=Math.floor(size*800/mw);x.font='900 '+size+'px '+F}x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=24;
+ if(mw>770){size=Math.floor(size*770/mw);x.font='900 '+size+'px '+F}x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=24;
  lines.forEach((l,i)=>{x.fillStyle=typeof l==='string'?'#fff':l[1];x.fillText(typeof l==='string'?l:l[0],W/2,400+i*size*1.18+(dy||0))});x.restore()}
 function arrowArc(r,a0,a1,col,al,w){ // arc in the equatorial plane from angle a0 to a1 with an arrow head at a1
  if(al<=0)return;x.save();x.globalAlpha=al;x.strokeStyle=col;x.fillStyle=col;x.lineWidth=w||7;x.lineCap='round';x.shadowColor=col;x.shadowBlur=14;x.beginPath();
@@ -62,7 +62,7 @@ SC={D:DUR,
    x.fillStyle=gr;x.beginPath();x.moveTo(q1[0],q1[1]);x.lineTo(q2[0],q2[1]);x.lineTo(q3[0],q3[1]);x.lineTo(q4[0],q4[1]);x.closePath();x.fill();x.restore();
    // horizon line
    const Lh=2.75,h1=proj(P.map((v,i)=>v+east[i]*Lh)),h2=proj(P.map((v,i)=>v-east[i]*Lh));
-   x.save();x.globalAlpha=pinA_*.9;x.strokeStyle='#e9f0ff';x.lineWidth=4;x.shadowColor='#9cc0ff';x.shadowBlur=10;x.beginPath();x.moveTo(h2[0],h2[1]);x.lineTo(h1[0],h1[1]);x.stroke();x.restore();
+   x.save();x.beginPath();x.arc(O[0],O[1],(proj(pos(0,A+.12))[0]-O[0]),0,7);x.clip();x.globalAlpha=pinA_*.9;x.strokeStyle='#e9f0ff';x.lineWidth=4;x.shadowColor='#9cc0ff';x.shadowBlur=10;x.beginPath();x.moveTo(h2[0],h2[1]);x.lineTo(h1[0],h1[1]);x.stroke();x.restore();
    // compass letters at the line ends, nudged to the sky side
    const off=proj(P.map((v,i)=>v+east[i]*1.7+nrm[i]*0.3)),offW=proj(P.map((v,i)=>v-east[i]*1.7+nrm[i]*0.3));
    const la=fa(t,11.8,28.6,.6,.6);
@@ -81,7 +81,7 @@ SC={D:DUR,
   x.beginPath();x.arc(pp[0],pp[1],rr+8,0,7);x.stroke();x.restore();
   // names (overview only)
   const na=fa(t,0,11.8,0,.5);const nd=[pp[0]-O[0],pp[1]-O[1]];const nl=Math.hypot(...nd);
-  const px_=Math.max(140,Math.min(850,pp[0]+nd[0]/nl*80)),py_=pp[1]+nd[1]/nl*80+14;label('PHOBOS',px_,py_,na,'#ffd9a8',44);
+  const px_=pp[0]-nd[0]/nl*118,py_=pp[1]-nd[1]/nl*118+14;label('PHOBOS',px_,py_,na,'#ffd9a8',44);
   label('MARS',O[0],O[1]+16,na*.9,'#fff',44);
   // spin counter beat
   if(t>C0-.3&&t<35.9){const ca=fa(t,C0-.3,35.9,.3,.3);const fr=cl((hrs(t)-hrs(C0))/PM,0,1);
@@ -90,8 +90,12 @@ SC={D:DUR,
    cardY(['IN ONE MARS SPIN',['IT RISES: '+n,'#7dffb0']],96,ca,0);}
   // falling beat: exaggerated inward spiral
   const fa2=fa(t,35.6,43.6,.6,.6);
-  if(fa2>0){x.save();x.globalAlpha=fa2*.8;x.strokeStyle='#ff9a7a';x.lineWidth=4;x.setLineDash([10,12]);x.lineDashOffset=t*30;x.beginPath();
-   const gr=cl((t-35.6)/3,0,1);const n=200;for(let i=0;i<=n*gr;i++){const u=i/n;const a=ph+S*u*2*Math.PI*1.4,r=lerp(A,1.02,u);const q=proj(pos(a,r));i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]);}x.stroke();x.restore();}
+  if(fa2>0){const gr=cl((t-35.8)/2.5,0,1),n=160,m=Math.floor(n*eio(gr));const pts=[];
+   for(let i=0;i<=m;i++){const u=i/n;pts.push(proj(pos(ph+S*u*2*Math.PI*0.9,lerp(A,1.04,u))));}
+   x.save();x.lineCap='round';for(let i=1;i<pts.length;i++){x.globalAlpha=fa2*(.35+.6*i/n);x.strokeStyle='#ff9a7a';x.lineWidth=3+3*i/n;x.beginPath();x.moveTo(pts[i-1][0],pts[i-1][1]);x.lineTo(pts[i][0],pts[i][1]);x.stroke();}
+   if(pts.length>3){const e=pts[pts.length-1],e2=pts[pts.length-3];const g=Math.atan2(e[1]-e2[1],e[0]-e2[0]);x.globalAlpha=fa2;x.fillStyle='#ff9a7a';x.beginPath();
+    x.moveTo(e[0]+Math.cos(g)*20,e[1]+Math.sin(g)*20);x.lineTo(e[0]+Math.cos(g+2.5)*18,e[1]+Math.sin(g+2.5)*18);x.lineTo(e[0]+Math.cos(g-2.5)*18,e[1]+Math.sin(g-2.5)*18);x.fill();}
+   x.restore();}
   // cards
   const CARDS=[[0,3.4,[['ON MARS, THIS MOON','#fff'],['RISES IN THE WEST','#ffd36b']]],
    [3.4,7.6,['Mars turns once in',['24 h 37 min','#ffb38a']]],
