@@ -6,11 +6,13 @@ const PSYN=1/(1/PP-1/PM);                                   // 11.11 h between r
 const HZ=Math.acos(1/A);                                    // 68.8 deg: Phobos is above an equator horizon while |psi| < HZ
 const S=-1;                                                 // angles decrease = counterclockwise seen from above the north pole (+y)
 const DUR=46;
-function rate(t){ // simulated hours per second of video
- if(t<11.8)return 1.6;if(t<13.4)return lerp(1.6,.42,eio((t-11.8)/1.6));if(t<27.0)return .42;
- if(t<28.6)return lerp(.42,3.6,eio((t-27)/1.6));if(t<35.6)return 3.6;if(t<37.0)return lerp(3.6,1.2,eio((t-35.6)/1.4));return 1.2;}
-const HT=[0];(function(){for(let i=1;i<=DUR*300;i++)HT.push(HT[i-1]+rate((i-.5)/300)/300);})();
 const hrs=t=>{const f=cl(t,0,DUR)*300,i=Math.floor(f);return i>=DUR*300?HT[DUR*300]:lerp(HT[i],HT[i+1],f-i)};
+let R0=1.6;const T_HOOK=1.0;
+function rate(t){ // simulated hours per second of video
+ if(t<11.8)return R0;if(t<13.4)return lerp(R0,.42,eio((t-11.8)/1.6));if(t<27.0)return .42;
+ if(t<28.6)return lerp(.42,3.6,eio((t-27)/1.6));if(t<35.6)return 3.6;if(t<37.0)return lerp(3.6,1.2,eio((t-35.6)/1.4));return 1.2;}
+let HT=[0];function buildHT(){HT=[0];for(let i=1;i<=DUR*300;i++)HT.push(HT[i-1]+rate((i-.5)/300)/300);}
+(function(){let lo=1,hi=3;for(let k=0;k<40;k++){R0=(lo+hi)/2;buildHT();const d=hrs(15.8)-hrs(T_HOOK);if(d>2*PSYN)hi=R0;else lo=R0;}buildHT();})();
 const T_RISE=15.8,T_MID=20.8;                               // first rise on screen; pin straight below Mars at T_MID
 const PSI0=-HZ-2*Math.PI*hrs(T_RISE)/PSYN;                  // psi = Phobos angle ahead of the observer (east +)
 const psi=t=>PSI0+2*Math.PI*hrs(t)/PSYN;
@@ -23,6 +25,10 @@ const RISES=[];(function(){let prev=psi(0);for(let i=1;i<=DUR*300;i++){const t=i
 const SETS=[];(function(){let prev=psi(0);for(let i=1;i<=DUR*300;i++){const t=i/300,p=psi(t);const k0=Math.floor((prev-HZ)/(2*Math.PI)),k1=Math.floor((p-HZ)/(2*Math.PI));if(k1>k0)SETS.push(t);prev=p;}})();
 const C0=28.0;const C1=(function(){const h0=hrs(C0);let t=C0;while(hrs(t)<h0+PM)t+=1/300;return t})(); // one full Mars spin
 const pos=(ang,r)=>[r*Math.cos(ang),0,r*Math.sin(ang)];
+const TI=36.4,TB=39.8,RB=1.32;const rIn=t=>t<TI?A:lerp(A,RB,eio((t-TI)/(TB-TI)));
+const PHI=[];(function(){let a=phA(TI);for(let i=0;i<=(DUR-TI)*300;i++){const t=TI+i/300;PHI.push(a);a+=S*2*Math.PI*rate(t)/PP*Math.pow(A/rIn(t),1.5)/300;}})();
+const phAng=t=>{if(t<TI)return phA(t);const f=(t-TI)*300,i=Math.min(Math.floor(f),PHI.length-2);return lerp(PHI[i],PHI[i+1],f-i)};
+const phR=t=>t<TB?PR:PR*(1-ease((t-TB)/0.5));
 const EYE=[0.39,10,0.37],TGT=[0.39,0,-0.23],FOV=0.711;
 const fa=(t,a,b,fi=.4,fo=.4)=>t<a?0:t<a+fi?ease((t-a)/fi):t<b-fo?1:t<b?1-ease((t-(b-fo))/fo):0;
 function cardY(lines,size,alpha,dy){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.textAlign='center';
@@ -35,24 +41,25 @@ function arrowArc(r,a0,a1,col,al,w){ // arc in the equatorial plane from angle a
  const e=proj(pos(a1,r)),e2=proj(pos(a1-(a1-a0)*.02,r));const g=Math.atan2(e[1]-e2[1],e[0]-e2[0]);
  x.beginPath();x.moveTo(e[0]+Math.cos(g)*22,e[1]+Math.sin(g)*22);x.lineTo(e[0]+Math.cos(g+2.5)*20,e[1]+Math.sin(g+2.5)*20);x.lineTo(e[0]+Math.cos(g-2.5)*20,e[1]+Math.sin(g-2.5)*20);x.fill();x.restore();}
 SC={D:DUR,
- scene(t){const sw=[.012*Math.sin(2*Math.PI*t/11.5),0,.01*Math.sin(2*Math.PI*t/9.2)];
+ scene(t){if(t>45&&!window.F0){draw(0);const f=document.createElement('canvas');f.width=W;f.height=H;f.getContext('2d').drawImage(c,0,0);window.F0=f;}
+  const sw=[.012*Math.sin(2*Math.PI*t/11.5),0,.01*Math.sin(2*Math.PI*t/9.2)];
   return {eye:EYE.map((v,i)=>v+sw[i]),tgt:TGT.map((v,i)=>v+sw[i]),fov:FOV,sun:[-.55,.32,-.78],
    p:{c:[0,0,0],r:1,ty:5,tilt:0,yaw:0,spin:pinA(t)},
-   q:{c:pos(phA(t),A),r:PR,ty:6,tilt:0,yaw:0,spin:phA(t)+Math.PI},ring:{n:[0,1,0],a:0},axis:0,expo:1.05};},
+   q:{c:pos(phAng(t),rIn(t)),r:phR(t),ty:6,tilt:0,yaw:0,spin:phAng(t)+Math.PI},ring:{n:[0,1,0],a:0},axis:0,expo:1.05};},
  cards:[],
  overlay(t){
-  const O=proj([0,0,0]);const pa=pinA(t),ph=phA(t),pp=proj(pos(ph,A));const isUp=up(t);
+  const O=proj([0,0,0]);const pa=pinA(t),ph=phAng(t),pp=proj(pos(ph,rIn(t)));const isUp=up(t)&&t<TI;
   // orbit path (to scale)
   x.save();x.globalAlpha=.42;x.strokeStyle='#cfd8ff';x.lineWidth=3;x.setLineDash([12,14]);x.lineDashOffset=-t*8;x.beginPath();
   for(let i=0;i<=240;i++){const q=proj(pos(i/240*2*Math.PI,A));i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1]);}x.stroke();x.restore();
   // Phobos trail (beat 2-3) - drawn behind it along the orbit
-  const ta=fa(t,7.6,11.8,.5,.5)+fa(t,0,3.4,0,.4)*.6;
+  const ta=fa(t,7.6,11.8,.5,.5)+fa(t,0,3.4,0,.4)*.6+fa(t,28.6,35.9,.5,.4)*.75;
   if(ta>0){x.save();x.lineCap='round';for(let k=0;k<30;k++){const a0=ph-S*(k/30)*1.6,a1=ph-S*((k+1)/30)*1.6;const q0=proj(pos(a0,A)),q1=proj(pos(a1,A));
    x.globalAlpha=ta*(1-k/30)*.8;x.strokeStyle='#ffd9a8';x.lineWidth=8*(1-k/30)+2;x.beginPath();x.moveTo(q0[0],q0[1]);x.lineTo(q1[0],q1[1]);x.stroke();}x.restore();}
   // Mars spin arrow (beat 1)
   arrowArc(1.13,pa-S*0.2,pa+S*1.5,'#ffb38a',fa(t,3.4,7.6,.5,.5),7);
   // observer, horizon and sky side
-  const pinA_=fa(t,11.8,36.4,.6,.6);const P=pos(pa,1),Pp=proj(P);const tg=[-Math.sin(pa),0,Math.cos(pa)];   // tangent direction (toward increasing angle)
+  const pinA_=Math.max(fa(t,0,3.4,0,.4),fa(t,11.8,36.4,.6,.6));const P=pos(pa,1),Pp=proj(P);const tg=[-Math.sin(pa),0,Math.cos(pa)];   // tangent direction (toward increasing angle)
   const east=tg.map(v=>v*S);                                // east = direction of rotation
   if(pinA_>0){
    // sky side tint (beyond the tangent line)
@@ -65,22 +72,22 @@ SC={D:DUR,
    x.save();x.beginPath();x.arc(O[0],O[1],(proj(pos(0,A+.12))[0]-O[0]),0,7);x.clip();x.globalAlpha=pinA_*.9;x.strokeStyle='#e9f0ff';x.lineWidth=4;x.shadowColor='#9cc0ff';x.shadowBlur=10;x.beginPath();x.moveTo(h2[0],h2[1]);x.lineTo(h1[0],h1[1]);x.stroke();x.restore();
    // compass letters at the line ends, nudged to the sky side
    const off=proj(P.map((v,i)=>v+east[i]*1.7+nrm[i]*0.3)),offW=proj(P.map((v,i)=>v-east[i]*1.7+nrm[i]*0.3));
-   const la=fa(t,11.8,28.6,.6,.6);
+   const la=Math.max(fa(t,0,3.4,0,.4),fa(t,11.8,35.9,.6,.4));
    const cx_=v=>Math.max(95,Math.min(890,v));
    label('E',cx_(off[0]),off[1]+18,la,'#ffd36b',54);label('W',cx_(offW[0]),offW[1]+18,la,'#ffd36b',54);
    // the observer pin
    x.save();x.globalAlpha=pinA_;x.fillStyle='#7dffb0';x.shadowColor='#7dffb0';x.shadowBlur=16;x.beginPath();x.arc(Pp[0],Pp[1],11,0,7);x.fill();
    const tip=proj(P.map((v,i)=>v+nrm[i]*0.17));x.strokeStyle='#7dffb0';x.lineWidth=5;x.beginPath();x.moveTo(Pp[0],Pp[1]);x.lineTo(tip[0],tip[1]);x.stroke();x.restore();
-   const ya=fa(t,11.8,28.6,.6,.6);const yl=proj(P.map((v,i)=>v+nrm[i]*0.62));label('YOU',yl[0],yl[1]+16,ya,'#7dffb0',44);
+   const ya=la;const yl=proj(P.map((v,i)=>v+nrm[i]*0.62));label('YOU',yl[0],yl[1]+16,ya,'#7dffb0',44);
    // sight line while Phobos is up
    const sa=isUp?Math.min(1,(Math.cos(psi(t))-1/A)*6):0;
    if(sa>0){x.save();x.globalAlpha=pinA_*sa*.85;x.strokeStyle='#7dffb0';x.lineWidth=3;x.setLineDash([8,10]);x.beginPath();x.moveTo(Pp[0],Pp[1]);x.lineTo(pp[0],pp[1]);x.stroke();x.restore();}
   }
   // Phobos highlight ring
-  const rr=PR*151.8*1.0;x.save();x.globalAlpha=isUp&&pinA_>0?.95:.55;x.strokeStyle=isUp&&pinA_>0?'#7dffb0':'#ffd9a8';x.lineWidth=4;x.shadowColor=x.strokeStyle;x.shadowBlur=14;
+  const rr=PR*151.8*1.0;x.save();x.globalAlpha=(isUp&&pinA_>0?.95:.55)*(t<TB?1:1-ease((t-TB)/.4));x.strokeStyle=isUp&&pinA_>0?'#7dffb0':'#ffd9a8';x.lineWidth=4;x.shadowColor=x.strokeStyle;x.shadowBlur=14;
   x.beginPath();x.arc(pp[0],pp[1],rr+8,0,7);x.stroke();x.restore();
   // names (overview only)
-  const na=fa(t,0,11.8,0,.5);const nd=[pp[0]-O[0],pp[1]-O[1]];const nl=Math.hypot(...nd);
+  const na=fa(t,3.4,11.8,.5,.5);const nd=[pp[0]-O[0],pp[1]-O[1]];const nl=Math.hypot(...nd);
   const px_=pp[0]-nd[0]/nl*118,py_=pp[1]-nd[1]/nl*118+14;label('PHOBOS',px_,py_,na,'#ffd9a8',44);
   label('MARS',O[0],O[1]+16,na*.9,'#fff',44);
   // spin counter beat
@@ -88,14 +95,14 @@ SC={D:DUR,
    arrowArc(1.13,pa-S*fr*2*Math.PI,pa,'#ffb38a',ca*(fr>0.01?1:0),6);
    const n=RISES.filter(r=>r>=C0&&r<=Math.min(t,C1)).length;
    cardY(['IN ONE MARS SPIN',['IT RISES: '+n,'#7dffb0']],96,ca,0);}
-  // falling beat: exaggerated inward spiral
-  const fa2=fa(t,35.6,43.6,.6,.6);
-  if(fa2>0){const gr=cl((t-35.8)/2.5,0,1),n=160,m=Math.floor(n*eio(gr));const pts=[];
-   for(let i=0;i<=m;i++){const u=i/n;pts.push(proj(pos(ph+S*u*2*Math.PI*0.9,lerp(A,1.04,u))));}
-   x.save();x.lineCap='round';for(let i=1;i<pts.length;i++){x.globalAlpha=fa2*(.35+.6*i/n);x.strokeStyle='#ff9a7a';x.lineWidth=3+3*i/n;x.beginPath();x.moveTo(pts[i-1][0],pts[i-1][1]);x.lineTo(pts[i][0],pts[i][1]);x.stroke();}
-   if(pts.length>3){const e=pts[pts.length-1],e2=pts[pts.length-3];const g=Math.atan2(e[1]-e2[1],e[0]-e2[0]);x.globalAlpha=fa2;x.fillStyle='#ff9a7a';x.beginPath();
-    x.moveTo(e[0]+Math.cos(g)*20,e[1]+Math.sin(g)*20);x.lineTo(e[0]+Math.cos(g+2.5)*18,e[1]+Math.sin(g+2.5)*18);x.lineTo(e[0]+Math.cos(g-2.5)*18,e[1]+Math.sin(g-2.5)*18);x.fill();}
-   x.restore();}
+  // falling beat: path travelled during the (exaggerated) inspiral, then the debris ring
+  const fa2=fa(t,TI-.2,45.0,.3,.6);
+  if(fa2>0&&t>TI){const te=Math.min(t,TB),n=Math.max(2,Math.floor((te-TI)*60));const pts=[];for(let i=0;i<=n;i++){const u=TI+(te-TI)*i/n;pts.push(proj(pos(phAng(u),rIn(u))));}
+   x.save();x.lineCap='round';for(let i=1;i<pts.length;i++){x.globalAlpha=fa2*(.25+.6*i/n)*(t<TB?1:1-ease((t-TB)/1.2));x.strokeStyle='#ff9a7a';x.lineWidth=2+4*i/n;x.beginPath();x.moveTo(pts[i-1][0],pts[i-1][1]);x.lineTo(pts[i][0],pts[i][1]);x.stroke();}x.restore();}
+  if(t>TB){const sp=ease((t-TB)/2.4),da=fa2;const w=S*2*Math.PI/PP*Math.pow(A/RB,1.5);const base=phAng(TB)+w*(hrs(t)-hrs(TB));
+   x.save();x.globalCompositeOperation='lighter';for(let k=0;k<90;k++){const j=(k*0.618)%1,o=(j-.5)*2*Math.PI*sp,rr2=RB+(((k*37)%11)/11-.5)*0.10*sp;const q=proj(pos(base+o,rr2));
+    x.globalAlpha=da*(.45+.35*((k*7)%5)/5);x.fillStyle=k%3?'#d9c3a8':'#ffb38a';x.beginPath();x.arc(q[0],q[1],2.2+((k*13)%4)*.6,0,7);x.fill();}
+   const rq=proj(pos(0,RB))[0]-O[0];x.globalAlpha=da*.18*sp;x.strokeStyle='#d9c3a8';x.lineWidth=12;x.beginPath();x.arc(O[0],O[1],rq,0,7);x.stroke();x.restore();}
   // cards
   const CARDS=[[0,3.4,[['ON MARS, THIS MOON','#fff'],['RISES IN THE WEST','#ffd36b']]],
    [3.4,7.6,['Mars turns once in',['24 h 37 min','#ffb38a']]],
@@ -109,8 +116,11 @@ SC={D:DUR,
    [43.6,DUR+.01,[['ON MARS, THIS MOON','#fff'],['RISES IN THE WEST','#ffd36b']]]];
   for(const [a,b,l] of CARDS){if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=DUR?1:ease((b-t)/.3);cardY(l,96,Math.min(fi,fo),(1-fi)*24)}}
   // footnote (bottom-right corner, outside the orbit)
-  x.save();x.globalAlpha=.8;x.font='700 26px '+F;x.textAlign='right';x.fillStyle='#d8d2e8';x.shadowColor='#000';x.shadowBlur=8;
-  x.fillText('Simulation',912,1396);x.fillText(t>35.6&&t<43.6?'spiral exaggerated':'Phobos enlarged',912,1430);x.restore();
+  x.save();x.globalAlpha=.8;x.font='700 26px '+F;x.textAlign='right';x.fillStyle='#d8d2e8';x.shadowColor='#000';x.shadowBlur=8;x.fillText('Simulation',912,1396);
+  const ex=t>=36.0&&t<44.7;const fb=ex?Math.min(fa(t,36.0,44.7,.3,.3),1):Math.max(fa(t,0,36.0,0,.3),fa(t,44.7,DUR+1,.3,0));x.globalAlpha=.8*fb;
+  x.fillText(ex?'Inspiral exaggerated':'Phobos enlarged',912,1430);x.restore();
+  // seamless loop: crossfade to frame 0 during the last second
+  if(t>45&&window.F0){x.save();x.globalAlpha=ease(t-45);x.drawImage(window.F0,0,0);x.restore();}
  }
 };
-window.MODEL={RISES,SETS,C0,C1,PSYN,HZ:HZ*180/Math.PI};
+window.MODEL={RISES,SETS,C0,C1,PSYN,R0,HZ:HZ*180/Math.PI};
