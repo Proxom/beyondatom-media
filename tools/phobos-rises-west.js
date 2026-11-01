@@ -41,7 +41,7 @@ function arrowArc(r,a0,a1,col,al,w){ // arc in the equatorial plane from angle a
  const e=proj(pos(a1,r)),e2=proj(pos(a1-(a1-a0)*.02,r));const g=Math.atan2(e[1]-e2[1],e[0]-e2[0]);
  x.beginPath();x.moveTo(e[0]+Math.cos(g)*22,e[1]+Math.sin(g)*22);x.lineTo(e[0]+Math.cos(g+2.5)*20,e[1]+Math.sin(g+2.5)*20);x.lineTo(e[0]+Math.cos(g-2.5)*20,e[1]+Math.sin(g-2.5)*20);x.fill();x.restore();}
 SC={D:DUR,
- scene(t){if(t>45&&!window.F0){draw(0);const f=document.createElement('canvas');f.width=W;f.height=H;f.getContext('2d').drawImage(c,0,0);window.F0=f;}
+ scene(t){if(t>44.3&&!window.F0){draw(0);const f=document.createElement('canvas');f.width=W;f.height=H;f.getContext('2d').drawImage(c,0,0);window.F0=f;}
   const sw=[.012*Math.sin(2*Math.PI*t/11.5),0,.01*Math.sin(2*Math.PI*t/9.2)];
   return {eye:EYE.map((v,i)=>v+sw[i]),tgt:TGT.map((v,i)=>v+sw[i]),fov:FOV,sun:[-.55,.32,-.78],
    p:{c:[0,0,0],r:1,ty:5,tilt:0,yaw:0,spin:pinA(t)},
@@ -88,7 +88,8 @@ SC={D:DUR,
   x.beginPath();x.arc(pp[0],pp[1],rr+8,0,7);x.stroke();x.restore();
   // names (overview only)
   const na=fa(t,3.4,11.8,.5,.5);const nd=[pp[0]-O[0],pp[1]-O[1]];const nl=Math.hypot(...nd);
-  const px_=pp[0]-nd[0]/nl*118,py_=pp[1]-nd[1]/nl*118+14;label('PHOBOS',px_,py_,na,'#ffd9a8',44);
+  x.save();x.font='800 44px '+F;const hw=x.measureText('PHOBOS').width/2;x.restore();const ux=nd[0]/nl,uy=nd[1]/nl;
+  const off_=rr+8+16+hw*Math.abs(ux)+22*Math.abs(uy);const px_=pp[0]-ux*off_,py_=pp[1]-uy*off_+15;label('PHOBOS',px_,py_,na,'#ffd9a8',44);
   label('MARS',O[0],O[1]+16,na*.9,'#fff',44);
   // spin counter beat
   if(t>C0-.3&&t<35.9){const ca=fa(t,C0-.3,35.9,.3,.3);const fr=cl((hrs(t)-hrs(C0))/PM,0,1);
@@ -116,11 +117,11 @@ SC={D:DUR,
    [43.6,DUR+.01,[['ON MARS, THIS MOON','#fff'],['RISES IN THE WEST','#ffd36b']]]];
   for(const [a,b,l] of CARDS){if(t>=a&&t<b){const fi=a===0?1:ease((t-a)/.35),fo=b>=DUR?1:ease((b-t)/.3);cardY(l,96,Math.min(fi,fo),(1-fi)*24)}}
   // footnote (bottom-right corner, outside the orbit)
-  x.save();x.globalAlpha=.8;x.font='700 26px '+F;x.textAlign='right';x.fillStyle='#d8d2e8';x.shadowColor='#000';x.shadowBlur=8;x.fillText('Simulation',912,1396);
-  const ex=t>=36.0&&t<44.7;const fb=ex?Math.min(fa(t,36.0,44.7,.3,.3),1):Math.max(fa(t,0,36.0,0,.3),fa(t,44.7,DUR+1,.3,0));x.globalAlpha=.8*fb;
-  x.fillText(ex?'Inspiral exaggerated':'Phobos enlarged',912,1430);x.restore();
+  x.save();x.globalAlpha=.8;x.font='700 26px '+F;x.textAlign='right';x.fillStyle='#d8d2e8';x.shadowColor='#000';x.shadowBlur=8;x.fillText('Simulation',925,1402);
+  const ex=t>=36.0&&t<44.1;const fb=ex?Math.min(fa(t,36.0,44.1,.3,.2),1):Math.max(fa(t,0,36.0,0,.3),fa(t,44.1,DUR+1,.2,0));x.globalAlpha=.8*fb;
+  x.fillText(ex?'Inspiral exaggerated':'Phobos enlarged',925,1434);x.restore();
   // seamless loop: crossfade to frame 0 during the last second
-  if(t>45&&window.F0){x.save();x.globalAlpha=ease(t-45);x.drawImage(window.F0,0,0);x.restore();}
+  if(t>44.3&&window.F0){x.save();x.globalAlpha=ease((t-44.3)/1.7);x.drawImage(window.F0,0,0);x.restore();}
  }
 };
 window.MODEL={RISES,SETS,C0,C1,PSYN,R0,HZ:HZ*180/Math.PI};
