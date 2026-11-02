@@ -12,7 +12,7 @@ const C={m:LEFT+RKM[0]*S2};C.t=C.m+RKM[0]*S2+GAP2+RKM[2]*S2;C.g=C.t+RKM[2]*S2+GA
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
 const eout=t=>{t=cl(t);return 1-Math.pow(1-t,3)},ein=t=>Math.pow(cl(t),2.2);
 // timeline
-const T_IN0=-0.6,T_IN1=1.0,T_EX0=37.8,T_EX1=D-0.6;
+const T_IN0=-1.0,T_IN1=0.6,T_EX0=37.8,T_EX1=D-1.0;   // bodies are almost in place (and labelled) at frame 0
 const Z_OUT=[10.8,12.0],TI_IN=[11.7,12.9],TI_OUT=[16.2,16.9],Z_BACK=[16.8,17.9];
 const CUT_OPEN=[25.2,26.6],CUT_CLOSE=[35.6,36.8];
 const GHOST=[6.8,7.0,8.0,10.4,10.8];          // fade in, slide start, slide end, fade start, fade end
@@ -53,7 +53,7 @@ const CARDS=[
  [8.1,10.7,[['GANYMEDE IS'],['8% WIDER',GR]],84],
  [12.95,16.3,[["SATURN'S TITAN"],['IS WIDER TOO',Y]],80],
  [17.6,21.35,[['NOW COMPARE'],['THEIR MASS']],80],
- [21.45,25.0,[['MERCURY HAS'],['2.2× THE MASS',OR]],80],
+ [21.45,25.0,[['MERCURY HAS'],['2.2× THE MASS',OR],['OF GANYMEDE',OR]],80],
  [26.7,31.1,[['WHY? MERCURY'],['HAS A HUGE'],['METAL CORE',OR]],80],
  [31.2,37.9,[['BIGGER'],["DOESN'T MEAN"],['HEAVIER',Y]],88]];
 const fmt=n=>Math.round(n).toLocaleString('en-US');
@@ -61,7 +61,7 @@ const NAMES=['MERCURY','GANYMEDE','TITAN'],TYPES=['PLANET','MOON OF JUPITER','MO
 const DIAM=RKM.map(r=>2*r);   // 4879, 5262, 5150 km
 const ROW1=1238,ROW2=1286,ROW3=1328;
 function win(t,a,b,fi,fo){return Math.min(ease((t-a)/(fi||.35)),ease((b-t)/(fo||.3)))*(t>=a&&t<b?1:0)}
-function labels(t,L){const exitA=1-ease((t-T_EX0+.1)/.3),inA=ease((tl(t)-T_IN1)/.35);const base=t>=D+T_IN0?0:Math.min(exitA,inA);
+function labels(t,L){const tt=tl(t);const base=tt<0?ease((tt+.2)/.2):(t>=T_EX0-.1?1-ease((t-T_EX0+.1)/.3):1);
  for(let k=0;k<3;k++){const b=L[k];let a=k===2?win(t,TI_IN[1],TI_OUT[0]+.15,.35,.3):base;if(a<=0)continue;
   txt(NAMES[k],b.x,ROW1,44,'center','#fff',a,900);
   // row 2: type (hook/payoff), diameter (measure + Titan), descriptor (cutaway)
@@ -104,7 +104,8 @@ function scene(t,tr){const n=Math.max(1,Math.min(16,Math.ceil(Math.max(speed(t),
  for(let i=0;i<n;i++){const ts=t+(i-(n-1)/2)/(30*n);shade(ts,tr+(i-(n-1)/2)/(30*n));x.globalAlpha=1/(i+1);x.drawImage(g,0,0)}x.globalAlpha=1;
  x.save();x.globalCompositeOperation='lighter';x.filter='blur(36px)';x.globalAlpha=.20;x.drawImage(c,0,0);x.restore();
  const vg=x.createRadialGradient(W/2,H*.48,H*.3,W/2,H*.48,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=vg;x.fillRect(0,0,W,H);}
-function overlay(t){const L=layout(t);dims(t,L);ghost(t,L);bars(t);coreLeader(t,L);labels(t,L);for(const cd of CARDS)card(cd[2],t,cd[0],cd[1],cd[3]);}
+function overlay(t){const L=layout(t);dims(t,L);ghost(t,L);bars(t);labels(t,L);   // core pointer removed (reviewer: line ended in empty space)
+for(const cd of CARDS)card(cd[2],t,cd[0],cd[1],cd[3]);}
 const SKIP0=33.0,SKIP=2.6,DN=D-SKIP;const remap=t=>t<SKIP0?t:t+SKIP;   // new duration 37.0 s
 function frame(tn){BB=[];const t=remap(tn);x.globalCompositeOperation='source-over';x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);scene(t,tn);overlay(t)}
 window.draw=frame;window.frameOverlay=tn=>{BB=[];overlay(remap(tn))};

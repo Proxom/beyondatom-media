@@ -29,7 +29,9 @@ vec3 alb(float ty,vec3 p){float lat=p.y;
   vec3 k1=crat(p,6.,.55),k2=crat(p,15.,.45);c*=1.-.18*k1.x-.12*k2.x;c+=vec3(.10)*(k1.y+k2.y*.7);c+=vec3(.16)*k1.z+vec3(.09)*k2.z;return c;}
  if(ty<1.5){float rg=fbm(p*2.2+vec3(7.,1.,3.));float br=smoothstep(.47,.56,rg);
   vec3 dk=vec3(.33,.30,.27)*(.85+.3*fbm(p*8.)),lt=vec3(.70,.68,.64)*(.9+.2*fbm(p*10.+3.));
-  float gr=sin(dot(p,normalize(vec3(.6,.3,.75)))*90.+fbm(p*4.)*14.)*.5+.5;lt*=.93+.10*gr;
+  // grooved terrain: short lanes with locally varying direction, low contrast (a single global stripe direction read as moire)
+  vec3 gd=normalize(vec3(n3(p*2.1+1.)-.5,n3(p*2.1+7.)-.5,n3(p*2.1+13.)-.5)+1e-3);float lane=smoothstep(.5,.62,n3(p*6.+3.));
+  float gr=sin(dot(p,gd)*55.+fbm(p*5.)*10.)*.5+.5;lt*=1.-.035*lane*gr;
   vec3 c=mix(dk,lt,br);vec3 k=crat(p,9.,.4);c*=1.-.10*k.x;c+=vec3(.20)*k.z+vec3(.07)*k.y;
   return mix(c,vec3(.80,.80,.80),smoothstep(.62,.80,abs(lat))*.45);}
  float w=lat+.03*(fbm(p*3.)-.5);vec3 c=mix(vec3(.86,.60,.28),vec3(.80,.55,.25),sin(w*6.)*.5+.5);c*=.95+.08*fbm(p*5.);
