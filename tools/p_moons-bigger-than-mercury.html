@@ -1,0 +1,89 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=g width=1080 height=1920 style="display:none"></canvas><canvas id=c width=1080 height=1920></canvas>
+<!-- moons-bigger-than-mercury: orthographic, to-scale spheres (JPL/NASA mean radii). Mercury cutaway: metal core 85% of radius (NASA). -->
+<script id=fs type=x-shader>
+precision highp float;
+uniform vec2 R;uniform float T;uniform vec3 SUN;
+uniform vec4 SP[3];uniform float SPIN[3];uniform float AL[3];
+uniform float CUTA;uniform vec3 E0,E1,E2;uniform float CUTON;
+float h1(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
+float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h1(i),h1(i+vec3(1,0,0)),f.x),mix(h1(i+vec3(0,1,0)),h1(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h1(i+vec3(0,0,1)),h1(i+vec3(1,0,1)),f.x),mix(h1(i+vec3(0,1,1)),h1(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*n3(p);p*=2.02;a*=.5;}return s;}
+vec3 sky(vec2 q){vec3 d=normalize(vec3((q-.5*R)/R.x,1.2));vec3 c=vec3(0.);
+ for(int l=0;l<2;l++){float sc=l==0?160.:320.;vec3 p=d*sc;vec3 id=floor(p);float hs=h1(id+float(l)*7.);
+  if(hs>.88){vec3 sp=id+.5+.35*(vec3(h1(id+1.),h1(id+2.),h1(id+3.))-.5);float dd=length(p-sp);
+   c+=pow(hs-.88,1.5)*30.*exp(-dd*dd*30.)*mix(vec3(1.,.85,.7),vec3(.75,.85,1.),h1(id+9.));}}
+ c+=vec3(.035,.03,.06)*pow(fbm(d*2.5+3.),2.5)*2.;c+=vec3(.010,.016,.035)*(1.-q.y/R.y);return c;}
+// craters: returns (floor darkening, rim brightening, ray brightness) from nearest crater centres
+vec3 crat(vec3 p,float sc,float dens){vec3 g=p*sc;vec3 i=floor(g),f=fract(g);vec3 o=step(.5,f)-1.;vec3 r=vec3(0.);
+ for(int a=0;a<2;a++)for(int b=0;b<2;b++)for(int c=0;c<2;c++){vec3 id=i+o+vec3(float(a),float(b),float(c));float hs=h1(id*1.37+4.1);if(hs>dens)continue;
+  vec3 cp=id+.25+.5*vec3(h1(id+1.7),h1(id+2.9),h1(id+5.3));float rad=.18+.22*h1(id+8.8);float d=length(g-cp)/rad;
+  r.x=max(r.x,smoothstep(1.,.75,d));r.y=max(r.y,smoothstep(.75,.95,d)*smoothstep(1.2,1.,d));
+  if(h1(id+11.1)>.8)r.z=max(r.z,smoothstep(3.2,1.,d)*(.5+.5*n3(normalize(g-cp)*7.+id)));}
+ return r;}
+// 0 mercury 1 ganymede 2 titan ; p = unit vector in body frame (y = spin axis)
+vec3 alb(float ty,vec3 p){float lat=p.y;
+ if(ty<.5){float n=fbm(p*3.+5.),m=fbm(p*9.+1.);vec3 c=vec3(.56,.54,.51)*(.78+.40*n)*(.92+.16*m);
+  vec3 k1=crat(p,6.,.55),k2=crat(p,15.,.45);c*=1.-.18*k1.x-.12*k2.x;c+=vec3(.10)*(k1.y+k2.y*.7);c+=vec3(.16)*k1.z+vec3(.09)*k2.z;return c;}
+ if(ty<1.5){float rg=fbm(p*2.2+vec3(7.,1.,3.));float br=smoothstep(.47,.56,rg);
+  vec3 dk=vec3(.33,.30,.27)*(.85+.3*fbm(p*8.)),lt=vec3(.70,.68,.64)*(.9+.2*fbm(p*10.+3.));
+  float gr=sin(dot(p,normalize(vec3(.6,.3,.75)))*90.+fbm(p*4.)*14.)*.5+.5;lt*=.93+.10*gr;
+  vec3 c=mix(dk,lt,br);vec3 k=crat(p,9.,.4);c*=1.-.10*k.x;c+=vec3(.20)*k.z+vec3(.07)*k.y;
+  return mix(c,vec3(.80,.80,.80),smoothstep(.62,.80,abs(lat))*.45);}
+ float w=lat+.03*(fbm(p*3.)-.5);vec3 c=mix(vec3(.86,.60,.28),vec3(.80,.55,.25),sin(w*6.)*.5+.5);c*=.95+.08*fbm(p*5.);
+ return mix(c,vec3(.70,.55,.35),smoothstep(.75,.95,lat)*.4);}
+vec3 atm(float ty){return ty<.5?vec3(0.):ty<1.5?vec3(0.):vec3(1.,.66,.30);}
+vec3 rot(vec3 p,float s){float ca=cos(s),sa=sin(s);return vec3(ca*p.x+sa*p.z,p.y,-sa*p.x+ca*p.z);}
+vec3 surf(int k,vec3 n,float spn){float ty=float(k);vec3 lp=rot(n,spn);
+ vec3 a=alb(ty,lp);float ndl=dot(n,SUN);float dif=smoothstep(-.08,.35,ndl)*max(ndl+.08,0.)/1.08;
+ float mu=max(n.z,0.);dif*=.55+.45*pow(mu,.4);if(k==2)dif=mix(dif,smoothstep(-.25,.4,ndl),.35);
+ vec3 c=a*dif*1.25;float rim=pow(1.-mu,k==2?2.:3.)*smoothstep(-.3,.5,ndl);c+=atm(ty)*rim*(k==2?.8:.55);c+=a*.035;return c;}
+// cut face colour (Mercury interior): r = radius fraction, n = face normal (view coords)
+vec3 face(vec3 pv,float R0,vec3 n){float r=length(pv)/R0;vec3 q=pv/R0;
+ vec3 core=mix(vec3(1.,.66,.34),vec3(.78,.45,.22),smoothstep(0.,.85,r))*(.88+.18*fbm(q*9.));
+ vec3 mant=vec3(.46,.41,.37)*(.8+.35*fbm(q*14.+2.));
+ vec3 c=r<.85?core:mant;c=mix(c,vec3(.95,.8,.6),smoothstep(.012,0.,abs(r-.85))*.8);  // bright core boundary line
+ c=mix(c,vec3(.62,.60,.57),smoothstep(.975,.99,r));                                    // thin crust
+ float l=.62+.38*max(dot(n,SUN),0.);return c*l*(r<.85?1.15:1.);}
+vec3 shadeAt(vec2 q){
+ vec3 col=sky(q);
+ for(int k=0;k<3;k++){vec4 S=SP[k];if(S.w<=0.||AL[k]<=0.)continue;float dd=length(q-S.xy)/S.w;col+=(k==2?vec3(1.,.7,.35):vec3(.55,.6,.7))*exp(-max(dd-1.,0.)*(k==2?5.:8.))*(k==2?.16:.06)*AL[k]*step(1.,dd);}
+ float best=-1e9;int bi=-1;vec3 bn=vec3(0.);
+ for(int k=0;k<3;k++){vec4 S=SP[k];if(S.w<=0.||AL[k]<=0.)continue;vec2 d=q-S.xy;float r2=dot(d,d);float rr=S.w+.75;if(r2>rr*rr)continue;
+  float z=sqrt(max(S.w*S.w-r2,0.));if(z>best){best=z;bi=k;bn=vec3(d.x,-d.y,z)/S.w;}}
+ if(bi<0)return col;
+ vec4 S;float spn,al;for(int k=0;k<3;k++){if(k==bi){S=SP[k];spn=SPIN[k];al=AL[k];}}
+ float dpx=length(q-S.xy);float cov=clamp(S.w-dpx+.5,0.,1.);
+ vec3 n=normalize(bn);vec3 c;
+ if(bi==0&&CUTON>0.){ // octant cut: removed where e_i.p > a for all i (p in px, view coords y up z to viewer)
+  vec3 p0=n*S.w;float a=CUTA*S.w;
+  bool rem=dot(E0,p0)>a&&dot(E1,p0)>a&&dot(E2,p0)>a;
+  if(!rem)c=surf(0,n,spn);
+  else{ float zb=-1e9;vec3 fn=vec3(0.);
+   float z0=(a-E0.x*p0.x-E0.y*p0.y)/E0.z,z1=(a-E1.x*p0.x-E1.y*p0.y)/E1.z,z2=(a-E2.x*p0.x-E2.y*p0.y)/E2.z;
+   if(z0<=p0.z+.01&&z0>zb){zb=z0;fn=E0;}if(z1<=p0.z+.01&&z1>zb){zb=z1;fn=E1;}if(z2<=p0.z+.01&&z2>zb){zb=z2;fn=E2;}
+   vec3 ph=vec3(p0.xy,zb);
+   if(zb>-p0.z)c=face(ph,S.w,fn);else c=col;}
+ }else c=surf(bi,n,spn);
+ return mix(col,c,cov*al);}
+void main(){
+ vec2 q=vec2(gl_FragCoord.x,R.y-gl_FragCoord.y);vec3 col;
+ vec4 S0=SP[0];bool aa=CUTON>0.&&length(q-S0.xy)<S0.w+2.;
+ if(aa){col=vec3(0.);for(int s=0;s<4;s++){vec2 o=vec2(s==1||s==3?.25:-.25,s>=2?.25:-.25);col+=shadeAt(q+o);}col*=.25;}
+ else col=shadeAt(q);
+ col=1.-exp(-col*1.1);col=pow(col,vec3(.95));gl_FragColor=vec4(col,1.);}
+</script>
+<script>
+const W=1080,H=1920;const g=document.getElementById('g'),gl=g.getContext('webgl',{preserveDrawingBuffer:true});
+function sh(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o}
+const pr=gl.createProgram();gl.attachShader(pr,sh(gl.VERTEX_SHADER,'attribute vec2 a;void main(){gl_Position=vec4(a,0,1);}'));
+gl.attachShader(pr,sh(gl.FRAGMENT_SHADER,document.getElementById('fs').text));gl.linkProgram(pr);
+if(!gl.getProgramParameter(pr,gl.LINK_STATUS))throw gl.getProgramInfoLog(pr);gl.useProgram(pr);
+const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+const U=n=>gl.getUniformLocation(pr,n);
+const c=document.getElementById('c'),x=c.getContext('2d');window.TEXREADY=true;
+</script>
+<script src="moons-bigger-than-mercury.js"></script>
