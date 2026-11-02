@@ -19,13 +19,14 @@ const eout=t=>{t=cl(t);return 1-Math.pow(1-t,3)};
 // Moon distance (centre to centre): apogee -> perigee -> apogee (half an anomalistic month each, ~13.8 days)
 const M1a=12.6,M1b=16.6,M2a=21.6,M2b=25.6;
 const HALF=27.55455/2,MID=(KM_APO+KM_PER)/2,AMP=(KM_APO-KM_PER)/2;   // half an anomalistic month (NASA: 27.55455 d)
-function phase(t){if(t>=M1a&&t<M2a)return{leg:1,day:HALF*eio((t-M1a)/(M1b-M1a))};if(t>=M2a)return{leg:2,day:HALF*eio((t-M2a)/(M2b-M2a))};return{leg:0,day:0}}
+function phase(t){if(t>=M1a&&t<M2a)return{leg:1,day:HALF*cl((t-M1a)/(M1b-M1a))};if(t>=M2a)return{leg:2,day:HALF*cl((t-M2a)/(M2b-M2a))};return{leg:0,day:0}} // linear days; the cosine eases the motion
 function moonKm(t){const p=phase(t);const c=Math.cos(Math.PI*p.day/HALF);return p.leg===1?MID+AMP*c:p.leg===2?MID-AMP*c:KM_APO} // r ~ a(1 - e cos M)
 function moonDay(t){const p=phase(t);return p.leg?p.day:-1}
 function solve(f,a,b){for(let i=0;i<60;i++){const m=(a+b)/2;if(f(a)*f(m)<=0)b=m;else a=m}return (a+b)/2}
 // Neptune leaves before the Moon reaches its slot and returns after the Moon has passed back above it
 const NOUT0=solve(t=>moonKm(t)-(CONTACT+14000),M1a,M1b),NOUT=.45;
-const NIN0=solve(t=>moonKm(t)-(CONTACT+6000),M2a,M2b),NIN=.7;
+const NIN0=solve(t=>moonKm(t)-(CONTACT+4000),M2a,M2b),NIN=.45;
+const TC2=solve(t=>moonKm(t)-CONTACT,M2a,M2b);   // gap back above the 380,016 km needed
 const TCONT=solve(t=>moonKm(t)-CONTACT,M1a,M1b);
 const NX_OUT=850;
 function nepX(t){if(t<NOUT0)return GX;if(t<NIN0)return GX+(NX_OUT-GX)*eio((t-NOUT0)/NOUT);return NX_OUT+(GX-NX_OUT)*eio((t-NIN0)/NIN)}
@@ -87,8 +88,8 @@ function shade(t,hl){const b=bodies(t);gl.viewport(0,0,W,H);gl.uniform1f(U('T'),
  gl.uniform4fv(U('HL'),hl);gl.drawArrays(gl.TRIANGLES,0,3);}
 function moving(t){if(t>=EX0)return true;for(const p of P){if(t>p.t0-.05&&t<land(p))return true}return (t>M1a&&t<M1b)||(t>M2a&&t<M2b)||(t>NOUT0&&t<NOUT0+NOUT)||(t>NIN0&&t<NIN0+NIN)}
 function hlAt(t){ // Neptune outline: red while out, green flash on return
- if(t>=TCONT&&t<NIN0)return[8,1,.25*ease((t-TCONT)/.3),ease((t-TCONT)/.3)];
- if(t>=NIN0&&t<NIN0+NIN+1.4){const k=t<NIN0+NIN?1-ease((t-NIN0)/NIN):0;const gk=t>=NIN0+NIN?Math.sin(Math.PI*cl((t-NIN0-NIN)/1.4)):0;
+ if(t>=TCONT&&t<TC2)return[8,1,.25*ease((t-TCONT)/.3),ease((t-TCONT)/.3)];
+ if(t>=TC2&&t<NIN0+NIN+1.4){const k=t<TC2+.25?1-ease((t-TC2)/.25):0;const gk=t>=NIN0+NIN?Math.sin(Math.PI*cl((t-NIN0-NIN)/1.4)):0;
   return k>0?[8,1,.25*k,k]:[8,0,0,gk]}
  return[-1,0,0,0]}
 function speed(t){let m=Math.abs(YE-moonKm(t+1/30)*S-(YE-moonKm(t)*S));for(const p of P){const a=planetX(p,t),b=planetX(p,t+1/30);if(isFinite(a)&&isFinite(b))m=Math.max(m,Math.abs(b-a))}return m}

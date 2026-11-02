@@ -3,7 +3,7 @@ import json,sys
 LANDS={'JUPITER':1.0,'SATURN':2.35,'URANUS':3.3,'NEPTUNE':4.2,'MARS':5.3,'VENUS':6.0,'MERCURY':6.7}
 NOTE={'JUPITER':0,'SATURN':1,'URANUS':3,'NEPTUNE':4,'MARS':7,'VENUS':6,'MERCURY':8}   # bigger planet = lower note
 PAN={'JUPITER':-.25,'SATURN':.25,'URANUS':.25,'NEPTUNE':.25,'MARS':-.2,'VENUS':-.2,'MERCURY':-.2}
-NOUT0,NIN0,NIN=13.69,23.84,.7
+NOUT0,NIN0,NIN=13.33,24.08,.45
 hits=[]
 for n,t in LANDS.items():
     hits.append(dict(t=t,kind='marimba',note=NOTE[n],vel=.55 if NOTE[n]<3 else .45,pan=PAN[n]))
