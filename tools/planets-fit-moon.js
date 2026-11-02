@@ -28,10 +28,10 @@ const NIN0=solve(t=>moonKm(t)-(CONTACT+3000),M2a,M2b),NIN=.7;
 const TCONT=solve(t=>moonKm(t)-CONTACT,M1a,M1b);
 const NX_OUT=850;
 function nepX(t){if(t<NOUT0)return GX;if(t<NIN0)return GX+(NX_OUT-GX)*eio((t-NOUT0)/NOUT);return NX_OUT+(GX-NX_OUT)*eio((t-NIN0)/NIN)}
-const EX0=32.9,EXD=1.0;
+const EX0=33.5,EXD=.9;
 function startX(p){return p.side<0?-(p.name==='SATURN'?360:p.r+40):W+(p.name==='SATURN'?360:p.r+40)}
 function planetX(p,t){
- if(t>=EX0){if(p.name==='JUPITER'&&t>=D-.4)return planetX(p,t-D);return GX+(startX(p)-GX)*Math.pow(cl((t-EX0)/EXD),2.2)}
+ if(t>=EX0){if(p.name==='JUPITER'&&t>=D-.4)return planetX(p,t-D);const ex=p.name==='JUPITER'?W+p.r+40:startX(p);return GX+(ex-GX)*Math.pow(cl((t-EX0)/EXD),2.2)}
  if(p===NEP&&t>=NOUT0)return nepX(t);const u=eout((t-p.t0)/p.dur);
  const start=p.side<0?-(p.name==='SATURN'?360:p.r+40):W+(p.name==='SATURN'?360:p.r+40);return start+(GX-start)*u}
 const land=p=>p.t0+p.dur;
