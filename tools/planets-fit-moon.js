@@ -18,13 +18,14 @@ const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2
 const eout=t=>{t=cl(t);return 1-Math.pow(1-t,3)};
 // Moon distance (centre to centre): apogee -> perigee -> apogee (half an anomalistic month each, ~13.8 days)
 const M1a=12.6,M1b=16.6,M2a=21.6,M2b=25.6;
-function moonKm(t){if(t<M1a)return KM_APO;if(t<M1b)return KM_APO+(KM_PER-KM_APO)*eio((t-M1a)/(M1b-M1a));
- if(t<M2a)return KM_PER;if(t<M2b)return KM_PER+(KM_APO-KM_PER)*eio((t-M2a)/(M2b-M2a));return KM_APO}
-function moonDay(t){if(t>=M1a&&t<M1b+.6)return 13.8*cl((t-M1a)/(M1b-M1a));if(t>=M2a&&t<M2b+.6)return 13.8*cl((t-M2a)/(M2b-M2a));return -1}
+const HALF=27.55455/2,MID=(KM_APO+KM_PER)/2,AMP=(KM_APO-KM_PER)/2;   // half an anomalistic month (NASA: 27.55455 d)
+function phase(t){if(t>=M1a&&t<M2a)return{leg:1,day:HALF*eio((t-M1a)/(M1b-M1a))};if(t>=M2a)return{leg:2,day:HALF*eio((t-M2a)/(M2b-M2a))};return{leg:0,day:0}}
+function moonKm(t){const p=phase(t);const c=Math.cos(Math.PI*p.day/HALF);return p.leg===1?MID+AMP*c:p.leg===2?MID-AMP*c:KM_APO} // r ~ a(1 - e cos M)
+function moonDay(t){const p=phase(t);return p.leg?p.day:-1}
 function solve(f,a,b){for(let i=0;i<60;i++){const m=(a+b)/2;if(f(a)*f(m)<=0)b=m;else a=m}return (a+b)/2}
 // Neptune leaves before the Moon reaches its slot and returns after the Moon has passed back above it
 const NOUT0=solve(t=>moonKm(t)-(CONTACT+14000),M1a,M1b),NOUT=.45;
-const NIN0=solve(t=>moonKm(t)-(CONTACT+3000),M2a,M2b),NIN=.7;
+const NIN0=solve(t=>moonKm(t)-(CONTACT+6000),M2a,M2b),NIN=.7;
 const TCONT=solve(t=>moonKm(t)-CONTACT,M1a,M1b);
 const NX_OUT=850;
 function nepX(t){if(t<NOUT0)return GX;if(t<NIN0)return GX+(NX_OUT-GX)*eio((t-NOUT0)/NOUT);return NX_OUT+(GX-NX_OUT)*eio((t-NIN0)/NIN)}
@@ -53,26 +54,27 @@ function card(lines,t,a,b,size){ // lines: [text,color,size?]; main lines share 
  const main=fitSize(lines.filter(l=>!l[2]).map(l=>l[0]),size);
  let y=342+(1-fi)*24;for(const l of lines){const sz=l[2]?fitSize([l[0]],l[2]):main;txt(l[0],LX,y+sz*.74,sz,'left',l[1]||'#fff',al,900);y+=sz*1.18}}
 const fmt=n=>Math.round(n).toLocaleString('en-US');
-function counters(t,a,b,status){const fi=ease((t-a)/.35),fo=ease((b-t)/.3),al=Math.min(fi,fo);if(t<a||t>=b||al<=0)return;
- let landed=0;for(const p of P)if(t>=land(p)&&!(p===NEP&&t>=NOUT0&&t<NIN0+NIN))landed+=2*p.rk;
+function txtFit(s,px,py,size,col,al,wt){x.font=(wt||700)+' '+size+'px '+FNT;const w=x.measureText(s).width;txt(s,px,py,w>LW?Math.floor(size*LW/w):size,'left',col,al,wt||700)}
+function counters(t,a,b,status,build){const fi=ease((t-a)/.35),fo=ease((b-t)/.3),al=Math.min(fi,fo);if(t<a||t>=b||al<=0)return;
+ let landed=0;for(const p of P)if(t>=land(p))landed+=2*p.rk;const all=t>=land(P[0]);
  const gap=moonKm(t)-RE-RM;const over=gap<SUMKM;
- txt('7 PLANETS, END TO END',LX,372,28,'left','#b9c6e6',al,700);
- txt(fmt(landed)+' km',LX,428,50,'left','#ffd98a',al,900);
- txt('GAP, SURFACE TO SURFACE',LX,470,28,'left','#b9c6e6',al,700);
- txt(fmt(gap)+' km',LX,526,50,'left',over?'#ff7a72':'#ffffff',al,900);
- if(status)txt(status[0],LX,566,30,'left',status[1],al*(status[2]==null?1:status[2]),800);}
+ txtFit(build?(all?'ALL 7, END TO END':'PLANETS SO FAR'):'ALL 7 NEED',LX,372,34,'#b9c6e6',al);
+ txt(fmt(build?landed:SUMKM)+' km',LX,426,50,'left','#ffd98a',al,900);
+ txtFit('GAP BETWEEN SURFACES',LX,470,34,'#b9c6e6',al);
+ txt(fmt(gap)+' km',LX,524,50,'left',over?'#ff7a72':'#ffffff',al,900);
+ if(status&&status[0])txtFit(status[0],LX,568,34,status[1],al*(status[2]==null?1:status[2]),800);}
 const CARDS=[
  [0,3.45,[['ALL 7'],['PLANETS'],['FIT IN','#ffd98a'],['THIS GAP','#ffd98a']],76],
  [D-.6,D,[['ALL 7'],['PLANETS'],['FIT IN','#ffd98a'],['THIS GAP','#ffd98a']],76],
  [8.2,11.8,[['THEY FIT!'],['17,376 km SPARE','#7dffb0',48]],72],
  [11.8,14.0,[['BUT THE'],["MOON'S"],['ORBIT IS AN','#ffd98a'],['ELLIPSE','#ffd98a']],64],
- [17.2,21.4,[['AT ITS CLOSEST,'],['NEPTUNE','#ff7a72'],["DOESN'T FIT",'#ff7a72'],['24,824 km SHORT','#ff7a72',46]],60],
+ [17.2,21.4,[['AT ITS CLOSEST,','#ffffff',48],['NEPTUNE','#ff7a72'],["DOESN'T FIT",'#ff7a72'],['24,824 km SHORT','#ff7a72',46]],66],
  [26.3,32.8,[['THEY FIT'],['ONLY WHEN'],['THE MOON','#ffd98a'],['IS FAR AWAY','#ffd98a']],72]];
 function status(t){const d=moonDay(t);
- if(t>=14&&t<18){if(t>=NOUT0)return["NEPTUNE: NO ROOM",'#ff7a72',ease((t-NOUT0)/.3)];return dayTxt(d)}
- if(t>=21.4&&t<26.3){if(t>=NIN0+NIN)return['ALL 7 FIT AGAIN','#7dffb0',ease((t-NIN0-NIN)/.3)];return dayTxt(d)}
+ if(t>=14&&t<18)return dayTxt(d,'FARTHEST');
+ if(t>=21.4&&t<26.3){if(t>=NIN0+NIN)return['ALL 7 FIT AGAIN','#7dffb0',ease((t-NIN0-NIN)/.3)];return dayTxt(d,'CLOSEST')}
  return null}
-function dayTxt(d){const n=Math.round(d);return[n>=1?'MOON, '+n+(n===1?' DAY':' DAYS')+' LATER':'','#b9c6e6']}
+function dayTxt(d,ref){const n=Math.round(d);return[n>=1?n+(n===1?' DAY':' DAYS')+' AFTER '+ref:'','#b9c6e6']}
 function bodies(t){ // returns uniform arrays
  const sp=new Float32Array(36),ty=new Float32Array(9),spin=new Float32Array(9),al=new Float32Array(9);
  const set=(k,x0,y0,r,tp,sn,a)=>{sp.set([x0,y0,0,r],4*k);ty[k]=tp;spin[k]=sn;al[k]=a};
@@ -85,19 +87,20 @@ function shade(t,hl){const b=bodies(t);gl.viewport(0,0,W,H);gl.uniform1f(U('T'),
  gl.uniform4fv(U('HL'),hl);gl.drawArrays(gl.TRIANGLES,0,3);}
 function moving(t){if(t>=EX0)return true;for(const p of P){if(t>p.t0-.05&&t<land(p))return true}return (t>M1a&&t<M1b)||(t>M2a&&t<M2b)||(t>NOUT0&&t<NOUT0+NOUT)||(t>NIN0&&t<NIN0+NIN)}
 function hlAt(t){ // Neptune outline: red while out, green flash on return
- if(t>=NOUT0&&t<NIN0)return[8,1,.25*ease((t-NOUT0)/.3),ease((t-NOUT0)/.3)];
+ if(t>=TCONT&&t<NIN0)return[8,1,.25*ease((t-TCONT)/.3),ease((t-TCONT)/.3)];
  if(t>=NIN0&&t<NIN0+NIN+1.4){const k=t<NIN0+NIN?1-ease((t-NIN0)/NIN):0;const gk=t>=NIN0+NIN?Math.sin(Math.PI*cl((t-NIN0-NIN)/1.4)):0;
   return k>0?[8,1,.25*k,k]:[8,0,0,gk]}
  return[-1,0,0,0]}
+function speed(t){let m=Math.abs(YE-moonKm(t+1/30)*S-(YE-moonKm(t)*S));for(const p of P){const a=planetX(p,t),b=planetX(p,t+1/30);if(isFinite(a)&&isFinite(b))m=Math.max(m,Math.abs(b-a))}return m}
 function scene(t){
- const n=moving(t)?4:1;
+ const n=Math.max(1,Math.min(16,Math.ceil(Math.max(speed(t),speed(t-1/30))/2.5)));
  for(let i=0;i<n;i++){const ts=t+(i-(n-1)/2)/(30*n)*1.0;shade(ts,hlAt(t));x.globalAlpha=1/(i+1);x.drawImage(g,0,0)}x.globalAlpha=1;
  // bloom + vignette
  x.save();x.globalCompositeOperation='lighter';x.filter='blur(36px)';x.globalAlpha=.22;x.drawImage(c,0,0);x.restore();
  const vg=x.createRadialGradient(W/2,H*.48,H*.3,W/2,H*.48,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=vg;x.fillRect(0,0,W,H);}
 function rings(t){ // emphasis circles for the tiny Earth and Moon
  const mY=YE-moonKm(t)*S;x.save();x.strokeStyle='rgba(170,200,255,.55)';x.lineWidth=2;
- x.beginPath();x.arc(GX,mY,RM*S+9,0,7);x.stroke();x.beginPath();x.arc(GX,YE,RE*S+8,0,7);x.stroke();x.restore()}
+ x.beginPath();x.arc(GX,mY,RM*S+9,0,7);x.stroke();x.beginPath();x.arc(GX,YE,RE*S+8,.12*Math.PI,.88*Math.PI);x.stroke();x.restore()}
 function lab(p,t){const lt=p.name==='SATURN'?Math.max(land(p),land(P[5])):land(p);let a=Math.min(ease((t-lt)/.35),1-ease((t-EX0+.35)/.3));if(p===NEP&&t>=NOUT0-.2){const k=t<NIN0+NIN?0:ease((t-NIN0-NIN)/.35);a=Math.min(a,Math.max(1-ease((t-NOUT0+.2)/.25),k))}
  if(a<=0)return;const sz=44;
  if(p.lab==='R'){let ly=p.y+sz*.36;if(p.name==='SATURN')ly=p.y-122;const lx=p.name==='SATURN'?676:GX+p.r+26;txt(p.name,lx,ly,sz,'left','#fff',a);
@@ -114,7 +117,7 @@ function overlay(t){
  const ga=Math.min(ease((t-8.2)/.4),ease((11.8-t)/.4));if(t>8.2&&t<11.8){const y0=mY+RM*S,y1=NEP.y-NEP.r;x.save();x.globalAlpha=ga;x.strokeStyle='#7dffb0';x.lineWidth=3;
   x.shadowColor='#7dffb0';x.shadowBlur=12;x.beginPath();x.moveTo(GX-40,y0);x.lineTo(GX+2,y0);x.moveTo(GX-40,y1);x.lineTo(GX+40,y1);x.moveTo(GX-32,y0+2);x.lineTo(GX-32,y1-2);x.stroke();x.restore()}
  for(const cd of CARDS)card(cd[2],t,cd[0],cd[1],cd[3]);
- counters(t,3.6,8.2,null);counters(t,14.0,17.2,status(t));counters(t,21.4,26.3,status(t));}
+ counters(t,3.6,8.2,null,true);counters(t,14.0,17.2,status(t));counters(t,21.4,26.3,status(t));}
 function frameOverlay(t){BB=[];overlay(t)}window.frameOverlay=frameOverlay;
 function frame(t){BB=[];x.globalCompositeOperation='source-over';x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);scene(t);overlay(t)}
 let F0=null;
