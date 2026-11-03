@@ -87,11 +87,11 @@ function foot(t){for(const f of FOOT){const a=f[0]===0?Math.min(1,ease((f[1]-t)/
 // barycentre marker (always on top), pulses while a card names it
 function marker(t,Lt){const a=Lt.a;let al=a.t0===0?1:ease((t-a.t0)/.3);if(a.name==='B')al*=ease((t-18.4)/.6);if(al<=0)return;
  const pulse=[[6.3,10.2],[10.3,14.25],[18.7,22.9],[31.7,35.6]].some(w=>t>=w[0]&&t<w[1])?.5+.5*Math.sin((t)*2*Math.PI*1.1):0;
- const A=a.name==='C'?8:13,rr=a.name==='C'?17:22;
+ const kk=a.name==='A'?Lt.k:1,A=a.name==='C'?8:7+6*kk,rr=a.name==='C'?17:12+10*kk;
  x.save();x.globalAlpha=al;x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=8;
  x.strokeStyle='rgba(0,0,0,.85)';x.lineWidth=8;x.lineCap='round';x.beginPath();x.moveTo(CX-A,CY);x.lineTo(CX+A,CY);x.moveTo(CX,CY-A);x.lineTo(CX,CY+A);x.stroke();
  x.strokeStyle=Y;x.lineWidth=4;x.shadowColor=Y;x.shadowBlur=12;x.beginPath();x.moveTo(CX-A,CY);x.lineTo(CX+A,CY);x.moveTo(CX,CY-A);x.lineTo(CX,CY+A);x.stroke();
- x.globalAlpha=al*(.55+.45*pulse);x.lineWidth=2.5;x.beginPath();x.ellipse(CX,CY,rr+6*pulse,(rr+6*pulse)*a.CI,0,0,7);x.stroke();x.restore();
+ x.globalAlpha=al*(.55+.45*pulse)*kk;x.lineWidth=2.5;x.beginPath();x.ellipse(CX,CY,rr+6*pulse,(rr+6*pulse)*a.CI,0,0,7);x.stroke();x.restore();
  window.MARK=[CX,CY,24];}
 // partner pointer for close views (partner off screen)
 function pointer(t,Lt){const a=Lt.a;let al;
