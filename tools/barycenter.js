@@ -68,7 +68,7 @@ function card(lines,t,a,b,size){const fi=a<=0?1:ease((t-a)/.35),fo=b>=D?1:ease((
 const Y='#ffd98a',BL='#9fd0ff';
 const CARDS=[
  [0,4.5,[['PLUTO IS CIRCLING'],['EMPTY SPACE',Y]],84],
- [4.6,6.2,[['WHAT IS IT'],['CIRCLING?',Y]],86],
+ [4.6,6.2,[['SO WHAT IS IT'],['CIRCLING?',Y]],86],
  [6.3,10.2,[['PLUTO AND CHARON'],['BOTH CIRCLE THEIR'],['BALANCE POINT',Y]],80],
  [10.3,14.25,[['CHARON IS SO HEAVY'],['THE POINT IS'],['OUTSIDE PLUTO',Y]],80],
  [14.5,18.6,[['EARTH AND THE MOON'],['DO IT TOO',Y]],82],
@@ -83,14 +83,14 @@ const FOOT=[
  [14.5,22.9,'To scale. Sped up: 1 orbit = 27.3 days'],
  [23.0,27.45,'1,700 km below the surface. Earth’s spin not shown'],
  [27.7,31.2,'Sun to scale. Sped up: 1 loop = 11.9 years'],
- [31.7,35.4,'The point: about 47,000 km above the surface',700,34],
+ [31.7,35.4,'The point: on average 47,000 km above the surface',700,34],
  [35.7,D,'Only Jupiter shown; other planets add smaller wobbles']];
 function win(t,a,b,fi,fo){return Math.min(ease((t-a)/(fi||.35)),ease((b-t)/(fo||.3)))*(t>=a&&t<b?1:0)}
 function foot(t){for(const f of FOOT){const a=f[0]===0?Math.min(1,ease((f[1]-t)/.3)):win(t,f[0],f[1],.35,.3);if(a<=0)continue;const s=fitSize([f[2]],f[4]||30,700,820);txt(f[2],495,f[3]||1428,s,'center',f[3]?Y:'#b9c6e6',a,f[3]?800:700,'foot')}}
 // barycentre marker (always on top), pulses while a card names it
 function marker(t,Lt){const a=Lt.a;let al=a.t0===0?1:ease((t-a.t0)/.3);if(a.name==='B')al*=ease((t-17.9)/.5);if(al<=0)return;
  const pulse=[[6.3,10.2],[10.3,14.25],[18.7,22.9],[31.7,35.6]].some(w=>t>=w[0]&&t<w[1])?.5+.5*Math.sin((t)*2*Math.PI*1.1):0;
- const kk=a.name==='A'?Lt.k:1,A=a.name==='C'?7:7+6*kk,rr=a.name==='C'?17:12+10*kk;
+ const kk=a.name==='A'?Lt.k:1,A=a.name==='C'?10:7+6*kk,rr=a.name==='C'?17:12+10*kk;
  x.save();x.globalAlpha=al;x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=8;
  x.strokeStyle='rgba(0,0,0,.85)';x.lineWidth=8;x.lineCap='round';x.beginPath();x.moveTo(CX-A,CY);x.lineTo(CX+A,CY);x.moveTo(CX,CY-A);x.lineTo(CX,CY+A);x.stroke();
  x.strokeStyle=Y;x.lineWidth=4;x.shadowColor=Y;x.shadowBlur=12;x.beginPath();x.moveTo(CX-A,CY);x.lineTo(CX+A,CY);x.moveTo(CX,CY-A);x.lineTo(CX,CY+A);x.stroke();
@@ -100,10 +100,10 @@ function marker(t,Lt){const a=Lt.a;let al=a.t0===0?1:ease((t-a.t0)/.3);if(a.name
 function pointer(t,Lt){const a=Lt.a;let al;
  if(a.name==='A')al=Math.max(1-ease((t-4.6)/.5),ease((t-11.5)/.4));else if(a.name==='B')al=ease((t-18.5)/.4);else al=ease((t-a.t0)/.3);
  al*=Math.min(1,ease((a.t1-t)/.15));if(al<=0)return;
- const [ux,uy]=Lt.u,h=Lt.H;const dh=Math.hypot(h.x-CX,h.y-CY);const s0=Math.max(34,h.r-dh+20);
- const nm={CHARON:'TO CHARON',MOON:'TO THE MOON',JUPITER:'TO JUPITER'}[a.L.name];x.font='800 40px '+FNT;const tw=x.measureText(nm).width;const ext=Math.abs(ux)*tw/2+Math.abs(uy)*20+22;
+ const [ux,uy]=Lt.u,h=Lt.H;const dh=Math.hypot(h.x-CX,h.y-CY);const s0=a.name==='B'?26:Math.max(34,h.r-dh+20);   // Earth: the point is inside the planet, so the arrow may start on the disc
+ const nm={CHARON:'TO CHARON',MOON:'TO THE MOON',JUPITER:'TO JUPITER'}[a.L.name];x.font='800 36px '+FNT;const tw=x.measureText(nm).width;const ext=Math.abs(ux)*tw/2+Math.abs(uy)*18+22;
  // shorten the arrow so its label fits the text safe area instead of being clamped back onto the arrow
- let Lr=120;for(;Lr>40;Lr-=2){const cx=CX+ux*(s0+Lr+16+ext);if(cx-tw/2>=60&&cx+tw/2<=930)break;}
+ let Lr=120;for(;Lr>28;Lr-=2){const cx=CX+ux*(s0+Lr+16+ext);if(cx-tw/2>=60&&cx+tw/2<=930)break;}
  window.PTRCLAMP=Lr<120;const s1=s0+Lr;
  const x0=CX+ux*s0,y0=CY+uy*s0,x1=CX+ux*s1,y1=CY+uy*s1;
  x.save();x.globalAlpha=al;x.lineCap='round';
@@ -111,7 +111,9 @@ function pointer(t,Lt){const a=Lt.a;let al;
   const px=-uy,py=ux,hx=x1+ux*16,hy=y1+uy*16;x.beginPath();x.moveTo(hx,hy);x.lineTo(x1-ux*6+px*13,y1-uy*6+py*13);x.lineTo(x1-ux*6-px*13,y1-uy*6-py*13);x.closePath();
   if(w>5){x.lineWidth=5;x.stroke()}else x.fill()}
  x.restore();
- let lx=x1+ux*(16+ext),ly=y1+uy*(16+ext)+14;lx=cl(lx,60+tw/2,930-tw/2);txt(nm,lx,ly,40,'center',BL,al,800,'ptr');}
+ let lx=x1+ux*(16+ext),ly=y1+uy*(16+ext)+14;
+ if(lx-tw/2<60||lx+tw/2>930){lx=cl(x1+ux*16,60+tw/2,930-tw/2);ly=uy>-.35?y1+uy*16-46:y1+uy*16+60;}  // no room beyond the tip: label above/below the arrowhead
+ window.ARROW=[x0,y0,x1+ux*16,y1+uy*16];txt(nm,lx,ly,36,'center',BL,al,800,'ptr');}
 function labels(t,Lt){const a=Lt.a;const k=Lt.k;
  // close views: name on the body; wide views: name below the body
  const close=a.name==='A'?Math.max(1-ease((t-4.6)/.35),ease((t-11.5)/.35)):a.name==='B'?ease((t-18.5)/.4):0;
