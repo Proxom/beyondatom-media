@@ -100,14 +100,17 @@ function marker(t,Lt){const a=Lt.a;let al=a.t0===0?1:ease((t-a.t0)/.3);if(a.name
 function pointer(t,Lt){const a=Lt.a;let al;
  if(a.name==='A')al=Math.max(1-ease((t-4.6)/.5),ease((t-11.5)/.4));else if(a.name==='B')al=ease((t-18.5)/.4);else al=ease((t-a.t0)/.3);
  al*=Math.min(1,ease((a.t1-t)/.15));if(al<=0)return;
- const [ux,uy]=Lt.u,h=Lt.H;const dh=Math.hypot(h.x-CX,h.y-CY);const s0=Math.max(34,h.r-dh+20),s1=s0+120;
+ const [ux,uy]=Lt.u,h=Lt.H;const dh=Math.hypot(h.x-CX,h.y-CY);const s0=Math.max(34,h.r-dh+20);
+ const nm={CHARON:'TO CHARON',MOON:'TO THE MOON',JUPITER:'TO JUPITER'}[a.L.name];x.font='800 40px '+FNT;const tw=x.measureText(nm).width;const ext=Math.abs(ux)*tw/2+Math.abs(uy)*20+22;
+ // shorten the arrow so its label fits the text safe area instead of being clamped back onto the arrow
+ let Lr=120;for(;Lr>40;Lr-=2){const cx=CX+ux*(s0+Lr+16+ext);if(cx-tw/2>=60&&cx+tw/2<=930)break;}
+ window.PTRCLAMP=Lr<120;const s1=s0+Lr;
  const x0=CX+ux*s0,y0=CY+uy*s0,x1=CX+ux*s1,y1=CY+uy*s1;
  x.save();x.globalAlpha=al;x.lineCap='round';
  for(const [w,cc] of [[7,'rgba(0,0,0,.8)'],[3.5,BL]]){x.strokeStyle=cc;x.fillStyle=cc;x.lineWidth=w;x.beginPath();x.moveTo(x0,y0);x.lineTo(x1,y1);x.stroke();
   const px=-uy,py=ux,hx=x1+ux*16,hy=y1+uy*16;x.beginPath();x.moveTo(hx,hy);x.lineTo(x1-ux*6+px*13,y1-uy*6+py*13);x.lineTo(x1-ux*6-px*13,y1-uy*6-py*13);x.closePath();
   if(w>5){x.lineWidth=5;x.stroke()}else x.fill()}
  x.restore();
- const nm={CHARON:'TO CHARON',MOON:'TO THE MOON',JUPITER:'TO JUPITER'}[a.L.name];x.font='800 40px '+FNT;const tw=x.measureText(nm).width;const ext=Math.abs(ux)*tw/2+Math.abs(uy)*20+22;
  let lx=x1+ux*(16+ext),ly=y1+uy*(16+ext)+14;lx=cl(lx,60+tw/2,930-tw/2);txt(nm,lx,ly,40,'center',BL,al,800,'ptr');}
 function labels(t,Lt){const a=Lt.a;const k=Lt.k;
  // close views: name on the body; wide views: name below the body
