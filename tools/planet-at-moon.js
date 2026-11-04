@@ -1,7 +1,7 @@
 // planet-at-moon: each planet placed at the Moon's average distance (384,400 km), drawn at its true angular size over a night horizon.
 // Sources: NASA NSSDC fact sheets (equatorial radii: Moon 1,738.1, Mars 3,396.2, Venus 6,051.8, Neptune 24,764, Uranus 25,559,
 // Jupiter 71,492, Saturn 60,268 km; Moon semimajor axis 384,400 km) and the Saturnian Rings Fact Sheet (A ring outer edge 136,780 km).
-const D=33.0,CX=540,CY=1010,HZY=1345;
+const D=30.5,CX=540,CY=1010,HZY=1345;
 const DIST=384400,FPX=1404;                        // focal length in px: rings (39.2 deg) span ~1,000 px of the 1,080 frame
 const pxR=R=>FPX*R/Math.sqrt(DIST*DIST-R*R);       // projected radius of a sphere (angular radius = asin(R/d))
 const angD=R=>2*Math.asin(R/DIST)*180/Math.PI;
@@ -10,8 +10,8 @@ const B={MOON:{R:1738.1,ty:4,fl:0},MARS:{R:3396.2,ty:5,fl:0},VENUS:{R:6051.8,ty:
 for(const k in B){B[k].px=pxR(B[k].R);B[k].deg=angD(B[k].R)}
 const RINGKM=136780,RINGDEG=2*Math.atan(RINGKM/DIST)*180/Math.PI,RINGK=(FPX*RINGKM/DIST)/(2.27*B.SATURN.px); // ring drawn at its true 39.2 deg
 // timeline: [body, arrive start, arrive end]; each body holds until the next one starts
-const SEQ=[['SATURN',-9,-8],['MOON',2.7,3.7],['MARS',6.6,7.5],['VENUS',9.6,10.5],['NEPTUNE',12.8,13.8],['URANUS',16.2,17.1],
- ['JUPITER',19.6,20.8],['SATURN',24.6,26.0]];
+const SEQ=[['SATURN',-9,-8],['MOON',2.7,3.5],['MARS',5.6,6.3],['VENUS',7.6,8.4],['NEPTUNE',9.8,10.8],['URANUS',13.2,14.1],
+ ['JUPITER',16.6,17.8],['SATURN',21.6,23.0]];
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
 function state(t){ // returns list of [name, radiusPx, alpha] passes, bottom first
  let i=0;for(let j=0;j<SEQ.length;j++)if(t>=SEQ[j][1])i=j;
@@ -19,21 +19,22 @@ function state(t){ // returns list of [name, radiusPx, alpha] passes, bottom fir
  if(!prev||t>=cur[2])return[[cur[0],B[cur[0]].px,1]];
  const u=(t-cur[1])/(cur[2]-cur[1]),k=eio(u);
  const r=Math.exp(Math.log(B[prev[0]].px)*(1-k)+Math.log(B[cur[0]].px)*k);
- return[[prev[0],r,1],[cur[0],r,ease((u-.40)/.25)]]}
+ // sequential swap (no double exposure): the old body fades out first, then the new one fades in; Saturn always enters at its true size
+ return[[prev[0],r,1-ease(u/.42)],[cur[0],cur[0]==='SATURN'?B.SATURN.px:r,ease((u-.50)/.35)]]}
 const SUN=(()=>{const v=[-.42,.30,.86];const l=Math.hypot(...v);return v.map(a=>a/l)})();
 const RA=22*Math.PI/180,RNV=[Math.sin(-6*Math.PI/180)*Math.cos(RA),Math.cos(RA),Math.sin(RA)];
 gl.uniform3fv(U('RN'),RNV);gl.uniform3fv(U('SUN'),SUN);gl.uniform2f(U('R'),W,H);gl.uniform1f(U('HZ'),HZY);
 // reference Moon (for scale) at the side
 const REFX=884,REFY=672;
-function refAlpha(t){ if(t<2.6)return 1-ease((t-2.35)/.25); if(t<6.6)return 0; return ease((t-6.7)/.5)}
-function shade(t,name,r,ra,ringA){
+function refAlpha(t){ if(t<2.6)return 1-ease((t-2.35)/.25); if(t<5.6)return 0; return ease((t-5.7)/.5)}
+function shade(t,name,r,ra){
  const sp=new Float32Array(36),ty=new Float32Array(9),spin=new Float32Array(9),al=new Float32Array(9),fl=new Float32Array(9);
  const b=B[name];const k=name==='SATURN'?4:0;const tl=t,TP=2*Math.PI/D;
  sp.set([CX,CY,0,r],4*k);ty[k]=b.ty;spin[k]=name==="MOON"?0:TP*t+1.3;al[k]=1;fl[k]=b.fl; // spin: one turn per loop (seamless)
  if(ra>0){sp.set([REFX,REFY,0,B.MOON.px],4);ty[1]=4;al[1]=ra;sp.set([REFX,REFY,0,B.MOON.px],4*1)}
  gl.uniform1f(U('ROUT'),2.27*r*RINGK);gl.uniform1f(U('T'),tl);
  gl.uniform4fv(U('SP'),sp);gl.uniform1fv(U('TY'),ty);gl.uniform1fv(U('SPIN'),spin);gl.uniform1fv(U('AL'),al);gl.uniform1fv(U('FL'),fl);
- gl.uniform1f(U('RINGA'),ringA==null?1:ringA);gl.uniform4fv(U('HL'),[-1,0,0,0]);gl.viewport(0,0,W,H);gl.drawArrays(gl.TRIANGLES,0,3);}
+ gl.uniform4fv(U('HL'),[-1,0,0,0]);gl.viewport(0,0,W,H);gl.drawArrays(gl.TRIANGLES,0,3);}
 // ---- landscape (drawn on the 2D canvas over the sky) ----
 function hsh(n){const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s)}
 function vn(x){const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return hsh(i)*(1-u)+hsh(i+1)*u}
@@ -74,12 +75,10 @@ function land(t){
  x.save();x.fillStyle=c2;x.beginPath();x.moveTo(-20,SHORE);for(let px=-20;px<=W+20;px+=6)x.lineTo(px,NR(px-dx2));x.lineTo(W+20,SHORE);x.closePath();x.fill();
  x.beginPath();for(const tr of TREES)if(tr.on)treePath(tr,dx2,false);x.fill();
  x.restore();}
-function ringAlpha(t,i,n){ // rings never overlap another planet's disc: they fade out before a swap and in after it
- if(n<2)return 1;let j=0;for(let k=0;k<SEQ.length;k++)if(t>=SEQ[k][1])j=k;const u=(t-SEQ[j][1])/(SEQ[j][2]-SEQ[j][1]);
- return i===0?1-ease(u/.35):ease((u-.66)/.34)}
 function scene(t){
  const ps=state(t),ra=refAlpha(t);
- for(let i=0;i<ps.length;i++){const p=ps[i];shade(t,p[0],p[1],ra,ringAlpha(t,i,ps.length));x.globalAlpha=p[2];x.drawImage(g,0,0);x.globalAlpha=1}
+ shade(t,ps[0][0],0,ra);x.drawImage(g,0,0);   // sky-only base pass, so the sky never dims while bodies swap
+ for(let i=0;i<ps.length;i++){const p=ps[i];shade(t,p[0],p[1],ra);x.globalAlpha=p[2];x.drawImage(g,0,0);x.globalAlpha=1}
  // bloom
  x.save();x.globalCompositeOperation='lighter';x.filter='blur(30px)';x.globalAlpha=.20;x.drawImage(c,0,0);x.restore();
  sx.clearRect(0,0,W,H);sx.drawImage(c,0,0);
@@ -101,13 +100,13 @@ const Y='#ffd98a';
 const HOOK=[['IF SATURN'],['WERE AS CLOSE',Y],['AS THE MOON',Y]];
 const CARDS=[
  [0,2.6,HOOK,80],[D-.55,D,HOOK,80],
- [3.7,6.5,[['THIS IS'],['OUR MOON',Y]],80],
- [6.6,9.5,[['NOW SWAP IN'],['EACH PLANET',Y]],76],
- [9.6,12.7,[['SAME DISTANCE:'],['384,400 km',Y]],76],
- [16.2,19.5,[['TIPPED'],['ON ITS SIDE',Y]],76],
- [19.6,24.0,[['THE BIGGEST'],['PLANET',Y]],80],
- [24.0,29.6,[["BUT SATURN'S"],['RINGS ARE',Y],['EVEN WIDER',Y]],80],
- [29.6,D-.55,[['ALL TO SCALE,'],['AT THE MOON\'S',Y],['DISTANCE',Y]],76]];
+ [2.95,5.5,[['THIS IS'],['OUR MOON',Y]],80],
+ [5.6,7.5,[['NOW SWAP IN'],['EACH PLANET',Y]],76],
+ [7.6,9.7,[['SAME DISTANCE:'],['384,400 km',Y]],76],
+ [13.2,16.5,[['TIPPED'],['ON ITS SIDE',Y]],76],
+ [16.6,21.0,[['THE BIGGEST'],['PLANET',Y]],80],
+ [21.0,26.6,[["BUT SATURN'S"],['RINGS ARE',Y],['EVEN WIDER',Y]],80],
+ [26.6,D-.55,[['ALL TO SCALE,'],['AT THE MOON\'S',Y],['DISTANCE',Y]],76]];
 const fmtDeg=d=>d<1.5?d.toFixed(1)+'°':d<10?d.toFixed(1)+'°':Math.round(d)+'°';
 const READ={MOON:['0.5° WIDE','ABOUT HALF A DEGREE OF SKY'],MARS:['MARS','1.0° WIDE · 2× THE MOON'],VENUS:['VENUS','1.8° WIDE · 3.5× THE MOON'],
  NEPTUNE:['NEPTUNE','7.4° WIDE · 14× THE MOON'],URANUS:['URANUS','7.6° WIDE · 15× THE MOON'],JUPITER:['JUPITER','21° WIDE · 41× THE MOON'],
@@ -115,9 +114,9 @@ const READ={MOON:['0.5° WIDE','ABOUT HALF A DEGREE OF SKY'],MARS:['MARS','1.0°
 function readout(t){ // planet name + size, below the card; follows the body on screen
  const ps=state(t);const last=ps[ps.length-1];let name=last[0],al=1;
  if(ps.length>1){const u=last[2];name=u<.5?ps[0][0]:last[0];al=u<.5?1-ease(u/.5):ease((u-.5)/.5)}
- if(t<2.6||t>=D-.55)return; // hook card shows alone
- if(name==='SATURN'&&t<26.0)return;
- if(name==='JUPITER')al*=1-ease((t-23.65)/.3);if(al<=0.01)return;
+ if(t<2.95||t>=D-.55)return; // hook card shows alone
+ if(name==='SATURN'&&t<23.0)return;
+ if(name==='JUPITER')al*=1-ease((t-20.65)/.3);if(al<=0.01)return;
  const rd=READ[name];const y0=name==='SATURN'?640:560;
  txt(rd[0],LX,y0+44,60,'left','#ffffff',al,900);txt(rd[1],LX,y0+98,40,'left','#b9c6e6',al,800)}
 function marks(t){ // emphasis ring around tiny discs, label on the reference Moon

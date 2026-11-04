@@ -110,7 +110,7 @@ function shade(t){const b=bodiesU(t);gl.viewport(0,0,W,H);gl.uniform1f(U('T'),t)
  gl.uniform1f(U('EDR'),edr(t));gl.uniform1f(U('ODR'),odr(t));
  const ca=cutA(t);gl.uniform1f(U('CUTA'),ca);gl.uniform1f(U('CUTON'),ca<.999?1:0);gl.drawArrays(gl.TRIANGLES,0,3);}
 function speed(t){const a=layout(t),b=layout(t+1/30);let m=0;for(let k=0;k<5;k++){if(a[k].r<=0&&b[k].r<=0)continue;m=Math.max(m,Math.abs(b[k].x-a[k].x)+Math.abs(b[k].y-a[k].y)+Math.abs(b[k].r-a[k].r))}return m}
-function scene(t){const n=Math.max(1,Math.min(16,Math.ceil(Math.max(speed(t),speed(t-1/30))/2.5)));
+function scene(t){const n=Math.max(1,Math.min(t>=12.3&&t<27.0?8:16,Math.ceil(Math.max(speed(t),speed(t-1/30))/2.5)));
  for(let i=0;i<n;i++){const ts=t+(i-(n-1)/2)/(30*n);shade(ts);x.globalAlpha=1/(i+1);x.drawImage(g,0,0)}x.globalAlpha=1;
  x.save();x.globalCompositeOperation='lighter';x.filter='blur(36px)';x.globalAlpha=.18;x.drawImage(c,0,0);x.restore();
  const vg=x.createRadialGradient(W/2,H*.48,H*.3,W/2,H*.48,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=vg;x.fillRect(0,0,W,H);}
