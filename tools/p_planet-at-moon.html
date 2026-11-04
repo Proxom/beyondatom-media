@@ -4,7 +4,7 @@
 <script id=fs type=x-shader>
 precision highp float;
 uniform vec2 R;uniform float T;uniform vec3 SUN;
-uniform vec4 SP[9];uniform float TY[9];uniform float SPIN[9];uniform float AL[9];uniform float FL[9];uniform float HZ;
+uniform vec4 SP[9];uniform float TY[9];uniform float SPIN[9];uniform float AL[9];uniform float FL[9];uniform float HZ;uniform float RINGA;
 uniform vec3 RN;uniform float RIN,ROUT;uniform float GUIDE,GX,GY0,GY1;uniform vec4 HL;uniform sampler2D TEX,CLD,MTX;
 float h1(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
 float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
@@ -72,7 +72,7 @@ void main(){
   if(rr>1.2&&rr<2.3){float dn2=ringD(rr);
    // planet shadow on ring
    vec3 lp=hp;float sh=1.;{float bb=dot(lp,SUN),cc=dot(lp,lp)-Sa.w*Sa.w;float h=bb*bb-cc;if(h>0.&&(-bb+sqrt(h))>0.)sh=.08;}
-   float lit=.55+.45*abs(dot(RN,SUN));rcol=ringC(rr)*lit*sh*1.05;ringA=dn2*AL[4];ringBack=hp.z<0.?1.:0.;}}
+   float lit=.55+.45*abs(dot(RN,SUN));rcol=ringC(rr)*lit*sh*1.05;ringA=dn2*AL[4]*RINGA;ringBack=hp.z<0.?1.:0.;}}
  // spheres: find front-most
  float best=-1e9;int bi=-1;vec3 bn=vec3(0.);
  for(int k=0;k<9;k++){vec4 S=SP[k];if(S.w<=0.||AL[k]<=0.)continue;vec2 d=q-S.xy;d.y/=1.-FL[k];float r2=dot(d,d);float rr=S.w+.75;if(r2>rr*rr)continue;

@@ -26,14 +26,14 @@ gl.uniform3fv(U('RN'),RNV);gl.uniform3fv(U('SUN'),SUN);gl.uniform2f(U('R'),W,H);
 // reference Moon (for scale) at the side
 const REFX=884,REFY=672;
 function refAlpha(t){ if(t<2.6)return 1-ease((t-2.35)/.25); if(t<6.6)return 0; return ease((t-6.7)/.5)}
-function shade(t,name,r,ra){
+function shade(t,name,r,ra,ringA){
  const sp=new Float32Array(36),ty=new Float32Array(9),spin=new Float32Array(9),al=new Float32Array(9),fl=new Float32Array(9);
  const b=B[name];const k=name==='SATURN'?4:0;const tl=t,TP=2*Math.PI/D;
  sp.set([CX,CY,0,r],4*k);ty[k]=b.ty;spin[k]=name==="MOON"?0:TP*t+1.3;al[k]=1;fl[k]=b.fl; // spin: one turn per loop (seamless)
  if(ra>0){sp.set([REFX,REFY,0,B.MOON.px],4);ty[1]=4;al[1]=ra;sp.set([REFX,REFY,0,B.MOON.px],4*1)}
  gl.uniform1f(U('ROUT'),2.27*r*RINGK);gl.uniform1f(U('T'),tl);
  gl.uniform4fv(U('SP'),sp);gl.uniform1fv(U('TY'),ty);gl.uniform1fv(U('SPIN'),spin);gl.uniform1fv(U('AL'),al);gl.uniform1fv(U('FL'),fl);
- gl.uniform4fv(U('HL'),[-1,0,0,0]);gl.viewport(0,0,W,H);gl.drawArrays(gl.TRIANGLES,0,3);}
+ gl.uniform1f(U('RINGA'),ringA==null?1:ringA);gl.uniform4fv(U('HL'),[-1,0,0,0]);gl.viewport(0,0,W,H);gl.drawArrays(gl.TRIANGLES,0,3);}
 // ---- landscape (drawn on the 2D canvas over the sky) ----
 function hsh(n){const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s)}
 function vn(x){const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return hsh(i)*(1-u)+hsh(i+1)*u}
@@ -74,9 +74,12 @@ function land(t){
  x.save();x.fillStyle=c2;x.beginPath();x.moveTo(-20,SHORE);for(let px=-20;px<=W+20;px+=6)x.lineTo(px,NR(px-dx2));x.lineTo(W+20,SHORE);x.closePath();x.fill();
  x.beginPath();for(const tr of TREES)if(tr.on)treePath(tr,dx2,false);x.fill();
  x.restore();}
+function ringAlpha(t,i,n){ // rings never overlap another planet's disc: they fade out before a swap and in after it
+ if(n<2)return 1;let j=0;for(let k=0;k<SEQ.length;k++)if(t>=SEQ[k][1])j=k;const u=(t-SEQ[j][1])/(SEQ[j][2]-SEQ[j][1]);
+ return i===0?1-ease(u/.35):ease((u-.66)/.34)}
 function scene(t){
  const ps=state(t),ra=refAlpha(t);
- for(let i=0;i<ps.length;i++){const p=ps[i];shade(t,p[0],p[1],ra);x.globalAlpha=p[2];x.drawImage(g,0,0);x.globalAlpha=1}
+ for(let i=0;i<ps.length;i++){const p=ps[i];shade(t,p[0],p[1],ra,ringAlpha(t,i,ps.length));x.globalAlpha=p[2];x.drawImage(g,0,0);x.globalAlpha=1}
  // bloom
  x.save();x.globalCompositeOperation='lighter';x.filter='blur(30px)';x.globalAlpha=.20;x.drawImage(c,0,0);x.restore();
  sx.clearRect(0,0,W,H);sx.drawImage(c,0,0);
