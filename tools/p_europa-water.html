@@ -70,7 +70,7 @@ vec3 shadeAt(vec2 q){
  return mix(col,c,cov*al);}
 void main(){
  vec2 q=vec2(gl_FragCoord.x,R.y-gl_FragCoord.y);vec3 col;
- vec4 S1=SP[1];bool aa=CUTON>0.&&length(q-S1.xy)<S1.w+2.&&AL[1]>0.;
+ vec4 S1=SP[1];bool aa=false; // 4x supersampling of the cut body was ~30x too slow in SwiftShader (render ~1 frame/min/proc)
  if(aa){col=vec3(0.);for(int s=0;s<4;s++){vec2 o=vec2(s==1||s==3?.25:-.25,s>=2?.25:-.25);col+=shadeAt(q+o);}col*=.25;}
  else col=shadeAt(q);
  col=1.-exp(-col*1.1);col=pow(col,vec3(.95));gl_FragColor=vec4(col,1.);}
