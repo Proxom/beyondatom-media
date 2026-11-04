@@ -37,24 +37,27 @@ function europa(t){ // centre + radius
   const r0=REU*S2,r=lg(r0,r0*PUSH,k);const q0=[L2.U[0]+EDGE.sx*r0*FQ,L2.U[1]+EDGE.sy*r0*FQ];const q=[lerp(q0[0],PT[0],k),lerp(q0[1],PT[1],k)];
   return {x:q[0]-EDGE.sx*r*FQ,y:q[1]-EDGE.sy*r*FQ,r}}
  if(t<Z34[0]){const k=eio((t-Z23[0])/(Z23[1]-Z23[0]));return {x:lerp(L2.U[0],L3.U[0],k),y:lerp(L2.U[1],L3.U[1],k),r:REU*lg(S2,S3,k)}}
- if(t<BACK[0]){const k=ein((t-Z34[0])/(Z34[1]-Z34[0]));return {x:lerp(L3.U[0],-420,k),y:L3.U[1],r:REU*S3}}
+ if(t<BACK[0]){const k=ein((t-Z34[0])/(Z34[1]-Z34[0])),kz=eio((t-Z34[0])/(Z34[1]-Z34[0]));return {x:lerp(L3.U[0],-420,k),y:L3.U[1],r:REU*lg(S3,S4,kz)}}
  const k=eout((t-BACK[0]-.3)/(BACK[1]-BACK[0]-.3));return {x:lerp(W+200,L1.U[0],k),y:L1.U[1],r:REU*S1}}
+// v2: during Z12 every body follows one camera zoom about Europa (no scale break)
+function cam12(t,P,R){const u=europa(t),z=u.r/(REU*S1);return {x:u.x+(P[0]-L1.U[0])*z,y:u.y+(P[1]-L1.U[1])*z,r:R*z}}
 function earth(t){
  if(t<Z12[0])return {x:L1.E[0],y:L1.E[1],r:RE*S1,al:1};
- if(t<BACK[0]){const k=ein((t-Z12[0])/(Z12[1]-Z12[0]-.4));return {x:lerp(L1.E[0],-RE*S1-60,k),y:L1.E[1]+120*k,r:RE*S1,al:k>=1?0:1}}
+ if(t<BACK[0]){if(t>=Z12[1])return {x:0,y:0,r:0,al:0};const c=cam12(t,L1.E,RE*S1);c.al=1;return c}
  const k=eout((t-BACK[0]-.7)/(BACK[1]-BACK[0]-.7));return {x:lerp(-RE*S1-60,L1.E[0],k),y:L1.E[1],r:RE*S1,al:1}}
 function ballA(t){ // Earth's oceans, act 1
  const r=RA*S1*Math.cbrt(edr(t));if(t<Z12[0])return {x:L1.A[0],y:L1.A[1],r,al:r>0?1:0};
- if(t<BACK[0]){const k=ein((t-Z12[0])/(Z12[1]-Z12[0]-.4));return {x:lerp(L1.A[0],W+80,k),y:L1.A[1],r:RA*S1,al:k>=1?0:1}}
+ if(t<BACK[0]){if(t>=Z12[1])return {x:0,y:0,r:0,al:0};const c=cam12(t,L1.A,RA*S1);c.al=1;return c}
  return {x:0,y:0,r:0,al:0}}
+const FO=.35;
 function ballU(t){ // Europa's ocean
- if(t<UB[0]||t>=BACK[0]+.8)return {x:0,y:0,r:0,al:0};
+ if(t<UB[0]||t>=BACK[0]+FO)return {x:0,y:0,r:0,al:0};
  if(t<Z34[0])return {x:L3.B[0],y:L3.B[1],r:RU*S3*Math.cbrt(odr(t)),al:1};
  if(t<BACK[0]){const k=eio((t-Z34[0])/(Z34[1]-Z34[0]));return {x:lerp(L3.B[0],L4.B[0],k),y:lerp(L3.B[1],L4.B[1],k),r:RU*lg(S3,S4,k),al:1}}
- const k=ein((t-BACK[0])/.8);return {x:L4.B[0],y:L4.B[1],r:RU*S4*(1-k),al:k<1?1:0}}
+ const k=eio((t-BACK[0])/FO);return {x:L4.B[0],y:L4.B[1],r:RU*S4,al:1-k}}
 function ballsE(t){ // two Earth-ocean balls, act 3b
- if(t<AIN[0]||t>=BACK[0]+.8)return [];const k=eout((t-AIN[0])/(AIN[1]-AIN[0]));const s=t<BACK[0]?1:1-ein((t-BACK[0])/.8);
- return [{x:L4.A1[0],y:lerp(H+200,L4.A1[1],k),r:RA*S4*s,al:1},{x:L4.A2[0],y:lerp(H+200+90,L4.A2[1],eout((t-AIN[0]-.15)/(AIN[1]-AIN[0]))),r:RA*S4*s,al:1}]}
+ if(t<AIN[0]||t>=BACK[0]+FO)return [];const k=eout((t-AIN[0])/(AIN[1]-AIN[0]));const s=t<BACK[0]?1:1-eio((t-BACK[0])/FO);
+ return [{x:L4.A1[0],y:lerp(H+200,L4.A1[1],k),r:RA*S4,al:s},{x:L4.A2[0],y:lerp(H+200+90,L4.A2[1],eout((t-AIN[0]-.15)/(AIN[1]-AIN[0]))),r:RA*S4,al:s}]}
 function layout(t){const e=earth(t),u=europa(t),a=ballA(t),b=ballU(t),es=ballsE(t);
  // slots: 0 earth, 1 europa, 2 ballA / first earth ball, 3 ballU, 4 second earth ball
  const s2=es.length?es[0]:a,s4=es.length?es[1]:{x:0,y:0,r:0,al:0};
@@ -80,14 +83,14 @@ const CARDS=[
  [9.7,12.2,[['NOW LOOK'],['INSIDE EUROPA',Y]],84],
  [12.3,19.6,[['UNDER ITS ICE:'],['A HIDDEN OCEAN',BL]],80],
  [19.7,25.3,[["EUROPA'S OCEAN"],['IN ONE BALL',BL]],80],
- [25.4,31.6,[['ABOUT TWICE'],["EARTH'S OCEANS",Y]],84],
+ [25.4,31.6,[['MAY HOLD TWICE'],["EARTH'S OCEANS",Y]],84],
  [31.7,34.8,[['ON A MOON ONLY'],["1/4 EARTH'S WIDTH",Y]],80],
  [34.9,D-.65,[["NASA'S EUROPA CLIPPER"],['ARRIVES IN 2030',Y]],72]];
 function labels(t,L){
  // act 1 names (also during the loop return)
  const a1=t<Z12[0]?(t<9.5?1:1-ease((t-9.5)/.4)):ease((t-BACK[1]+.2)/.4);
- if(a1>0){txt('EARTH',72,770,40,'left','#fff',a1,900);txt('EUROPA',728,690,40,'right','#fff',a1,900);txt('MOON OF JUPITER',728,728,26,'right','#b9c6e6',a1,800)}
- const aa=win(t,7.0,9.8,.35,.3);if(aa>0)txt('1,370 km',L[2].x,L[2].y+L[2].r+44,30,'center',BL,aa,800);
+ if(a1>0){txt('EARTH',72,770,40,'left','#fff',a1,900);txt('EUROPA',728,690,40,'right','#fff',a1,900);txt('MOON OF JUPITER',728,732,30,'right','#b9c6e6',a1,800)}
+ const aa=win(t,7.0,9.8,.35,.3);if(aa>0)txt('1,370 km',Math.min(L[2].x,800),L[2].y+L[2].r+48,38,'center',BL,aa,800);
  // push-in layer labels
  const pl=win(t,16.0,19.2,.35,.3);if(pl>0){const u=L[1];
   const P=f=>[u.x+EDGE.sx*u.r*f,u.y+EDGE.sy*u.r*f];window.LAYERPTS=[P(.9936),P(.955)];
@@ -95,11 +98,11 @@ function labels(t,L){
   leader(pi,[pi[0]-40,pi[1]-150],pl,IC);txt('ICE SHELL',pi[0]-40,pi[1]-200,44,'right',IC,pl,900);txt('15-25 km THICK',pi[0]-40,pi[1]-160,32,'right','#cfd8ea',pl,800);
   leader(po,[po[0]+70,po[1]-140],pl,BL);txt('OCEAN',po[0]+60,po[1]-190,44,'left',BL,pl,900);txt('60-150 km DEEP',po[0]+60,po[1]-150,32,'left','#cfd8ea',pl,800)}
  // act 3a: ball size
- const ab=win(t,23.9,26.2,.35,.3);if(ab>0)txt('≈ 1,720 km',L[3].x,L[3].y+L[3].r+46,32,'center',BL,ab,800);
+ const ab=win(t,23.9,26.2,.35,.3);if(ab>0)txt('≈ 1,720 km',L[3].x,L[3].y+L[3].r+52,40,'center',BL,ab,800);
  // act 3b: equation
- const ae=win(t,27.4,31.1,.4,.3);if(ae>0){const b=L[3];txt("EUROPA'S",b.x+b.r+22,b.y-6,32,'left','#fff',ae,900);txt('OCEAN',b.x+b.r+22,b.y+34,32,'left','#fff',ae,900);
+ const ae=win(t,27.4,31.1,.4,.3);if(ae>0){const b=L[3];txt("EUROPA'S OCEAN",b.x,b.y-b.r-26,40,'center','#fff',ae,900);
   txt('=',540,1050,56,'center','#fff',ae,900);txt('+',540,1210,56,'center','#fff',ae,900);
-  for(const k of [2,4]){const e=L[k];txt("EARTH'S OCEANS",e.x,e.y+e.r+42,28,'center',BL,ae,800)}}}
+  for(const k of [2,4]){const e=L[k];{txt("EARTH'S",e.x,e.y+e.r+48,36,'center',BL,ae,800);txt('OCEANS',e.x,e.y+e.r+90,36,'center',BL,ae,800)}}}}
 function leader(p,q,a,col){x.save();x.globalAlpha=a*.9;x.strokeStyle=col;x.lineWidth=3;x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=6;
  x.beginPath();x.moveTo(q[0],q[1]);x.lineTo(p[0],p[1]);x.stroke();x.fillStyle=col;x.beginPath();x.arc(p[0],p[1],5,0,7);x.fill();x.restore()}
 const TP=2*Math.PI/D;
@@ -110,7 +113,7 @@ function shade(t){const b=bodiesU(t);gl.viewport(0,0,W,H);gl.uniform1f(U('T'),t)
  gl.uniform1f(U('EDR'),edr(t));gl.uniform1f(U('ODR'),odr(t));
  const ca=cutA(t);gl.uniform1f(U('CUTA'),ca);gl.uniform1f(U('CUTON'),ca<.999?1:0);gl.drawArrays(gl.TRIANGLES,0,3);}
 function speed(t){const a=layout(t),b=layout(t+1/30);let m=0;for(let k=0;k<5;k++){if(a[k].r<=0&&b[k].r<=0)continue;m=Math.max(m,Math.abs(b[k].x-a[k].x)+Math.abs(b[k].y-a[k].y)+Math.abs(b[k].r-a[k].r))}return m}
-function scene(t){const n=Math.max(1,Math.min(t>=12.3&&t<27.0?8:16,Math.ceil(Math.max(speed(t),speed(t-1/30))/2.5)));
+function scene(t){const n=(t>=12.3&&t<27.0)?1:Math.max(1,Math.min(16,Math.ceil(Math.max(speed(t),speed(t-1/30))/2.5)));
  for(let i=0;i<n;i++){const ts=t+(i-(n-1)/2)/(30*n);shade(ts);x.globalAlpha=1/(i+1);x.drawImage(g,0,0)}x.globalAlpha=1;
  x.save();x.globalCompositeOperation='lighter';x.filter='blur(36px)';x.globalAlpha=.18;x.drawImage(c,0,0);x.restore();
  const vg=x.createRadialGradient(W/2,H*.48,H*.3,W/2,H*.48,H*.78);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=vg;x.fillRect(0,0,W,H);}
