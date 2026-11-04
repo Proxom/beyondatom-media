@@ -11,6 +11,7 @@ float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
  return mix(mix(mix(h1(i),h1(i+vec3(1,0,0)),f.x),mix(h1(i+vec3(0,1,0)),h1(i+vec3(1,1,0)),f.x),f.y),
             mix(mix(h1(i+vec3(0,0,1)),h1(i+vec3(1,0,1)),f.x),mix(h1(i+vec3(0,1,1)),h1(i+vec3(1,1,1)),f.x),f.y),f.z);}
 float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*n3(p);p*=2.02;a*=.5;}return s;}
+vec3 bgc(vec2 q){float hz=clamp(q.y/HZ,0.,1.);return mix(vec3(.004,.007,.022),vec3(.040,.055,.115),pow(hz,2.2))+vec3(.05,.03,.06)*pow(hz,8.);}
 vec3 sky(vec2 q){vec3 d=normalize(vec3((q-.5*R)/R.x,1.2));vec3 c=vec3(0.);
  float hz=clamp(q.y/HZ,0.,1.);
  for(int l=0;l<2;l++){float sc=l==0?160.:320.;vec3 p=d*sc;vec3 id=floor(p);float hs=h1(id+float(l)*7.);
@@ -72,12 +73,13 @@ void main(){
   if(rr>1.2&&rr<2.3){float dn2=ringD(rr);
    // planet shadow on ring
    vec3 lp=hp;float sh=1.;{float bb=dot(lp,SUN),cc=dot(lp,lp)-Sa.w*Sa.w;float h=bb*bb-cc;if(h>0.&&(-bb+sqrt(h))>0.)sh=.08;}
-   float lit=.55+.45*abs(dot(RN,SUN));rcol=ringC(rr)*lit*sh*1.05*BR;ringA=dn2*AL[4];ringBack=hp.z<0.?1.:0.;}}
+   float lit=.55+.45*abs(dot(RN,SUN));rcol=ringC(rr)*lit*sh*1.05;ringA=dn2*AL[4];ringBack=hp.z<0.?1.:0.;}}
  // spheres: find front-most
  float best=-1e9;int bi=-1;vec3 bn=vec3(0.);
  for(int k=0;k<9;k++){vec4 S=SP[k];if(S.w<=0.||AL[k]<=0.)continue;vec2 d=q-S.xy;d.y/=1.-FL[k];float r2=dot(d,d);float rr=S.w+.75;if(r2>rr*rr)continue;
   float z=sqrt(max(S.w*S.w-r2,0.));if(z>best){best=z;bi=k;bn=vec3(d.x,-d.y,z)/S.w;}}
  // ring behind planet
+ if(ringA>0.)rcol=mix(bgc(q),rcol,BR);
  if(ringA>0.&&ringBack>.5)col=mix(col,rcol,clamp(ringA,0.,.98));
  if(bi>=0){vec4 S;float ty,spn,al;
   for(int k=0;k<9;k++){if(k==bi){S=SP[k];ty=TY[k];spn=SPIN[k];al=AL[k];}}
@@ -90,7 +92,7 @@ void main(){
   vec3 c=a*dif*1.25;float rim=pow(1.-mu,3.)*smoothstep(-.2,.5,ndl);c+=atm(ty)*rim*.55;c+=a*.035; // faint fill so night side is not pure black
   // highlight outline (red/green) for one body
   if(HL.w>0.&&float(bi)==HL.x){float e=smoothstep(S.w-5.,S.w-1.,dpx);c=mix(c,HL.y>.5?vec3(1.,.32,.3):vec3(.45,1.,.65),e*HL.w);c*=1.-HL.z*.55;}
-  c*=BR; // opaque fade: brightness only, the disc always hides the stars behind it
+  c=mix(bgc(q),c,BR); // opaque fade from the sky's background tone: never black, never see-through (stars stay hidden)
   col=mix(col,c,cov*al);}
  // ring in front
  if(ringA>0.&&ringBack<.5){float occ=0.;col=mix(col,rcol,clamp(ringA,0.,.98));}
