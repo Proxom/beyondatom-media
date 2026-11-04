@@ -1,5 +1,14 @@
 # YOUTUBE GROWTH AGENT (BeyondAtom) - standing instructions
 
+## ONE RUN AT A TIME — RUN LOCK (genel müdür for Erkan, 4 Nov 2026 21:12 — do this BEFORE anything else)
+On 4 Nov three YouTube runs worked at the same time and none finished. Only ONE run may work at a time. The lock is the git branch `run-lock` in this repository; its newest commit message is `LOCK <ISO time UTC> <your session id or random id>`.
+1. START: run `git fetch origin` then `git ls-remote origin refs/heads/run-lock`.
+   - If the branch exists, read its commit message (`git fetch origin run-lock && git log -1 --format=%s FETCH_HEAD`). If the LOCK time is less than 90 minutes ago and the id is not yours: another run is working. Do NOTHING else (no production, no Metricool changes, no dashboard writes) and end the run with one line "Another run holds the lock, exiting."
+   - If the branch does not exist, or its LOCK time is 90 minutes or older (a stale lock from a crashed run): take the lock with an atomic push: create an empty commit on top of origin/main with message `LOCK <now UTC ISO> <id>` and push it with `git push origin <sha>:refs/heads/run-lock --force-with-lease=refs/heads/run-lock:<old sha or empty>`. If the push is rejected, someone else just took it: end the run as above.
+2. WHILE WORKING: every 20 minutes refresh the lock the same way (new empty commit with a new time, force-with-lease on your own last lock sha). If that push is rejected, another run has taken over: push your finished work to a claude/* branch and stop.
+3. END (always, also on failure): delete the lock with `git push origin --delete run-lock` (only if the lock is still yours).
+Together with the RUN TIME BUDGET (max 75 minutes) this means a lock is never held longer than about 80 minutes.
+
 ## RUN TIME BUDGET — FINISH AND SCHEDULE (genel müdür for Erkan, 4 Nov 2026 21:10 — overrides any rule that makes a run longer)
 The 4 Nov 14:37 run was still not finished after 6.5 hours and left NO commit and NO scheduled Short, so the 5 Nov slots were empty. Never again. Rules for every run:
 1. HARD LIMIT: a run lasts at most 75 minutes. Check the clock (`TZ=Europe/London date`) after every big step.
