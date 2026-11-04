@@ -27,12 +27,12 @@ gl.uniform3fv(U('RN'),RNV);gl.uniform3fv(U('SUN'),SUN);gl.uniform2f(U('R'),W,H);
 // reference Moon (for scale) at the side
 const REFX=884,REFY=672;
 function refAlpha(t){ if(t<2.6)return 1-ease((t-2.35)/.25); if(t<5.6)return 0; return ease((t-5.7)/.5)}
-function shade(t,name,r,ra){
+function shade(t,name,r,ra,br){
  const sp=new Float32Array(36),ty=new Float32Array(9),spin=new Float32Array(9),al=new Float32Array(9),fl=new Float32Array(9);
  const b=B[name];const k=name==='SATURN'?4:0;const tl=t,TP=2*Math.PI/D;
  sp.set([CX,CY,0,r],4*k);ty[k]=b.ty;spin[k]=name==="MOON"?0:TP*t+1.3;al[k]=1;fl[k]=b.fl; // spin: one turn per loop (seamless)
  if(ra>0){sp.set([REFX,REFY,0,B.MOON.px],4);ty[1]=4;al[1]=ra;sp.set([REFX,REFY,0,B.MOON.px],4*1)}
- gl.uniform1f(U('ROUT'),2.27*r*RINGK);gl.uniform1f(U('T'),tl);
+ gl.uniform1f(U('ROUT'),2.27*r*RINGK);gl.uniform1f(U('BR'),br==null?1:br);gl.uniform1f(U('T'),tl);
  gl.uniform4fv(U('SP'),sp);gl.uniform1fv(U('TY'),ty);gl.uniform1fv(U('SPIN'),spin);gl.uniform1fv(U('AL'),al);gl.uniform1fv(U('FL'),fl);
  gl.uniform4fv(U('HL'),[-1,0,0,0]);gl.viewport(0,0,W,H);gl.drawArrays(gl.TRIANGLES,0,3);}
 // ---- landscape (drawn on the 2D canvas over the sky) ----
@@ -40,9 +40,12 @@ function hsh(n){const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s
 function vn(x){const i=Math.floor(x),f=x-i,u=f*f*(3-2*f);return hsh(i)*(1-u)+hsh(i+1)*u}
 function ridge(x,base,amp,sc,seed){return base-amp*(vn(x/sc+seed)*.65+vn(x/(sc*.37)+seed*3)*.25+vn(x/(sc*.11)+seed*7)*.10)}
 const TREES=[];for(let i=0;i<46;i++){const x=-80+i*27+hsh(i*3.1)*22;TREES.push({x,h:38+hsh(i*7.7)*70,w:.30+hsh(i*5.3)*.12,on:hsh(i*9.1)>.35})}
+function pl(p){const alb={MOON:.12,MARS:.17,VENUS:.69,NEPTUNE:.44,URANUS:.49,JUPITER:.54,SATURN:.5}[p[0]];let a=p[1]*p[1]*alb;if(p[0]==='SATURN')a*=1.6;return a}
 function shine(t){ // planet-shine on the land: apparent disc area x brightness, crossfaded like the sky
  let s=0;for(const p of state(t)){const b=B[p[0]];const alb={MOON:.12,MARS:.17,VENUS:.69,NEPTUNE:.44,URANUS:.49,JUPITER:.54,SATURN:.5}[p[0]];
-  let a=p[1]*p[1]*alb;if(p[0]==='SATURN')a*=1.6;s=s*(1-p[2])+a*p[2]}
+  let a=p[1]*p[1]*alb;if(p[0]==='SATURN')a*=1.6;p.sh=a}
+ // land light crossfades between the two bodies' values (normalised weights), so it never dips in the swap gap
+ {const ps2=state(t);if(ps2.length>1){const w0=ps2[0][2],w1=ps2[1][2],a0=pl(ps2[0]),a1=pl(ps2[1]);const m=w1>0?.5+.5*w1:.5-.5*w0;s=a0*(1-m)+a1*m}else s=pl(ps2[0])}
  return cl(Math.log10(1+s/40)/3.1)}
 const SHORE=1478,NR=px=>ridge(px,HZY+112,55,300,8.2);
 const rC=document.createElement('canvas');rC.width=1080;rC.height=1920;const rx=rC.getContext('2d');
@@ -77,8 +80,9 @@ function land(t){
  x.restore();}
 function scene(t){
  const ps=state(t),ra=refAlpha(t);
- shade(t,ps[0][0],0,ra);x.drawImage(g,0,0);   // sky-only base pass, so the sky never dims while bodies swap
- for(let i=0;i<ps.length;i++){const p=ps[i];shade(t,p[0],p[1],ra);x.globalAlpha=p[2];x.drawImage(g,0,0);x.globalAlpha=1}
+ // one opaque pass: the visible body fades by brightness (never see-through); old and new bodies are never visible together
+ const vis=ps.filter(p=>p[2]>0.002);const pv=vis.length?vis[vis.length-1]:null;
+ if(pv)shade(t,pv[0],pv[1],ra,pv[2]);else shade(t,ps[0][0],0,ra,0);x.drawImage(g,0,0);
  // bloom
  x.save();x.globalCompositeOperation='lighter';x.filter='blur(30px)';x.globalAlpha=.20;x.drawImage(c,0,0);x.restore();
  sx.clearRect(0,0,W,H);sx.drawImage(c,0,0);
@@ -103,9 +107,9 @@ const CARDS=[
  [2.95,5.5,[['THIS IS'],['OUR MOON',Y]],80],
  [5.6,7.5,[['NOW SWAP IN'],['EACH PLANET',Y]],76],
  [7.6,9.7,[['SAME DISTANCE:'],['384,400 km',Y]],76],
- [13.2,16.5,[['TIPPED'],['ON ITS SIDE',Y]],76],
- [16.6,21.0,[['THE BIGGEST'],['PLANET',Y]],80],
- [21.0,26.6,[["BUT SATURN'S"],['RINGS ARE',Y],['EVEN WIDER',Y]],80],
+ [13.65,17.2,[['TIPPED'],['ON ITS SIDE',Y]],76],
+ [17.2,21.85,[['THE BIGGEST'],['PLANET',Y]],80],
+ [22.3,26.6,[["BUT SATURN'S"],['RINGS ARE',Y],['EVEN WIDER',Y]],80],
  [26.6,D-.55,[['ALL TO SCALE,'],['AT THE MOON\'S',Y],['DISTANCE',Y]],76]];
 const fmtDeg=d=>d<1.5?d.toFixed(1)+'°':d<10?d.toFixed(1)+'°':Math.round(d)+'°';
 const READ={MOON:['0.5° WIDE','ABOUT HALF A DEGREE OF SKY'],MARS:['MARS','1.0° WIDE · 2× THE MOON'],VENUS:['VENUS','1.8° WIDE · 3.5× THE MOON'],
@@ -113,19 +117,18 @@ const READ={MOON:['0.5° WIDE','ABOUT HALF A DEGREE OF SKY'],MARS:['MARS','1.0°
  SATURN:['SATURN','RINGS: 39° OF SKY']};
 function readout(t){ // planet name + size, below the card; follows the body on screen
  const ps=state(t);const last=ps[ps.length-1];let name=last[0],al=1;
- if(ps.length>1){const u=last[2];name=u<.5?ps[0][0]:last[0];al=u<.5?1-ease(u/.5):ease((u-.5)/.5)}
+ if(ps.length>1){if(ps[1][2]>0){name=ps[1][0];al=ps[1][2]}else{name=ps[0][0];al=ps[0][2]}}   // label = the body that is visible, same alpha
  if(t<2.95||t>=D-.55)return; // hook card shows alone
- if(name==='SATURN'&&t<23.0)return;
- if(name==='JUPITER')al*=1-ease((t-20.65)/.3);if(al<=0.01)return;
+ if(al<=0.01||(name==='SATURN'&&t<10))return;   // the opening Saturn is introduced by the hook card only
  const rd=READ[name];const y0=name==='SATURN'?640:560;
  txt(rd[0],LX,y0+44,60,'left','#ffffff',al,900);txt(rd[1],LX,y0+98,40,'left','#b9c6e6',al,800)}
 function marks(t){ // emphasis ring around tiny discs, label on the reference Moon
- const ps=state(t);const r=ps[ps.length-1][1];const a=1-ease((r-26)/20);
+ const ps=state(t);const vb=ps.filter(p=>p[2]>0);const pv=vb.length?vb[vb.length-1]:ps[0];const r=pv[1];const a=(1-ease((r-26)/20))*(vb.length?pv[2]:0);
  if(a>0.01){x.save();x.globalAlpha=a*.6;x.strokeStyle='#b9d0ff';x.lineWidth=2.5;x.beginPath();x.arc(CX,CY,r+16,0,7);x.stroke();x.restore()}
  const ra=refAlpha(t);if(ra>0.01){x.save();x.globalAlpha=ra*.55;x.strokeStyle='#b9d0ff';x.lineWidth=2;x.beginPath();x.arc(REFX,REFY,B.MOON.px+12,0,7);x.stroke();x.restore();
   txt('MOON',925,REFY+68,34,'right','#d9dde6',ra,800);txt('FOR SCALE',925,REFY+106,30,'right','#9fb0d0',ra,700)}}
 function axis(t){ // Uranus spin axis (98 deg tilt): dashed line through the poles
- const ps=state(t);let a=0;for(const p of ps)if(p[0]==='URANUS')a=p[2];if(ps.length>1&&ps[0][0]==='URANUS')a=1-ease((ps[1][1]-B.URANUS.px)/6);if(a<=0.01)return;
+ const ps=state(t);let a=0;for(const p of ps)if(p[0]==='URANUS')a=p[2];if(a<=0.01)return;
  const r=B.URANUS.px,ux=.97,uy=-.20,l=Math.hypot(ux,uy),L=r*2.3;x.save();x.globalAlpha=a*.75;x.strokeStyle='#cfe8ff';x.lineWidth=3;x.setLineDash([12,9]);
  x.beginPath();x.moveTo(CX-ux/l*L,CY-uy/l*L);x.lineTo(CX-ux/l*r*1.02,CY-uy/l*r*1.02);x.moveTo(CX+ux/l*r*1.02,CY+uy/l*r*1.02);x.lineTo(CX+ux/l*L,CY+uy/l*L);x.stroke();
  x.setLineDash([]);x.restore();txt('SPIN AXIS',CX+ux/l*L+14,CY+uy/l*L+10,28,'left','#cfe8ff',a,800)}
