@@ -1,5 +1,15 @@
 # YOUTUBE GROWTH AGENT (BeyondAtom) - standing instructions
 
+## RUN TIME BUDGET — FINISH AND SCHEDULE (genel müdür for Erkan, 4 Nov 2026 21:10 — overrides any rule that makes a run longer)
+The 4 Nov 14:37 run was still not finished after 6.5 hours and left NO commit and NO scheduled Short, so 5 Nov 01:00, 09:00 and 17:00 were empty. Never again. Rules for every run:
+1. HARD LIMIT: a run lasts at most 75 minutes. Check the clock (`TZ=Europe/London date`) after every big step.
+2. FIRST 10 MINUTES: getScheduledPosts for the next 24 h. If the next slot is empty and a finished video with qc passed exists (dashboard 'ready', or a finished file on a claude/* branch or in the repo), schedule it at once before starting anything new.
+3. ONE video per run, finished and scheduled. Commit and push work in progress at least every 20 minutes so nothing is lost.
+4. REAL FOOTAGE TIME BOX: spend at most 20 minutes finding and downloading NASA/ESA footage (https only, the ~mobile.mp4 or ~medium.mp4 size, never ~orig; trim with ffmpeg -ss/-t before any processing; keep source clips under 60 MB). If no usable clip is found in 20 minutes, make this video as a rendered simulation instead and note it; the 2-of-3 real-footage target is measured over the week, not per run.
+5. REVIEW ROUNDS: at most 2 fix rounds after the first review. If it still fails, fix only real defects (facts, broken visuals, audio), not taste, or switch to a simpler topic you can finish.
+6. At minute 60, stop polishing: finish the current version that passes the quality gate, host it, schedule it into the next empty slot, update the dashboard, push, end.
+7. Never run a render or download in the foreground longer than 10 minutes; split long renders (lower resolution preview first, final 1080x1920 only once).
+
 ## PUBLISHING SCHEDULE — 3 PER DAY (Erkan, 1 Nov 12:27) — OVERRIDES EVERY OLDER SLOT RULE IN THIS FILE
 All three channels (Instagram, TikTok, YouTube) now publish exactly 3 videos per day at 01:00, 09:00 and 17:00 Europe/London (Metricool publicationDate exactly these times, timezone Europe/London). Wherever this file says 4 or 6 per day, or names any other slot (03:00, 05:00, 13:00, 15:00, 21:00 ...), read it as 3 per day at 01:00 / 09:00 / 17:00. Fewer videos means each one must be better: more time per video, the full quality gate, slower pacing, no filler. Rules that still apply: no empty slot (fill the next free slot of the new schedule), no double posts in a slot, the QUEUE CAP UPDATE (6 / 3), the zero-defect gate.
 On 1 Nov around 12:30 the existing queue was moved to the new slots (nothing was dropped). Your first job in every run: getScheduledPosts for the next 3 days, confirm every queued post of your network is on 01/09/17, move any stray post to the next free new slot with updateScheduledPost (keep the full original content), and then continue. Do not publish to other times again. Runs are now 3 per day at 06:37, 14:37 and 22:37 Europe/London, each starting 3 hours before a slot (Erkan, 1 Nov 13:01); they check, repair and produce.
