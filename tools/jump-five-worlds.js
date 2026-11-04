@@ -46,7 +46,7 @@ const SC=[];(function(){const N=Math.ceil(D*FPS)+2,sub=8,dt=1/FPS/sub;let s=S0,v
  for(let i=0;i<N;i++){SC.push(s);for(let k=0;k<sub;k++){const t=i/FPS+k*dt;const g=tgt(t);const ac=wn*wn*(g-s)-2*wn*vs;vs+=ac*dt;s+=vs*dt;if(s>S0){s=S0;vs=Math.min(vs,0)}}}})();
 function scaleJ(t){const f=Math.max(0,t)*FPS,i=Math.floor(f),k=f-i;return lerp(SC[Math.min(i,SC.length-1)],SC[Math.min(i+1,SC.length-1)],k)}
 // recap tail: pull back to show every jump height at once, then push back in for the loop
-const S1=(GY-TOPY)/(17.3+2.3),Z_OUT=[24.4,25.7],Z_IN=[28.3,29.4];
+const S1=(GY-TOPY)/(17.3+3.3),Z_OUT=[24.4,25.7],Z_IN=[28.0,29.1];
 function zk(t){return eio((t-Z_OUT[0])/(Z_OUT[1]-Z_OUT[0]))*(1-eio((t-Z_IN[0])/(Z_IN[1]-Z_IN[0])))}
 function scale(t){const b=scaleJ(t),k=zk(t);return k<=0?b:Math.exp(lerp(Math.log(b),Math.log(S1),k))}
 // height beams rise one column at a time during the pull-back
@@ -69,10 +69,10 @@ const CARDS=[
  {a:6.3,b:9.6,l:['CERES IS STILL','GOING UP'],c:[0,1]},
  {a:10.75,b:13.9,l:['PLUTO: 10 SECONDS','IN THE AIR'],c:[0,1]},
  {a:14.0,b:17.6,l:['CERES: ABOUT 3%','OF EARTH’S GRAVITY'],c:[0,1]},
- {a:17.7,b:21.6,l:['17 METERS UP','FROM A 50 cm JUMP'],c:[0,1]},
- {a:22.75,b:24.9,l:['22 SECONDS','IN THE AIR'],c:[0,1]},
- {a:25.0,b:28.2,l:['GRAVITY VS EARTH','LESS PULL, MORE AIR'],c:[0,1]},
- {a:28.3,b:29.95,l:['WHERE WOULD','YOU JUMP?'],c:[0,1]},
+ {a:17.7,b:22.6,l:['17 METERS UP','FROM A 50 cm JUMP'],c:[0,1]},
+ {a:22.7,b:24.9,l:['22 SECONDS','IN THE AIR'],c:[0,1]},
+ {a:25.0,b:27.9,l:['GRAVITY VS EARTH','LESS PULL, MORE AIR'],c:[0,1]},
+ {a:28.0,b:29.95,l:['WHERE WOULD','YOU JUMP?'],c:[0,1]},
  {a:30.05,b:D,l:['SAME JUMP, 5 WORLDS','WHO LANDS LAST?'],c:[0,1],foot:'same push-off speed \u00b7 no air \u00b7 no spacesuit'}];
 // recap chips: gravity as % of Earth's, popping in one column at a time
 const CHIP_T0=24.7+0.7,CHIP_DT=0.3,CHIP_OUT=27.9;

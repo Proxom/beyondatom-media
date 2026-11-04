@@ -11,7 +11,7 @@ for i,(n,g,cx) in enumerate(W):
     h(TL+T/2,'glass',5+i,.14,pan)                                    # apex
     h(TL+T,'wood',3,(.75 if i==0 else .42) if i<4 else .55,pan)                         # landing thump
     if i==4: h(TL+T+.01,'marimba',0,.44,pan)
-for a in [3.1,6.3,10.75,14.0,17.7,22.75,25.0,28.3]: h(a,'bell',4 if a<22 else 6,.22,0)   # card changes
+for a in [3.1,6.3,10.75,14.0,17.7,22.7,25.0,28.0]: h(a,'bell',4 if a<22 else 6,.22,0)   # card changes
 for i,(n,g,cx) in enumerate(W): h(25.4+i*.3,'marimba',8-i*2,.26,(cx-540)/540*.7)   # recap chips, falling pitch with gravity
 h(30.05,'marimba',2,.14,0)                                           # loop
 H.sort(key=lambda q:q['t'])
