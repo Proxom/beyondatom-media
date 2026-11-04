@@ -111,7 +111,7 @@ function bodiesU(t){const L=layout(t);const sp=new Float32Array(20),spin=new Flo
 function shade(t){const b=bodiesU(t);gl.viewport(0,0,W,H);gl.uniform1f(U('T'),t);
  gl.uniform4fv(U('SP'),b.sp);gl.uniform1fv(U('SPIN'),b.spin);gl.uniform1fv(U('AL'),b.al);gl.uniform1fv(U('TY'),b.ty);
  gl.uniform1f(U('EDR'),edr(t));gl.uniform1f(U('ODR'),odr(t));
- const ca=cutA(t);gl.uniform1f(U('CUTA'),ca);gl.uniform1f(U('CUTON'),ca<.999?1:0);gl.drawArrays(gl.TRIANGLES,0,3);}
+ const ca=cutA(t);gl.uniform1f(U('CUTA'),ca);gl.uniform1f(U('CUTON'),ca<.54?1:0);gl.drawArrays(gl.TRIANGLES,0,3);}
 function speed(t){const a=layout(t),b=layout(t+1/30);let m=0;for(let k=0;k<5;k++){if(a[k].r<=0&&b[k].r<=0)continue;m=Math.max(m,Math.abs(b[k].x-a[k].x)+Math.abs(b[k].y-a[k].y)+Math.abs(b[k].r-a[k].r))}return m}
 function scene(t){const n=(t>=12.3&&t<27.0)?1:Math.max(1,Math.min(16,Math.ceil(Math.max(speed(t),speed(t-1/30))/2.5)));
  for(let i=0;i<n;i++){const ts=t+(i-(n-1)/2)/(30*n);shade(ts);x.globalAlpha=1/(i+1);x.drawImage(g,0,0)}x.globalAlpha=1;

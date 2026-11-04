@@ -1,4 +1,4 @@
-# europa-water v2 (4 Nov 2026, run 22:37)
+# europa-water v2 (4 Nov 2026, run 22:37) - independent review v2 PASS (hook 7, polish 8, realism 7, motion 8, sound 7, payoff 8); -20.0 LUFS / -4.4 dBTP
 Generator: tools/p_europa-water.html + tools/europa-water.js + tools/europa-water.sound.py (38 s, 1140 frames).
 Facts re-verified 4 Nov 22:47 UTC: Europa Clipper FAQ (ice shell 15-25 km, ocean 60-150 km deep, "about twice as much
 water as Earth's global ocean", arrives 2030), USGS (oceans 1,338,000,000 km3), JPL SSD satellite parameters
@@ -10,6 +10,7 @@ v1 review (FAIL 6/10) fixes applied in v2:
 2. 12.3-27 s: no sub-frame motion blur while the cut body moves (stacked rim copies are gone).
 3. 31.0-31.35 s: water balls fade out at full size before Europa returns; Europa also scales S3->S4 with the ocean ball while it leaves (25.4-27 s).
 4. Hedged: card "MAY HOLD TWICE / EARTH'S OCEANS"; title "Europa May Hold More Water Than Earth (To Scale)".
+5. 26.2 s: the closing octant wedge switches off at CUTA 0.54 (it is empty above 1/sqrt(3)), so no dark speck is left (reviewer v2 note).
 Also: labels enlarged (36-40 px), "EARTH'S / OCEANS" on two lines, "1,370 km" kept left of x=930.
 
 ## YouTube
