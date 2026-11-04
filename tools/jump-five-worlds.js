@@ -3,7 +3,7 @@
 // Sources: NASA NSSDC fact sheets (surface gravity, mean: Earth 9.82, Mars 3.73, Moon 1.62, Pluto 0.62 m/s^2);
 //   Ceres: Park et al. 2016 (JPL, Dawn gravity science) GM = 62.6285 km^3/s^2, mean radius ~470 km (JPL SSD: 469.7 km) -> g = GM/R^2 = 0.284 m/s^2.
 //   Planet spin ignored.
-const D=31.5,FPS=30,W=1080,H=1920;
+const D=30.5,FPS=30,W=1080,H=1920;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
 const lerp=(a,b,k)=>a+(b-a)*k;
 const GE=9.82,HE=0.5,V0=Math.sqrt(2*GE*HE),TL=0.55;
@@ -44,7 +44,14 @@ const HEADTOP=B.torso+B.neck+2*B.head; // above hip (upright)
 const SC=[];(function(){const N=Math.ceil(D*FPS)+2,sub=8,dt=1/FPS/sub;let s=S0,vs=0;const wn=5.0;
  const tgt=t=>{let m=0;for(const w of WORLDS){for(let k=0;k<=8;k++){const tt=t+k*0.1;const j=jumper(w,tt);m=Math.max(m,j.hip+HEADTOP+0.25)}}return Math.min(S0,(GY-TOPY)/m)};
  for(let i=0;i<N;i++){SC.push(s);for(let k=0;k<sub;k++){const t=i/FPS+k*dt;const g=tgt(t);const ac=wn*wn*(g-s)-2*wn*vs;vs+=ac*dt;s+=vs*dt;if(s>S0){s=S0;vs=Math.min(vs,0)}}}})();
-function scale(t){const f=Math.max(0,t)*FPS,i=Math.floor(f),k=f-i;return lerp(SC[Math.min(i,SC.length-1)],SC[Math.min(i+1,SC.length-1)],k)}
+function scaleJ(t){const f=Math.max(0,t)*FPS,i=Math.floor(f),k=f-i;return lerp(SC[Math.min(i,SC.length-1)],SC[Math.min(i+1,SC.length-1)],k)}
+// recap tail: pull back to show every jump height at once, then push back in for the loop
+const S1=(GY-TOPY)/(17.3+2.3),Z_OUT=[24.4,25.7],Z_IN=[28.3,29.4];
+function zk(t){return eio((t-Z_OUT[0])/(Z_OUT[1]-Z_OUT[0]))*(1-eio((t-Z_IN[0])/(Z_IN[1]-Z_IN[0])))}
+function scale(t){const b=scaleJ(t),k=zk(t);return k<=0?b:Math.exp(lerp(Math.log(b),Math.log(S1),k))}
+// height beams rise one column at a time during the pull-back
+const BEAM_T0=24.7,BEAM_DT=0.3,BEAM_RISE=0.7;
+function beamK(i,t){return eio((t-(BEAM_T0+i*BEAM_DT))/BEAM_RISE)*(1-ease((t-27.9)/0.4))}
 // joints in metres (x forward, y up) relative to feet point under the hip
 function joints(j){const p=j.pose,hy=j.hip;const hip=[0,hy];
  const knee=[hip[0]+B.thigh*Math.sin(p[1]),hip[1]-B.thigh*Math.cos(p[1])];
@@ -63,11 +70,12 @@ const CARDS=[
  {a:10.75,b:13.9,l:['PLUTO: 10 SECONDS','IN THE AIR'],c:[0,1]},
  {a:14.0,b:17.6,l:['CERES: ABOUT 3%','OF EARTH’S GRAVITY'],c:[0,1]},
  {a:17.7,b:21.6,l:['17 METERS UP','FROM A 50 cm JUMP'],c:[0,1]},
- {a:22.75,b:25.6,l:['22 SECONDS','IN THE AIR'],c:[0,1]},
- {a:25.7,b:28.6,l:['GRAVITY VS EARTH','LESS PULL, MORE AIR'],c:[0,1]},
- {a:28.7,b:31.0,l:['WHERE WOULD','YOU JUMP?'],c:[0,1]}];
+ {a:22.75,b:24.9,l:['22 SECONDS','IN THE AIR'],c:[0,1]},
+ {a:25.0,b:28.2,l:['GRAVITY VS EARTH','LESS PULL, MORE AIR'],c:[0,1]},
+ {a:28.3,b:29.95,l:['WHERE WOULD','YOU JUMP?'],c:[0,1]},
+ {a:30.05,b:D,l:['SAME JUMP, 5 WORLDS','WHO LANDS LAST?'],c:[0,1],foot:'same push-off speed \u00b7 no air \u00b7 no spacesuit'}];
 // recap chips: gravity as % of Earth's, popping in one column at a time
-const CHIP_T0=25.9,CHIP_DT=0.38,CHIP_OUT=30.9;
+const CHIP_T0=24.7+0.7,CHIP_DT=0.3,CHIP_OUT=27.9;
 for(const [i,w] of WORLDS.entries()){w.pct=Math.round(w.g/WORLDS[0].g*100)+'%';w.chipT=CHIP_T0+i*CHIP_DT;}
 function fmtT(s){return s<9.995?s.toFixed(2)+' s':s.toFixed(1)+' s'}
 function fmtH(h){return '↑ '+h.toFixed(1)+' m'}
@@ -75,4 +83,4 @@ function fmtH(h){return '↑ '+h.toFixed(1)+' m'}
 function hud(w,t){const fin=1-ease((t-29.8)/0.6);  // reset at the loop seam
  const el=cl(t-TL,0,w.T);const run=t>=TL&&t<w.tD;const done=t>=w.tD;
  return {timer:fmtT(fin<1&&t>29.8?el*fin:el),timerOn:run?1:(done?0.75:0.45),hAl:(t>=w.tA?ease((t-w.tA)/0.3):0)*fin,hTxt:fmtH(w.h)};}
-if(typeof module!=='undefined')module.exports={CHIP_T0,CHIP_DT,CHIP_OUT,D,FPS,WORLDS,V0,TL,GY,TOPY,S0,CARDS,jumper,joints,scale,HEADTOP,hud,B};
+if(typeof module!=='undefined')module.exports={beamK,zk,S1,CHIP_T0,CHIP_DT,CHIP_OUT,D,FPS,WORLDS,V0,TL,GY,TOPY,S0,CARDS,jumper,joints,scale,HEADTOP,hud,B};
