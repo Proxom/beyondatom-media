@@ -27,7 +27,9 @@ const P0=20.5,P1=22.6,BK=2.7,BCX=-70;          // push-in onto the left half for
 const lerpCam=(a,b,e)=>({cx:a.cx+(b.cx-a.cx)*e,cy:a.cy+(b.cy-a.cy)*e,s:Math.exp(Math.log(a.s)+(Math.log(b.s)-Math.log(a.s))*e)});
 function camB(t){const a=camA(P0);return{cx:BCX,cy:0,s:a.s*BK*(1+.025*cl((t-P1)/(27.4-P1)))}}
 function cam(t){if(t<P0)return camA(t);if(t<P1)return lerpCam(camA(P0),camB(P1),eio((t-P0)/(P1-P0)));if(t<27.4)return camB(t);
- const o=camFor(0);return lerpCam(camB(27.4),{cx:o.cx,cy:0,s:o.s},eio((t-27.4)/3.4))}
+ // return to the opening: zoom about Earth 0 so it stays on screen the whole way (its screen x moves smoothly to the opening spot)
+ const o=camFor(0),b=camB(27.4),e=eio((t-27.4)/3.4);const s=Math.exp(Math.log(b.s)+(Math.log(o.s)-Math.log(b.s))*e);
+ const sxB=540+(X0-b.cx)*b.s,sxO=540+(X0-o.cx)*o.s;const sx=sxB+(sxO-sxB)*e;return{cx:X0-(sx-540)/s,cy:0,s}}
 const CX=495;const FNT='"DejaVu Sans",Arial,sans-serif';
 let BB=[];window.BBOX=()=>BB;
 function txt(s,px,py,size,align,col,alpha,weight){if(alpha<=0.01)return;x.save();x.globalAlpha=cl(alpha);x.font=(weight||800)+' '+size+'px '+FNT;x.textAlign=align||'left';
