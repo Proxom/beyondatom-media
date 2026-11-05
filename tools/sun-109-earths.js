@@ -48,7 +48,7 @@ window.MODEL={T_ALL,T_HALF,C0,C1,D,ratio:695700/6371,vol:Math.pow(695700/6371,3)
  earthT:Array.from({length:109},(_,k)=>{if(k==0)return 1.0;let a=1.2,b=11.2;for(let i=0;i<50;i++){const m=(a+b)/2;if(CRf(m)-.4>=k)b=m;else a=m}return +b.toFixed(3)})};
 function frame(t){BB=[];const c=cam(t);
  gl.uniform3f(U('CAM'),c.cx,c.cy,c.s);gl.uniform1f(U('CR'),CRf(t));gl.uniform1f(U('CC'),CCf(t));gl.uniform1f(U('E0X'),E0Xf(t));
- gl.uniform1f(U('RA'),RAf(t));gl.uniform1f(U('CA'),RAf(t));gl.uniform1f(U('ZE'),ZE);gl.uniform1f(U('LOD'),1);gl.uniform1f(U('GLOW'),cl((24-c.s)/16));gl.uniform1f(U('FR'),t<F0?0:(RS+10)*eio((t-F0)/(F1-F0)));gl.uniform1f(U('FA'),RAf(t));
+ gl.uniform1f(U('RA'),RAf(t));gl.uniform1f(U('CA'),RAf(t));gl.uniform1f(U('ZE'),ZE);gl.uniform1f(U('LOD'),1);gl.uniform1f(U('GLOW'),cl((24-c.s)/16));gl.uniform1f(U('FR'),t<F0?0:(RS+10)*eio((t-F0)/(F1-F0)));gl.uniform1f(U('FA'),RAf(t));gl.uniform1f(U('SOFT'),1+.7*ease((t-20.4)/1.0)*(1-ease((t-27.0)/.6)));
  gl.uniform1f(U('SRR'),2*Math.PI*t/D);gl.uniform1f(U('T'),4*Math.sin(2*Math.PI*t/D));
  gl.drawArrays(gl.TRIANGLES,0,3);x.clearRect(0,0,W,H);x.drawImage(g,0,0);
  // the camera anchor is y=AY: shader uses 1000 -> shift the GL image so world y=0 lands on AY
@@ -75,7 +75,8 @@ function frame(t){BB=[];const c=cam(t);
  // volume beat
  const v1=win(t,15.0,18.0,.3,.3);txt("IT'S A BALL, SO IT'S",CX,370,58,'center','#fff',v1,900);txt('ALSO 109 TALL',CX,452,58,'center','#ffd27a',v1*ease((t-16.2)/.3),900);
  const v2=win(t,18.0,20.4,.3,.3);txt('VOLUME GROWS WITH',CX,370,56,'center','#fff',v2,900);txt('109 × 109 × 109',CX,456,66,'center','#ffd27a',v2,900);
- const v3=win(t,20.4,27.2,.35,.4);if(v3>.01){x.save();x.globalAlpha=v3*.62;x.fillStyle='#07070c';x.beginPath();x.roundRect(CX-410,312,820,184,34);x.fill();x.restore();}txt('ABOUT 1.3 MILLION',CX,382,72,'center','#ffd27a',v3,900);txt('EARTHS TO FILL IT',CX,470,66,'center','#fff',v3*ease((t-20.7)/.35),900);
+ const v3=win(t,20.4,27.2,.35,.4);if(v3>.01){x.save();x.globalAlpha=v3*.62;x.fillStyle='#07070c';x.beginPath();x.roundRect(CX-410,312,820,184,34);x.fill();x.restore();}txt('ITS VOLUME: ABOUT',CX,380,58,'center','#fff',v3,900);txt('1.3 MILLION EARTHS',CX,466,66,'center','#ffd27a',v3*ease((t-20.7)/.35),900);
+ pill('ONE LAYER: ABOUT 9,200 EARTHS',CX,1372,36,'#fff',win(t,23.9,27.0,.35,.35));
  // "1 Earth" marker on Earth 0 (scale reference) during the volume card
  const m1=win(t,23.4,27.0,.35,.35);if(m1>0){const rr=Math.max(er*1.9,15);x.save();x.globalAlpha=m1;x.strokeStyle='#bfe0ff';x.lineWidth=3;
   x.beginPath();x.arc(ex,ey,rr,0,Math.PI*2);x.stroke();x.beginPath();x.moveTo(ex-rr*.7,ey-rr*.7);x.lineTo(Math.max(ex-46,185),ey-96);x.stroke();x.restore();

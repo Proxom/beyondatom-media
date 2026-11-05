@@ -4,7 +4,7 @@
  World units = Earth radii, y up, Sun centre at the origin. Earths sit ZE Earth radii in front of the Sun, lit by it. -->
 <script id=fs type=x-shader>
 precision highp float;
-uniform vec2 R;uniform vec3 CAM;uniform float T,CR,CC,E0X,RA,CA,ZE,LOD,SRR,GLOW,FR,FA;uniform sampler2D TEX,CLD;
+uniform vec2 R;uniform vec3 CAM;uniform float T,CR,CC,E0X,RA,CA,ZE,LOD,SRR,GLOW,FR,FA,SOFT;uniform sampler2D TEX,CLD;
 const float RS=109.2;const float X0=-108.2;
 float h1(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
 vec3 h3(vec3 p){return vec3(h1(p),h1(p+17.1),h1(p+31.7));}
@@ -41,7 +41,7 @@ vec3 sunCol(vec2 p,float px){ // p world (Earth radii); px = world size of one p
   float cov=clamp((RS-length(p))/px+.5,0.,1.);c=mix(c,s,cov);}
  return c;}
 vec3 earthCol(vec3 cen,vec2 p,float sz,float spin,vec3 under,float px,out float cov){
- vec2 d=(p-cen.xy)/sz;float dd=length(d);cov=clamp((1.-dd)*sz/px+.5,0.,1.);
+ vec2 d=(p-cen.xy)/sz;float dd=length(d);cov=clamp((1.-dd)*sz/(px*SOFT)+.5,0.,1.);   // SOFT > 1 softens edges while the packed grid is on screen (no moire)
  vec3 L=normalize(-cen);                                  // towards the Sun centre
  vec3 n=vec3(d,sqrt(max(1.-dd*dd,0.)));
  float ca=cos(spin),sa=sin(spin);vec3 lp=vec3(ca*n.x+sa*n.z,n.y,-sa*n.x+ca*n.z);
