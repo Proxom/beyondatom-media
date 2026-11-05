@@ -4,7 +4,7 @@
  World units = Earth radii, y up, Sun centre at the origin. Earths sit ZE Earth radii in front of the Sun, lit by it. -->
 <script id=fs type=x-shader>
 precision highp float;
-uniform vec2 R;uniform vec3 CAM;uniform float T,CR,CC,E0X,RA,CA,ZE,LOD,SRR,GLOW;uniform sampler2D TEX,CLD;
+uniform vec2 R;uniform vec3 CAM;uniform float T,CR,CC,E0X,RA,CA,ZE,LOD,SRR,GLOW,FR,FA;uniform sampler2D TEX,CLD;
 const float RS=109.2;const float X0=-108.2;
 float h1(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
 vec3 h3(vec3 p){return vec3(h1(p),h1(p+17.1),h1(p+31.7));}
@@ -30,10 +30,11 @@ vec3 sunCol(vec2 p,float px){ // p world (Earth radii); px = world size of one p
   float ld=1.-.50*(1.-mu)-.16*(1.-mu)*(1.-mu);           // limb darkening
   vec3 P=vec3(p,mu*RS);                                    // point on the photosphere (Earth radii)
   float g=.5,wg=clamp((0.16/px-1.2)/2.,0.,1.)*LOD;         // granules ~0.16 R_E (~1,000 km); fade when sub-pixel
+  wg*=smoothstep(.1,.5,mu);                                // granules fade out where the surface curves away
   if(wg>0.)g=mix(.5,gran(P/0.16+vec3(0.,0.,T*.15)),wg);
   float m=fbm(P/2.2+3.)-.5,m2=fbm(P/9.+11.)-.5;           // mottling + faint large-scale pattern
   float fac=smoothstep(.55,.0,mu)*smoothstep(.12,.3,fbm(P/1.4+7.))*.25; // faculae near the limb
-  float I=ld*(1.+.45*mix(.3,1.,smoothstep(.1,.6,mu))*(g-.5)*wg+.10*m+.06*m2+fac);
+  float I=ld*(1.+.45*(g-.5)*wg+.10*m+.06*m2+fac);
   vec3 hot=vec3(1.,.84,.52),warm=vec3(1.,.52,.12),deep=vec3(.85,.24,.03);
   vec3 sc=mix(deep,mix(warm,hot,smoothstep(.25,1.,mu)),smoothstep(0.,.35,mu));
   vec3 s=sc*I*1.75;
@@ -70,6 +71,10 @@ void main(){
    float ord=kk<54.?(54.-kk)*2.-1.:(kk-54.)*2.;          // grows outward from the centre, both ways
    float sc=clamp((CC-ord)/.8,0.,1.);sc=sc*sc*(3.-2.*sc)*CA;if(sc<=.001)continue;
    vec3 cen=vec3(xc,X0+2.*kk,ZE);col=earthCol(cen,p,sc,kk*1.7+1.,col,px,cov);}}
+ // fill: the whole disc packed with Earths (grid aligned with the row: x = X0+2i, y = 2j), spreading out from the centre
+ if(FA>0.){vec2 cell=vec2(X0+2.*floor((p.x-X0)/2.+.5),2.*floor(p.y/2.+.5));float lc=length(cell);
+  if(lc+1.<=RS&&abs(cell.y)>.5&&abs(cell.x-(X0+108.))>.5){float sc=clamp((FR-lc)/8.,0.,1.);sc=sc*sc*(3.-2.*sc)*FA;
+   if(sc>.001)col=earthCol(vec3(cell,ZE),p,sc,cell.x*.7+cell.y*1.3,col,px,cov);}}
  // Earth 0
  {vec3 cen=vec3(E0X,0.,ZE);if(length(p-cen.xy)<1.3)col=earthCol(cen,p,1.,SRR,col,px,cov);}
  col=1.-exp(-col*1.25);col=pow(col,vec3(.97));

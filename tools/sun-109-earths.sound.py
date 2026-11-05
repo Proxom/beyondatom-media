@@ -13,9 +13,10 @@ hits+=[dict(t=15.05,kind='wood',note=5,vel=.24,pan=0),dict(t=15.25,kind='glass',
        dict(t=16.25,kind='glass',note=8,vel=.26,pan=0),dict(t=17.45,kind='glass',note=9,vel=.24,pan=0)]   # column grows
 hits+=[dict(t=18.05,kind='wood',note=5,vel=.24,pan=0)]
 hits+=[dict(t=20.45+.12*i,kind='bell',note=n,vel=.42-.06*i,pan=(-.15,.15,0)[i]) for i,n in enumerate((2,4,7))]  # 1.3 million
-hits+=[dict(t=21.45,kind='marimba',note=3,vel=.22,pan=-.45)]            # 1 EARTH marker
+hits+=[dict(t=21.5+.36*i,kind='glass',note=4+i,vel=.16+.015*i,pan=(-.3,.3,-.15,.15,0,-.1,.1)[i]) for i in range(7)]  # Earths spread across the Sun (21.4-23.6)
+hits+=[dict(t=23.45,kind='marimba',note=3,vel=.22,pan=-.45)]            # 1 EARTH marker
 hits+=[dict(t=27.0+.2*i,kind='marimba',note=6-2*i,vel=.18-.03*i,pan=(-.2,.2,-.2)[i]) for i in range(3)]  # row fades, zoom back
 hits+=[dict(t=29.65,kind='wood',note=3,vel=.18,pan=0)]                  # hook returns
 hits.sort(key=lambda h:h['t'])
-cfg=dict(dur=31.5,seed=109,root=104,bed='space',bed_db=12,wet=.24,hits=hits,swells=[[4.6,11.2,.32],[15.2,17.5,.28],[19.6,21.4,.3]])
+cfg=dict(dur=31.5,seed=109,root=104,bed='space',bed_db=12,wet=.24,hits=hits,swells=[[4.6,11.2,.32],[15.2,17.5,.28],[20.5,23.6,.32]])
 json.dump(cfg,open(sys.argv[1],'w'));print(len(hits),'hits')
