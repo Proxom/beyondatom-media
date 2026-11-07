@@ -1,0 +1,169 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=c width=1080 height=1920></canvas>
+<!-- astronaut-taller: "Why do astronauts get taller in space?" Original 2D canvas animation.
+ Sources (checked 7 Nov 2026):
+  NASA NTRS 20110023150 (Young & Rajulu): spinal elongation from lack of compression on the spine; up to 3% increase in stature.
+  NASA NTRS 20090007782: "In as little as two days ... increases in stature of up to 3 percent"; expansion of the intervertebral discs.
+  NASA Mission X handout "What's Your Space Height?": an astronaut grew from 171 cm (Earth height) to 174.4 cm (space height);
+  astronauts typically return to their pre-flight height in a short amount of time after landing.
+ The figure is drawn to scale (171 cm = 1100 px); the ruler panel is a zoomed scale. -->
+<script>
+const W=1080,H=1920,D=18.0;
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
+const H0=171.0,H1=174.4,PXCM=1100/171;           // figure scale: 6.43 px per cm
+const GROW=(H1-H0)*PXCM;                          // 21.9 px at full growth
+// timeline
+function growth(t){if(t<6.4)return ease(t/6.4);if(t<11.2)return 1;if(t<15.6)return 1-ease((t-11.2)/4.4);return 0}
+function earthW(t){if(t<9.9)return 0;if(t<11.0)return ease((t-9.9)/1.1);if(t<15.9)return 1;if(t<17.0)return 1-ease((t-15.9)/1.1);return 0}
+// deterministic stars
+let seed=7;const rnd=()=>{seed=(seed*16807)%2147483647;return seed/2147483647};
+const STARS=[];for(let i=0;i<420;i++)STARS.push([rnd()*W,rnd()*H,Math.pow(rnd(),3)*2.2+.35,rnd()*6.28,rnd()]);
+const FNT='"DejaVu Sans",Arial,sans-serif';
+let BB=[];window.BBOX=()=>BB;
+function txt(s,px,py,size,align,col,alpha,weight){if(alpha<=0.01)return;x.save();x.globalAlpha=cl(alpha);x.font=(weight||800)+' '+size+'px '+FNT;x.textAlign=align||'left';
+ const w=x.measureText(s).width;x.lineJoin='round';x.strokeStyle='rgba(0,0,0,.85)';x.lineWidth=Math.max(4,size*.13);x.strokeText(s,px,py);
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.8)';x.shadowBlur=10;x.fillText(s,px,py);x.restore();
+ const x0=align==='right'?px-w:align==='center'?px-w/2:px;BB.push({s,x0,x1:x0+w,y0:py-size*.74,y1:py+size*.04});}
+const LX=60,LWID=860,GOLD='#ffd98a',CYAN='#7fe3ff';
+function fitSize(lines,size,weight){x.font=(weight||900)+' '+size+'px '+FNT;let mw=0;lines.forEach(l=>mw=Math.max(mw,x.measureText(l).width));return mw>LWID?Math.floor(size*LWID/mw):size}
+function cardAlpha(t,a,b){const fi=a<=0?1:ease((t-a)/.35),fo=b>=D?1:ease((b-t)/.3);return t<a||t>=b?0:Math.min(fi,fo)}
+function card(lines,t,a,b,size){const al=cardAlpha(t,a,b);if(al<=0)return;const fi=a<=0?1:ease((t-a)/.35);
+ const main=fitSize(lines.filter(l=>!l[2]).map(l=>l[0]),size);
+ let y=342+(1-fi)*20;for(const l of lines){const sz=l[2]?fitSize([l[0]],l[2]):main;txt(l[0],LX,y+sz*.74,sz,'left',l[1]||'#fff',al,900);y+=sz*1.18}}
+const HOOK=[['WHY DO ASTRONAUTS'],['GET TALLER IN SPACE?',GOLD]];
+const CARDS=[[0,3.3,HOOK,70],[17.3,D,HOOK,70],
+ [3.3,6.6,[['NO GRAVITY IS'],['SQUEEZING THE SPINE',CYAN]],70],
+ [6.6,8.4,[['+3.4 cm',GOLD],['ONE NASA ASTRONAUT: 171 → 174.4 cm','#ffffff',40]],96],
+ [8.4,10.2,[['UP TO 3%',GOLD],['TALLER IN A FEW DAYS','#ffffff',52]],96],
+ [10.2,13.2,[['BUT BACK'],['ON EARTH...',GOLD]],76],
+ [13.2,17.3,[['GRAVITY SQUEEZES'],['IT ALL BACK',GOLD]],70]];
+// ---------- background ----------
+function space(al){if(al<=0)return;x.save();x.globalAlpha=al;
+ const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#03040c');g.addColorStop(.6,'#060a1c');g.addColorStop(1,'#0a1630');x.fillStyle=g;x.fillRect(0,0,W,H);
+ const n=x.createRadialGradient(820,520,40,820,520,700);n.addColorStop(0,'rgba(90,60,160,.20)');n.addColorStop(1,'rgba(40,20,90,0)');x.fillStyle=n;x.fillRect(0,0,W,H);
+ x.restore()}
+function stars(t,al){if(al<=0)return;x.save();for(const s of STARS){const tw=.75+.25*Math.sin(s[3]+t*2*Math.PI/D*3);
+  const yy=(s[1]+t*(6+s[4]*10))%H;x.globalAlpha=al*tw*(.35+.65*s[4]);x.fillStyle=s[4]>.8?'#cfe0ff':'#fff2dc';x.beginPath();x.arc(s[0],yy,s[2],0,7);x.fill()}x.restore()}
+function earthLimb(t,al){if(al<=0)return;x.save();x.globalAlpha=al;const cx=540,cy=1920+1500,R=1720;
+ const a=x.createRadialGradient(cx,cy,R-30,cx,cy,R+120);a.addColorStop(0,'rgba(120,190,255,.55)');a.addColorStop(.3,'rgba(80,150,255,.25)');a.addColorStop(1,'rgba(40,90,200,0)');
+ x.fillStyle=a;x.beginPath();x.arc(cx,cy,R+120,0,7);x.fill();
+ const e=x.createRadialGradient(cx-300,cy-R,100,cx,cy,R);e.addColorStop(0,'#3d7fc4');e.addColorStop(.25,'#1f4f8c');e.addColorStop(1,'#071528');x.fillStyle=e;x.beginPath();x.arc(cx,cy,R,0,7);x.fill();
+ x.globalCompositeOperation='lighter';x.globalAlpha=al*.35;for(let i=0;i<9;i++){const ph=i*1.7+t*2*Math.PI/D;x.fillStyle='rgba(255,255,255,.18)';
+  x.beginPath();x.ellipse(cx+Math.sin(ph)*700,cy-R+60+i*14,180+60*Math.sin(i),18,0,0,7);x.fill()}
+ x.restore()}
+function earthScene(t,al){if(al<=0)return;x.save();x.globalAlpha=al;
+ const g=x.createLinearGradient(0,0,0,1740);g.addColorStop(0,'#173a6e');g.addColorStop(.55,'#3f74ad');g.addColorStop(1,'#9cc3e0');x.fillStyle=g;x.fillRect(0,0,W,1740);
+ const f=x.createLinearGradient(0,1720,0,H);f.addColorStop(0,'#3a3f48');f.addColorStop(1,'#1b1e24');x.fillStyle=f;x.fillRect(0,1720,W,H-1720);
+ x.fillStyle='rgba(255,255,255,.10)';x.fillRect(0,1720,W,3);
+ for(let i=0;i<14;i++){x.fillStyle='rgba(0,0,0,.10)';x.fillRect(i*80+((i*37)%30),1760+((i*53)%120),46,3)}
+ x.restore()}
+// ---------- figure ----------
+const CX=400,FEET=1716;
+function capsule(ax,ay,bx,by,ra,rb){const dx=bx-ax,dy=by-ay,l=Math.hypot(dx,dy),ux=dx/l,uy=dy/l,nx=-uy,ny=ux;
+ x.beginPath();x.moveTo(ax+nx*ra,ay+ny*ra);x.lineTo(bx+nx*rb,by+ny*rb);x.arc(bx,by,rb,Math.atan2(ny,nx),Math.atan2(ny,nx)+Math.PI,false);
+ x.lineTo(ax-nx*ra,ay-ny*ra);x.arc(ax,ay,ra,Math.atan2(-ny,-nx),Math.atan2(-ny,-nx)+Math.PI,false);x.closePath()}
+const off=document.createElement('canvas');off.width=W;off.height=H;const o=off.getContext('2d');
+function bodyPath(c,g,by){ // g = growth px, by = vertical offset (float)
+ const up=y=>y<1120?y-g:y;  // everything above the lumbar base moves up with the spine
+ const Y=y=>up(y)+by;
+ c.beginPath();c.ellipse(CX,Y(694),58,74,0,0,7);c.fill();                       // head
+ c.beginPath();c.moveTo(CX-24,Y(752));c.lineTo(CX+24,Y(752));c.lineTo(CX+30,Y(810));c.lineTo(CX-30,Y(810));c.fill(); // neck
+ c.beginPath();c.moveTo(CX-60,Y(790));c.bezierCurveTo(CX-112,Y(796),CX-120,Y(812),CX-118,Y(850));
+ c.bezierCurveTo(CX-108,Y(950),CX-80,Y(1010),CX-76,Y(1060));c.bezierCurveTo(CX-84,Y(1100),CX-98,1150+by,CX-94,1196+by);
+ c.lineTo(CX+94,1196+by);c.bezierCurveTo(CX+98,1150+by,CX+84,Y(1100),CX+76,Y(1060));
+ c.bezierCurveTo(CX+80,Y(1010),CX+108,Y(950),CX+118,Y(850));c.bezierCurveTo(CX+120,Y(812),CX+112,Y(796),CX+60,Y(790));c.closePath();c.fill(); // torso
+ for(const s of[-1,1]){
+  // arms hang from the shoulders; they move up with the torso
+  c.save();capsuleOn(c,CX+s*110,Y(838),CX+s*132,Y(1010),24,19);c.fill();capsuleOn(c,CX+s*132,Y(1010),CX+s*142,Y(1170),19,15);c.fill();
+  c.beginPath();c.ellipse(CX+s*144,Y(1196),15,26,s*.08,0,7);c.fill();c.restore();
+  capsuleOn(c,CX+s*50,1176+by,CX+s*44,1450+by,40,26);c.fill();capsuleOn(c,CX+s*44,1450+by,CX+s*40,1690+by,26,17);c.fill();   // legs
+  c.beginPath();c.ellipse(CX+s*52,FEET-12+by,34,13,0,0,7);c.fill()}  // feet
+}
+function capsuleOn(c,ax,ay,bx,by,ra,rb){const dx=bx-ax,dy=by-ay,l=Math.hypot(dx,dy),ux=dx/l,uy=dy/l,nx=-uy,ny=ux,a0=Math.atan2(ny,nx);
+ c.beginPath();c.moveTo(ax+nx*ra,ay+ny*ra);c.lineTo(bx+nx*rb,by+ny*rb);c.arc(bx,by,rb,a0,a0+Math.PI,false);c.lineTo(ax-nx*ra,ay-ny*ra);c.arc(ax,ay,ra,a0+Math.PI,a0+2*Math.PI,false);c.closePath()}
+// spine: 24 vertebrae (7 cervical, 12 thoracic, 5 lumbar) between y=770 and y=1120 (at Earth height)
+const NV=24,TOP=770,BASE=1120;
+function spineLayout(g){const discBase=3.2,discAdd=g/NV;const disc=discBase+discAdd;
+ const vh=(BASE-TOP-NV*discBase)/NV;                   // vertebra height (constant)
+ const v=[];let y=BASE;for(let i=NV-1;i>=0;i--){const top=y-vh;v.unshift({i,y0:top,y1:y,w:lerp(20,40,Math.pow(i/(NV-1),.8))});y=top-disc}
+ return {v,disc}}
+function skeleton(g,by,glow){const L=spineLayout(g);x.save();
+ // ribs (faint)
+ x.strokeStyle='rgba(235,225,200,.20)';x.lineWidth=5;x.lineCap='round';
+ for(let k=0;k<10;k++){const vv=L.v[7+k];const yy=(vv.y0+vv.y1)/2+by;const w=lerp(64,96,Math.sin(Math.PI*cl((k+1)/10)*.9));
+  for(const s of[-1,1]){x.beginPath();x.moveTo(CX+s*14,yy);x.quadraticCurveTo(CX+s*(w+10),yy-6,CX+s*(w-6),yy+34+k*2);x.stroke()}}
+ // pelvis
+ x.fillStyle='rgba(235,225,200,.22)';x.beginPath();x.moveTo(CX-22,1122+by);x.bezierCurveTo(CX-96,1110+by,CX-100,1170+by,CX-70,1196+by);
+ x.lineTo(CX-20,1186+by);x.lineTo(CX,1210+by);x.lineTo(CX+20,1186+by);x.lineTo(CX+70,1196+by);x.bezierCurveTo(CX+100,1170+by,CX+96,1110+by,CX+22,1122+by);x.closePath();x.fill();
+ // discs (the key part, glowing)
+ for(let i=0;i<NV;i++){const a=L.v[i],b=L.v[i+1];const y0=a.y1+by,y1=(b?b.y0:a.y1+L.disc)+by;if(!b)continue;const w=(a.w+b.w)/2*.92;
+  x.save();x.shadowColor='rgba(110,220,255,'+(.55+.45*glow)+')';x.shadowBlur=10+12*glow;x.fillStyle='rgba(120,225,255,'+(.75+.25*glow)+')';
+  rr(CX-w/2,y0,w,Math.max(1.5,y1-y0),2);x.fill();x.restore()}
+ // vertebrae
+ for(const a of L.v){const y0=a.y0+by,y1=a.y1+by;const gr=x.createLinearGradient(CX-a.w/2,0,CX+a.w/2,0);
+  gr.addColorStop(0,'#b7aa8c');gr.addColorStop(.45,'#f4ecd8');gr.addColorStop(1,'#a99c80');x.fillStyle=gr;rr(CX-a.w/2,y0,a.w,y1-y0,4);x.fill();
+  x.fillStyle='rgba(235,225,200,.55)';rr(CX-a.w*.75,y0+(y1-y0)*.3,a.w*1.5,(y1-y0)*.35,3);x.fill()}
+ // skull hint
+ x.strokeStyle='rgba(235,225,200,.22)';x.lineWidth=4;x.beginPath();x.ellipse(CX,694-g+by,42,54,0,0,7);x.stroke();
+ x.restore();return L}
+function rr(a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+function figure(t,g,by,ew){
+ o.clearRect(0,0,W,H);o.fillStyle='#fff';bodyPath(o,g,by);
+ // tint the silhouette (hologram look) and add a rim glow
+ const tint=document.createElement('canvas');tint.width=W;tint.height=H;const q=tint.getContext('2d');
+ q.drawImage(off,0,0);q.globalCompositeOperation='source-in';const gg=q.createLinearGradient(0,600,0,1720);
+ gg.addColorStop(0,'rgba(120,200,255,.30)');gg.addColorStop(1,'rgba(60,120,220,.20)');q.fillStyle=gg;q.fillRect(0,0,W,H);
+ const rim=document.createElement('canvas');rim.width=W;rim.height=H;const r=rim.getContext('2d');
+ r.drawImage(off,0,0);r.globalCompositeOperation='source-in';r.fillStyle='#8fe8ff';r.fillRect(0,0,W,H);
+ x.save();x.globalAlpha=.9;x.shadowColor='rgba(120,220,255,.9)';x.shadowBlur=26;x.drawImage(rim,0,0);x.restore();
+ x.save();x.globalCompositeOperation='source-over';
+ // inner fill: draw the silhouette shrunk by drawing it in dark then the tint
+ x.globalAlpha=1;x.filter='blur(2.5px)';x.drawImage(darkVersion(),0,0);x.filter='none';x.drawImage(tint,0,0);x.restore();
+ skeleton(g,by,cl(g/GROW+ew*0));
+}
+let DARK=null;function darkVersion(){if(!DARK){DARK=document.createElement('canvas');DARK.width=W;DARK.height=H}const d=DARK.getContext('2d');d.clearRect(0,0,W,H);
+ d.drawImage(off,0,0);d.globalCompositeOperation='source-in';d.fillStyle='rgba(6,16,36,.86)';d.fillRect(0,0,W,H);d.globalCompositeOperation='source-over';return DARK}
+// Earth-height line + gravity chevrons + magnifier + ruler
+function earthLine(g,by,al){const y=620+by;x.save();x.globalAlpha=al;x.setLineDash([14,10]);x.strokeStyle='rgba(255,255,255,.75)';x.lineWidth=3;
+ x.beginPath();x.moveTo(CX-150,y);x.lineTo(CX+150,y);x.stroke();x.setLineDash([]);
+ txt('EARTH',CX-162,y-4,26,'right','rgba(255,255,255,.85)',al*.9,700);txt('HEIGHT',CX-162,y+26,26,'right','rgba(255,255,255,.85)',al*.9,700);
+ if(g>2){x.strokeStyle=GOLD;x.lineWidth=5;x.beginPath();x.moveTo(CX+150,y);x.lineTo(CX+150,y-g);x.stroke();
+  x.beginPath();x.moveTo(CX+138,y-g);x.lineTo(CX+162,y-g);x.stroke();x.beginPath();x.moveTo(CX+138,y);x.lineTo(CX+162,y);x.stroke()}
+ x.restore()}
+function chevrons(t,al){if(al<=0)return;x.save();for(const sx of[CX-230,CX+230]){for(let k=0;k<4;k++){const ph=((t*0.9+k/4)%1);const yy=700+ph*700;
+  x.globalAlpha=al*Math.sin(ph*Math.PI)*.8;x.strokeStyle=GOLD;x.lineWidth=7;x.lineCap='round';x.lineJoin='round';
+  x.beginPath();x.moveTo(sx-26,yy-14);x.lineTo(sx,yy+12);x.lineTo(sx+26,yy-14);x.stroke()}}
+ x.restore()}
+function magnifier(g,by,al){if(al<=0)return;const mx=190,my=1240,R=112;const L=spineLayout(g);const vv=L.v[20];const sy=(vv.y0+vv.y1)/2+by;
+ x.save();x.globalAlpha=al;x.strokeStyle='rgba(127,227,255,.55)';x.lineWidth=2.5;x.beginPath();x.moveTo(CX-24,sy);x.lineTo(mx+R*.72,my-R*.72);x.stroke();
+ x.beginPath();x.arc(CX,sy,26,0,7);x.stroke();
+ x.save();x.beginPath();x.arc(mx,my,R,0,7);x.clip();x.fillStyle='rgba(4,10,24,.92)';x.fillRect(mx-R,my-R,2*R,2*R);
+ const k=1+.22*(g/GROW),dh=30*k,vh=56;           // zoomed: disc 30 -> 37 px (+22 %), vertebra 56 px
+ const y0=my-dh/2-vh,y1=my+dh/2;
+ for(const [yy] of [[y0],[y1]]){const gr=x.createLinearGradient(mx-80,0,mx+80,0);gr.addColorStop(0,'#b7aa8c');gr.addColorStop(.45,'#f4ecd8');gr.addColorStop(1,'#a99c80');
+  x.fillStyle=gr;rr(mx-78,yy,156,vh,10);x.fill()}
+ x.shadowColor='rgba(110,220,255,.9)';x.shadowBlur=18;x.fillStyle='rgba(120,225,255,.95)';rr(mx-72,my-dh/2,144,dh,8);x.fill();x.shadowBlur=0;
+ x.restore();x.strokeStyle='rgba(127,227,255,.9)';x.lineWidth=4;x.beginPath();x.arc(mx,my,R,0,7);x.stroke();x.restore();
+ txt('SPINE DISCS',mx,my+R+44,32,'center',CYAN,al,800)}
+const RX=700,RW=220,RY0=600,RY1=1400;
+function rulerY(h){return 1330-(h-170)*140}
+function ruler(t,h,al){x.save();x.globalAlpha=al;x.fillStyle='rgba(4,10,24,.72)';rr(RX,RY0,RW,RY1-RY0,18);x.fill();x.strokeStyle='rgba(255,255,255,.22)';x.lineWidth=2;rr(RX,RY0,RW,RY1-RY0,18);x.stroke();
+ x.save();rr(RX,RY0+100,RW,RY1-RY0-140,18);x.clip();
+ for(let c=1700;c<=1755;c+=1){const hh=c/10,yy=rulerY(hh);const major=c%10===0,half=c%5===0;x.strokeStyle='rgba(255,255,255,'+(major?.9:half?.6:.35)+')';x.lineWidth=major?3:2;
+  x.beginPath();x.moveTo(RX+RW-18,yy);x.lineTo(RX+RW-18-(major?60:half?40:22),yy);x.stroke();if(major)txt(String(hh),RX+20,yy+14,38,'left','#ffffff',al,800)}
+ const ym=rulerY(h);const top=h>=H1-.01;x.fillStyle=top?'#7dffb0':GOLD;x.shadowColor=x.fillStyle;x.shadowBlur=14;
+ x.beginPath();x.moveTo(RX+RW-12,ym);x.lineTo(RX+RW-52,ym-16);x.lineTo(RX+RW-52,ym+16);x.closePath();x.fill();x.fillRect(RX+14,ym-2,RW-60,4);x.restore();
+ txt(h.toFixed(1)+' cm',RX+RW/2,RY0+70,50,'center',h>=H1-.01?'#7dffb0':'#ffffff',al,900);
+ txt('ZOOMED',RX+RW/2,RY1-18,24,'center','#8f9cc0',al*.9,700);x.restore()}
+function vignette(){const v=x.createRadialGradient(W/2,H*.48,H*.25,W/2,H*.5,H*.75);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.45)');x.fillStyle=v;x.fillRect(0,0,W,H)}
+window.draw=function(t){BB=[];t=((t%D)+D)%D;const ew=earthW(t),sw=1-ew;const g=GROW*growth(t),h=H0+(H1-H0)*growth(t);
+ const by=-6*Math.sin(2*Math.PI*t/D*3)*sw;   // gentle weightless float, zero on the ground
+ x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ space(1);stars(t,sw);earthLimb(t,sw);earthScene(t,ew);
+ figure(t,g,by,ew);earthLine(g,by,1);chevrons(t,cl((ew-.5)*2)*(t>10.5&&t<16.2?1:0)*ease(Math.min((t-10.5)/.5,(16.2-t)/.5)));
+ magnifier(g,by,1);ruler(t,h,1);vignette();
+ for(const c of CARDS)card(c[2],t,c[0],c[1],c[3]);
+ return h};
+window.TEXREADY=true;
+</script>
