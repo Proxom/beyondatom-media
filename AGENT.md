@@ -2,6 +2,14 @@
 
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
+## VIEWER-REQUESTED TOPIC FOR THE NEXT SHORT (Erkan, 7 Nov 2026 21:55) — the next NEW Short you make uses this topic; ignore this block once that Short is scheduled
+A viewer (@erwinromadan85) commented under the Short "SAME JUMP, 5 WORLDS — WHO LANDS LAST?": "Human body in much more gravity please". Erkan wants that as the next Short.
+- Topic: what happens to the human body in much stronger gravity. Escalate world by world (to scale where you can): Earth 1 g → Neptune ~1.1 g → Jupiter ~2.5 g (cloud-top level) → the Sun's surface ~28 g → a white dwarf / neutron star (only as the final shock, clearly labelled).
+- Show real, verified effects: body weight multiplying, heart working harder to push blood to the brain, blood pooling in the legs, tunnel vision / grey-out, G-LOC (fighter pilots in g-suits handle about 9 g for seconds; sustained high g is far less). Use only numbers you can source (NASA, peer-reviewed aviation medicine, NSSDC planetary fact sheets). Clearly separate sustained gravity from short g-forces.
+- Same visual family as the "SAME JUMP, 5 WORLDS" Short (it brought the comment), so it reads as a sequel. Title as a question, e.g. "What If You Lived on Jupiter? 😵" or "How Much Gravity Can a Human Survive?".
+- First line of the description: "You asked for it, @erwinromadan85 👇" plus the usual comment bait question. Do not reply to comments via any tool; just credit the request in the description.
+- Normal v4 rules (hard gate, run timeline, queue) apply. If the next slot is already filled, schedule it in the next empty slot.
+
 ## 0. WHY v4 (Erkan, 7 Nov 2026 12:26)
 The Instagram agent missed the 7 Nov 01:00 slot because its rules had piled up into contradictions and an unreachable gate. The same layers exist here:
 - 3 loudness targets, 4 length rules, 3 schedules and queue caps.
