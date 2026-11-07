@@ -154,7 +154,7 @@ function ruler(t,h,al){x.save();x.globalAlpha=al;x.fillStyle='rgba(4,10,24,.72)'
   x.beginPath();x.moveTo(RX+RW-18,yy);x.lineTo(RX+RW-18-(major?60:half?40:22),yy);x.stroke();if(major)txt(String(hh),RX+20,yy+14,38,'left','#ffffff',al,800)}
  const ym=rulerY(h);const top=h>=H1-.01;x.fillStyle=top?'#7dffb0':GOLD;x.shadowColor=x.fillStyle;x.shadowBlur=14;
  x.beginPath();x.moveTo(RX+RW-12,ym);x.lineTo(RX+RW-52,ym-16);x.lineTo(RX+RW-52,ym+16);x.closePath();x.fill();x.fillRect(RX+14,ym-2,RW-60,4);x.restore();
- txt(h.toFixed(1)+' cm',RX+RW/2,RY0+70,50,'center',h>=H1-.01?'#7dffb0':'#ffffff',al,900);
+ txt(h.toFixed(1)+' cm',RX+RW/2,RY0+66,42,'center',h>=H1-.01?'#7dffb0':'#ffffff',al,900);
  txt('ZOOMED',RX+RW/2,RY1-18,24,'center','#8f9cc0',al*.9,700);x.restore()}
 function vignette(){const v=x.createRadialGradient(W/2,H*.48,H*.25,W/2,H*.5,H*.75);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.45)');x.fillStyle=v;x.fillRect(0,0,W,H)}
 window.draw=function(t){BB=[];t=((t%D)+D)%D;const ew=earthW(t),sw=1-ew;const g=GROW*growth(t),h=H0+(H1-H0)*growth(t);
