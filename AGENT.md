@@ -71,6 +71,18 @@ v4 keeps what works (Shorts with question titles, to-scale animations, real NASA
 9. SERIES: "Life in Space", "How Big Is It?", "What If…": the same hook style and look.
 10. DESCRIPTION: 1-2 hook lines, then the facts with numbers, "Sources:" URLs, and a "Footage:" line with every asset's title, URL and credit. Then "More space every day on BeyondAtom." and 3-4 hashtags including #shorts.
 11. If a Short reaches 3x the median or more than 5,000 views, make its Part 2 within 2 days.
+12. STYLE FAMILIES AND ROTATION (Erkan, 7 Nov 2026 23:33):
+   - Q. QUESTION SHORT: the current format (items 1-11).
+   - T. COSMIC TOUR (new, Erkan's idea, 7 Nov 23:30):
+     - Camera: one continuous camera journey through space with no cuts, starting at Earth or the Moon. The camera pans left and right, pushes in close and pulls out to other planets, the Sun, stars, giant and dwarf stars, nebulae, galaxies and black holes.
+     - At every stop, a short verified fact card appears ("Jupiter: 1,321 Earths fit inside").
+     - Each tour has one theme: "Every planet up close", "Smallest to biggest stars", "Zoom out from Earth to a black hole", "The 5 weirdest moons", "Dwarfs vs giants".
+     - Build: three.js scene; textures from licensed real images (NASA/JPL planet maps, NASA SVS, Hubble/Webb/ESA/ESO images under their licences, credits in the description). Smooth eased camera path (Catmull-Rom spline, no jerks), real relative sizes where the theme is about size (say "not to scale" for distances), depth of field and bloom on stars, a deep, soft synthesized space pad plus gentle whooshes on moves (no harsh highs).
+     - Length: 25-40 s, a new object every 3-5 s, the biggest or strangest object last, then loop back to the first frame.
+     - Title: a question or a challenge ("How Big Is the Biggest Star? 🌟", "Can You Name Them All? 👇"). Comment bait: "Which one surprised you? 👇".
+     - Build the tour engine once in tools/cosmic-tour/ (camera path, object loader, fact cards, audio bed) and reuse it; each new tour only changes the object list, theme and facts.
+   - ROTATION: at most 3 Shorts IN A ROW from the same family, then switch. Posts already scheduled stay as they are. The viewer-requested gravity Short (block above) comes first; the first T tour comes right after it.
+   - PERFORMANCE PER FAMILY: tag every video doc with family Q or T. Judge each Short after 72 h against the channel median (views, average view duration, likes, comments, shares) and keep a per-family table in learnings/current. A family whose batch of 3 is above 1.2x the median gets more turns (never more than 3 in a row); one below 0.7x is paused for a week. Explain each decision in one Turkish line in the daily report.
 
 ## 5. HARD GATE — the ONLY things that can block a Short
 1. TECHNICAL:
