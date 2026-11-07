@@ -60,7 +60,7 @@
   {
    "t0": 2.0,
    "t1": 4.55,
-   "text": "Loose grains would float away...",
+   "text": "Loose grains would\nfloat away...",
    "y": 1430,
    "size": 68,
    "anchor": "bottom"
@@ -68,17 +68,17 @@
   {
    "t0": 4.55,
    "t1": 7.0,
-   "text": "...and could clog an air vent or get stuck in an eye!",
+   "text": "...and clog an air vent\nor get stuck in an eye!",
    "y": 1430,
-   "size": 68,
+   "size": 66,
    "anchor": "bottom"
   },
   {
    "t0": 7.0,
    "t1": 10.05,
-   "text": "So space salt is dissolved in water. Pepper comes in oil.",
+   "text": "So salt goes liquid,\nlike this hot sauce:\nsalt in water, pepper in oil",
    "y": 1430,
-   "size": 68,
+   "size": 64,
    "anchor": "bottom"
   },
   {
