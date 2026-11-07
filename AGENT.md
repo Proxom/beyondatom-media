@@ -1,5 +1,14 @@
 # YOUTUBE GROWTH AGENT (BeyondAtom) - standing instructions
 
+## CREDIT CAP + SAVE WORK IN PROGRESS (Erkan, 7 Nov 2026 11:23 — overrides the 5-hour safety limit in KEEP WORKING and any longer time rule in this file)
+The weekly Claude limit is being burned by long runs and by work that is thrown away. Rules for every run:
+1. HARD CAP 2 HOURS per run (from the run's start). At 1 h 45 min you stop making changes: if a video passes QC, schedule it; if none passes, schedule the best video you have that has no real defect (correct logic, no visual glitch, clean sound), note it in the report and end. A slot is still never left empty on purpose; you just do not polish past the cap.
+2. MAX 2 QC/REVIEW ROUNDS per video. After round 2, fix only the listed real defects once and schedule; no third full review.
+3. SAVE WORK IN PROGRESS TO THE REPO, never only in the scratchpad (the scratchpad is deleted when the run ends). Every 20 minutes (with the RUN LOCK refresh) commit to main under wip/<post-id>/: the render script/scene code, the audio script, the caption text, the reviewer's defect list, a short NEXT.md ("what is done, what is left") and the latest MP4 if it is under 50 MB (else the last good stills). Push it.
+4. START OF EVERY RUN: look at wip/ first. If an unfinished video is there, CONTINUE it from NEXT.md instead of starting a new one from scratch. When it is scheduled, move wip/<post-id>/ to posts/<post-id>/ (or delete the wip folder) in the same commit.
+5. Do not stop to ask Erkan questions mid-run; nobody is watching. Take the most reasonable choice, write it in the report, carry on.
+6. Keep runs lean: do not re-read research, do not re-run analytics more than once per run, do not render full-length test versions when a 5-second test clip shows the problem.
+
 ## KEEP WORKING UNTIL A VIDEO IS SCHEDULED + LATE POSTS GO OUT AT ONCE (Erkan, 7 Nov 2026 07:13 — overrides the RUN TIME BUDGET and any "leave the slot empty / leave it to the next run" wording)
 1. A missing extra (photoreal Canva cover, a nice-to-have effect, a tool that is blocked) is NEVER a reason not to publish. If the video itself passes the quality check, it is published; use the template cover your own pipeline can make.
 2. If the next slot of your network has no scheduled, QC-passed video, you do NOT end the run. Keep fixing or making a video until one passes QC and is scheduled. Refresh the RUN LOCK every 20 minutes while you work (and commit work in progress), so no other run starts in parallel. The 75-minute budget only limits polishing a video that already passes; it never ends a run that still has an empty next slot. Safety limit: if after 5 hours of work nothing passes, schedule the best video you have that has no real defect (correct logic, no visual glitches, clean sound), note it in the report and end.
