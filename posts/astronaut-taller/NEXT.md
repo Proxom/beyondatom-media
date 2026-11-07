@@ -7,3 +7,5 @@ Done:
 - Facts verified by reviewer from NTRS API + NASA PDF.
 Left:
 - Final render (render-range.js astronaut-taller 0 540), encode, 2 fps check, host media/astronaut-taller/, schedule 8 Nov 01:00 in Metricool, dashboard docs.
+
+Scheduled 2026-11-08 01:00 Europe/London, Metricool 419917474. Media: media/astronaut-taller/.
