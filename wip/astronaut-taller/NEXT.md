@@ -1,9 +1,9 @@
 # astronaut-taller (YouTube Short, target slot 8 Nov 2026 01:00 Europe/London)
 Run: 7 Nov 12:10 UTC (yt-1207, session trusting-davinci-da966s).
 Done:
-- Scene: tools/p_astronaut-taller.html (18 s, 2D canvas, hologram figure to scale 171 cm = 1100 px, zoomed ruler, disc magnifier, space -> Earth -> space loop).
-- Sound: tools/astronaut-taller.sound.py -> tools/sound-v2.py; master chain highpass 38, lowpass 7500 p=2, acompressor 2.5:1, highshelf 5k -4 dB, alimiter, 2-pass loudnorm -20 LUFS / TP -3.
-  Measured: -20.0 LUFS, peak -5.6 dBFS, highpass-4k version -46.0 LUFS (26 dB below).
-- Facts verified this run: NASA NTRS 20110023150, NTRS 20090007782, NASA Mission X "What's Your Space Height?" (171 -> 174.4 cm).
+- Scene tools/p_astronaut-taller.html (18 s loop), sound tools/astronaut-taller.sound.py (-20.0 LUFS, peak -5.5 dBFS, HP4k -46 LUFS).
+- Own QC round 1: counter 8 px into the right safe zone -> font 42 px (fixed).
+- Reviewer round 1 (FAIL, 2 real defects): starfield jumped at the loop (linear drift) -> periodic drift; ruler marker bar struck through labels -> bar starts right of labels. Optional: labels 30 px, caption wording. All fixed.
+- Facts verified by reviewer from NTRS API + NASA PDF.
 Left:
-- Render frames: cd tools && node render-range.js astronaut-taller 0 540 (skips existing frames), encode (tools/encode.sh pattern), QC (frames 2 fps, safe zones, spell check), reviewer pass, host in media/astronaut-taller/, schedule in Metricool.
+- Final render (render-range.js astronaut-taller 0 540), encode, 2 fps check, host media/astronaut-taller/, schedule 8 Nov 01:00 in Metricool, dashboard docs.
