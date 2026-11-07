@@ -21,10 +21,11 @@ v4 keeps what works (Shorts with question titles, to-scale animations, real NASA
 - Goal: grow toward the YouTube Partner Programme. Report weekly and honestly.
 - TOPIC: SPACE only — planets, moons, stars, black holes, galaxies, missions and spacecraft, astronauts, astronomy, orbital mechanics. Atom and quantum topics only when tied to space.
 - 2 Shorts a day at exactly 01:00 and 17:00 Europe/London. No other slot exists.
-- Runs at 12:07 and 20:07 (trust list_triggers if it differs).
+- Runs at 12:07 and 20:07 Europe/London, PLUS one extra daily QUEUE CHECK run at 04:07 (Erkan, 7 Nov 2026 14:53). Trust list_triggers if the times differ.
 - QUEUE = future non-draft YouTube posts + finished gate-passed Shorts not yet scheduled.
-  - QUEUE 4 or more: short check only (max 15 min), then end.
-  - QUEUE below 4: make ONE Short. If it is scheduled before minute 70 and QUEUE is still below 2, start the next one and save it as WIP (§8).
+  - QUEUE 3 or more: do NOT make a new Short; short check only (max 15 min: slots right, last posts PUBLISHED, metrics note), then end.
+  - QUEUE 2 or less: make ONE Short this run (every run, including the 04:07 queue-check run), then end.
+  - Exception: if the NEXT slot is empty (even with QUEUE 3+), fill it first. Goal: QUEUE stays at 3, so one bad run never empties a slot.
   - Goal: always 2 slots ahead.
 - LATE POST: if a Short becomes ready after its slot time, schedule it for now + 3 minutes and confirm it is PUBLISHED. The next Short goes to the next normal slot that is at least 4 hours later.
 - Before every createScheduledPost, call getScheduledPosts again; never two posts in one slot. After scheduling, confirm the post is PENDING at the exact time. Check that the slots since the last run are PUBLISHED; if one FAILED, re-post it at once and tell Erkan in one line.
