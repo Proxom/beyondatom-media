@@ -1,0 +1,126 @@
+{
+ "src": "/tmp/claude-0/-home-user-beyondatom-media/4b8aec7a-a3c9-57fb-80e0-c68468fa1946/scratchpad/dl/eat_large.mp4",
+ "srcw": 1920,
+ "srch": 1080,
+ "fps": 30,
+ "audio": "/tmp/claude-0/-home-user-beyondatom-media/4b8aec7a-a3c9-57fb-80e0-c68468fa1946/scratchpad/salt.master.wav",
+ "shots": [
+  {
+   "in": 7.4,
+   "out": 8.85,
+   "dur": 2.0,
+   "cx": 0.5,
+   "z": 1.2
+  },
+  {
+   "in": 4.75,
+   "out": 7.3,
+   "dur": 2.55,
+   "cx": 0.47
+  },
+  {
+   "in": 25.0,
+   "out": 30.5,
+   "dur": 5.5,
+   "cx": 0.45
+  },
+  {
+   "in": 37.1,
+   "out": 39.45,
+   "dur": 2.35,
+   "cx": 0.68
+  },
+  {
+   "in": 39.6,
+   "out": 41.6,
+   "dur": 2.0,
+   "cx": 0.5
+  },
+  {
+   "in": 44.8,
+   "out": 47.9,
+   "dur": 3.1,
+   "cx": 0.52
+  },
+  {
+   "in": 54.5,
+   "out": 56.6,
+   "dur": 3.5,
+   "cx": 0.55
+  }
+ ],
+ "cards": [
+  {
+   "t0": 0,
+   "t1": 4.55,
+   "text": "Why can't astronauts sprinkle salt?",
+   "y": 400,
+   "size": 92
+  },
+  {
+   "t0": 2.0,
+   "t1": 4.55,
+   "text": "Loose grains would float away...",
+   "y": 1430,
+   "size": 68,
+   "anchor": "bottom"
+  },
+  {
+   "t0": 4.55,
+   "t1": 7.0,
+   "text": "...and could clog an air vent or get stuck in an eye!",
+   "y": 1430,
+   "size": 68,
+   "anchor": "bottom"
+  },
+  {
+   "t0": 7.0,
+   "t1": 10.05,
+   "text": "So space salt is dissolved in water. Pepper comes in oil.",
+   "y": 1430,
+   "size": 68,
+   "anchor": "bottom"
+  },
+  {
+   "t0": 10.05,
+   "t1": 12.4,
+   "text": "Bread is a problem too: crumbs!",
+   "y": 1430,
+   "size": 68,
+   "anchor": "bottom"
+  },
+  {
+   "t0": 12.4,
+   "t1": 14.4,
+   "text": "The fix since 1985: tortillas",
+   "y": 1430,
+   "size": 72,
+   "anchor": "bottom"
+  },
+  {
+   "t0": 14.4,
+   "t1": 17.5,
+   "text": "Guess: how many did the space station crew eat in 2024?",
+   "y": 1430,
+   "size": 70,
+   "anchor": "bottom"
+  }
+ ],
+ "counter": {
+  "t0": 17.6,
+  "t1": 19.5,
+  "to": 3100,
+  "suffix": "+",
+  "y": 820,
+  "size": 210,
+  "label": "tortillas eaten on the space station in 2024",
+  "label_size": 62,
+  "hold": 99
+ },
+ "grains": {
+  "t0": 0,
+  "t1": 4.55,
+  "n": 150,
+  "seed": 11
+ }
+}
