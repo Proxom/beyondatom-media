@@ -70,8 +70,8 @@ const CARDS=[
  {a:8.6,b:11.6,l:['TRITON: 8 SECONDS','IN THE AIR'],c:[0,1]},
  {a:11.7,b:14.6,l:['13 METERS UP','FROM A 50 cm JUMP'],c:[0,1]},
  {a:14.7,b:17.6,l:['TITANIA: ABOUT 4%','OF EARTH\u2019S GRAVITY'],c:[0,1]},
- {a:17.7,b:19.4,l:['17 SECONDS','IN THE AIR'],c:[0,1]},
- {a:19.5,b:20.95,l:['GRAVITY VS EARTH','LESS PULL, MORE AIR'],c:[0,1]},
+ {a:17.7,b:18.95,l:['17 SECONDS','IN THE AIR'],c:[0,1]},
+ {a:19.0,b:20.95,l:['GRAVITY VS EARTH','LESS PULL, MORE AIR'],c:[0,1]},
  {a:21.0,b:22.4,l:['WHICH MOON','WOULD YOU PICK?'],c:[0,1]},
  {a:LOOP,b:D,l:['SAME JUMP, 4 MOONS','WHO LANDS LAST?'],c:[0,1],foot:'Earth for comparison \u00b7 same push-off \u00b7 no air'}];
 const FOLLOW={a:21.1,b:22.4,txt:'FOLLOW \u2192 MORE EVERY DAY'};

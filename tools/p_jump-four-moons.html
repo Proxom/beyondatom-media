@@ -69,8 +69,8 @@ function cards(t){for(const c of CARDS){if(t<c.a||t>=c.b)continue;const al=Math.
 function draw(t){const s=scale(t);x.globalCompositeOperation='source-over';x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
  for(const w of WORLDS)panel(w,s);
  // ruler every 5 m (appears as the camera pulls back)
- const ra=cl((110-s)/30);if(ra>0){x.save();x.beginPath();x.rect(0,735,W,GY-735-4);x.clip();x.setLineDash([10,10]);x.lineWidth=2;
-  for(let m=5;m<=25;m+=5){const y=GY-m*s;if(y<735)continue;const la=cl((y-10-28-750)/30);x.strokeStyle='rgba(255,255,255,'+(0.28*ra*la)+')';x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke();txt(m+' m',66,y-10,28,'left','#e8edf3',0.9*ra*la,700)}
+ const ra=cl((110-s)/30);if(ra>0){x.save();x.beginPath();x.rect(0,830,W,GY-830-4);x.clip();x.setLineDash([10,10]);x.lineWidth=2;
+  for(let m=5;m<=25;m+=5){const y=GY-m*s;if(y<830)continue;const la=cl((y-10-28-845)/30);x.strokeStyle='rgba(255,255,255,'+(0.28*ra*la)+')';x.beginPath();x.moveTo(0,y);x.lineTo(W,y);x.stroke();txt(m+' m',66,y-10,28,'left','#e8edf3',0.9*ra*la,700)}
   x.restore()}
  // panel dividers
  for(let i=1;i<WORLDS.length;i++){const px=WORLDS[i].x0;x.fillStyle='rgba(0,0,0,.65)';x.fillRect(px-2,0,4,H);x.fillStyle='rgba(255,255,255,.10)';x.fillRect(px+2,0,1,H)}
@@ -95,9 +95,9 @@ function draw(t){const s=scale(t);x.globalCompositeOperation='source-over';x.glo
   const col=run?ACC:(done?'#ffffff':'#c9ced6');const al=run?1:(done?0.92:0.6);
   if(t>LOOP-0.15){if(t<LOOP+0.05)txt(fmtT(el),cx,660,38,'center',col,al*fin,800);else txt(fmtT(0),cx,660,38,'center','#c9ced6',0.6*fin0,800)}
   else txt(fmtT(el),cx,660,38,'center',col,al,800);
-  const ha=(t>=w.tA?ease((t-w.tA)/0.3):0)*fin;txt(fmtH(w.h),cx,702,28,'center','#9df0bf',ha,700);}
+  const ha=(t>=TL?ease((t-TL)/0.25):0)*fin;const hv=t>=w.tA?w.h:Math.max(0,Math.min(w.h,V0*(t-TL)-0.5*w.g*(t-TL)*(t-TL)));txt(fmtH(hv),cx,702,28,'center',t>=w.tA?'#9df0bf':ACC,ha,700);}
  // recap chips
- for(const w of WORLDS){if(t<w.chipT)continue;const k=cl((t-w.chipT)/0.35),pop=1+0.25*Math.sin(Math.PI*k)*(1-k)*2;const al=ease(k)*(1-ease((t-CHIP_OUT)/0.3));if(al<=0)continue;
+ for(const w of WORLDS){if(t<w.chipT)continue;const k=cl((t-w.chipT)/0.35),pop=1+0.12*Math.sin(Math.PI*k)*(1-k)*2;const al=ease(k)*(1-ease((t-CHIP_OUT)/0.3));if(al<=0)continue;
   const cyc=780;x.save();x.translate(w.cx,cyc);x.scale(pop,pop);x.globalAlpha=al;x.fillStyle='rgba(8,12,22,.86)';const bw=156,bh=64;x.beginPath();x.roundRect(-bw/2,-bh/2-14,bw,bh,14);x.fill();
   x.strokeStyle='rgba(255,209,102,.85)';x.lineWidth=3;x.stroke();x.restore();txt(w.pct,w.cx,cyc+4*pop,44*pop,'center',ACC,al,800);}
  cards(t);
