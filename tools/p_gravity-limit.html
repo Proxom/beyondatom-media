@@ -117,9 +117,9 @@ const CARDS=[
  {a:8.7,b:10.8,l:['BUT ONLY 1.15 g','BARELY HEAVIER'],foot:'at the cloud tops · no solid surface'},
  {a:10.8,b:13.0,l:['JUPITER: 2.64 g','HEART WORKS HARDER'],foot:'at the cloud tops · no solid surface'},
  {a:13.0,b:15.0,l:['BLOOD SINKS','INTO YOUR LEGS']},
- {a:15.0,b:17.0,l:['LONGEST HUMAN TEST:','24 HOURS AT 2 g'],foot:'US Navy centrifuge, 1961'},
+ {a:15.0,b:17.0,l:['IN 1961, A PERSON SPENT','24 HOURS AT 2 g'],foot:'US Navy study, 1961'},
  {a:17.0,b:19.0,l:['THE SUN: 28 g','28× YOUR WEIGHT'],foot:'ignoring the 5,500 °C heat'},
- {a:19.0,b:21.1,l:['TUNNEL VISION ~4 g','BLACKOUT ~5 g'],foot:'average for an untrained, relaxed person'},
+ {a:19.0,b:21.1,l:['YOU WOULD PASS OUT','AT ABOUT 5 g'],foot:'tunnel vision ~4 g · average, relaxed, no g-suit'},
  {a:21.1,b:23.2,l:['FIGHTER PILOTS:','~9 g, FOR SECONDS'],foot:'with g-suits and special breathing'},
  {a:23.2,b:26.6,l:['NEUTRON STAR:','100 BILLION g'],foot:'illustration · nothing survives this'},
  {a:26.6,b:29.4,l:['WHERE IS','YOUR LIMIT?']},
@@ -144,7 +144,7 @@ function gauge(t){const top=gMax(t),g=gNow(t);x.save();
  for(const [v,l] of ticks){const yy=gy(v,top);if(yy<GT-2)continue;x.fillStyle='rgba(255,255,255,.7)';x.fillRect(GX-30,yy-1.5,14,3);txt(l,GX-38,yy+9,24,'right','#e6ebf2',.85,700)}
  // pilot line at 9 g
  const yp=gy(9,top);if(yp>GT){x.setLineDash([8,7]);x.strokeStyle='rgba(255,107,90,.9)';x.lineWidth=3;x.beginPath();x.moveTo(GX-26,yp);x.lineTo(GX+26,yp);x.stroke();x.setLineDash([]);
-  txt('9 g PILOTS',GX-38,yp+9,26,'right',RED,top<3?1:.7,800)}
+  txt('9 g PILOTS',GX-38,yp+9,26,'right',RED,cl((4-top)/1.5),800)}
  // pointer
  x.fillStyle=col;x.beginPath();x.moveTo(GX+22,yv);x.lineTo(GX+42,yv-12);x.lineTo(GX+42,yv+12);x.fill();
  x.restore()}
@@ -153,8 +153,8 @@ function fmtW(kg){if(kg<1e4)return (kg<1000?Math.round(kg):Math.round(kg/10)*10)
  if(tn<1e6)return Math.round(tn).toLocaleString('en-US')+' tonnes';if(tn<1e9)return (tn/1e6).toFixed(tn<1e7?1:0)+' million tonnes';return (tn/1e9).toFixed(tn<1e10?1:0).replace('.0','')+' billion tonnes'}
 function readout(t){const s=seg(t),g=gNow(t);const kg=s.w==='ns'?70*g:70*WL[s.w].g*(g/WL[s.w].g);
  const val=s.w==='earth'?70:(s.w==='neptune'?(g>=1.149?80.5:70*g):(s.w==='jupiter'&&g>=2.639?185:kg));
- txt('A 70 kg PERSON',90,840,30,'left','#e6ebf2',.95,700);txt('FEELS LIKE',90,878,30,'left','#e6ebf2',.95,700);
- const str=fmtW(s.w==='sun'&&g>=27.99?1960:val);txt(str,90,948,fit(str,62,560,900),'left',g<3?'#ffffff':(g<9?ACC:RED),1,900);
+ txt('A 70 kg PERSON',90,842,34,'left','#e6ebf2',.95,800);txt('FEELS LIKE',90,884,34,'left','#e6ebf2',.95,800);
+ const str=fmtW(s.w==='sun'&&g>=27.99?1960:val);txt(str,90,954,fit(str,62,560,900),'left',g<3?'#ffffff':(g<9?ACC:RED),1,900);
  // world label
  txt(WL[s.w].name,90,700,40,'left','#fff',.95,800);txt(WL[s.w].gl,90,762,52,'left',ACC,1,900)}
 // ---------- vision effects: tunnel vision + grey-out + blackout (Sun and neutron star) ----------
@@ -164,7 +164,7 @@ function vision(t){const s=seg(t);let k=0;if(s.w==='sun'){k=s.hook?eio((s.lt-.5)
  // grey-out: desaturate
  x.globalCompositeOperation='saturation';x.fillStyle='rgba(128,128,128,'+cl(k*1.2)+')';x.fillRect(0,0,W,H);x.globalCompositeOperation='source-over';
  const r0=lerp(1100,120,k),r1=lerp(1500,520,k);const g=x.createRadialGradient(CXF,1080,r0,CXF,1080,r1);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,'+cl(.25+.75*k)+')');x.fillStyle=g;x.fillRect(0,0,W,H);
- if(s.w==='sun'&&!s.hook){const bo=eio((s.lt-3.6)/1.2)*(1-eio((s.lt-5.3)/.6));x.fillStyle='rgba(0,0,0,'+(.82*bo)+')';x.fillRect(0,0,W,H)}
+ if(s.w==='sun'&&!s.hook){const bo=eio((s.lt-3.6)/.8)*(1-eio((s.lt-4.6)/.5));x.fillStyle='rgba(0,0,0,'+(.55*bo)+')';x.fillRect(0,0,W,H)}
  x.restore();return k}
 // ---------- frame ----------
 function world(t){const s=seg(t);x.save();const z=1+.03*eio(s.lt/6);x.translate(CXF,GY);x.scale(z,z);x.translate(-CXF,-GY);
