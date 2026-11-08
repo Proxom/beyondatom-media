@@ -1,0 +1,26 @@
+Guess before the end: the next street, the next city or across an ocean? 👇
+
+Shrink the Sun to a basketball (about 24 cm wide) and keep everything to the same scale. Earth becomes a 2 mm speck 26 meters away. Jupiter is a 2.4 cm grape 133 m away. Neptune, the farthest planet, is just 8 mm wide and 774 m away, about 8 football fields (American, 100 yards each).
+
+And the nearest star, Proxima Centauri? On this scale it is a ball about 3.4 cm wide, a bit smaller than a ping-pong ball, and it sits about 6,900 km away. Put the basketball in New York and you have to cross the whole Atlantic, go past London (5,570 km) and keep going into central Europe. Between them: almost nothing.
+
+About the video: an original computer animation. All sizes and distances are to the same scale (Sun = 23.85 cm, a size 7 ball that is 29.5 in around). The planets are drawn as markers because at their true size they would be too small to see, and they are shown in a line, which they never really are. The line on the globe follows the shortest path from New York through London. Earth image: NASA Blue Marble.
+
+The math: scale = 23.85 cm / 1,391,400 km. Earth 149.6 million km → 25.6 m; Jupiter 778.5 million km → 133 m; Neptune 4,515 million km → 774 m; Proxima Centauri 40,208,000,000,000 km → 6,892 km.
+
+Sources:
+NASA Sun Fact Sheet (mean radius 695,700 km): https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html
+NASA Earth Fact Sheet (diameter 12,742 km, 149.6 million km from the Sun): https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
+NASA Jupiter Fact Sheet (mean radius 69,911 km, 778.5 million km): https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
+NASA Neptune Fact Sheet (equatorial radius 24,764 km, 4,515 million km): https://nssdc.gsfc.nasa.gov/planetary/factsheet/neptunefact.html
+NASA Imagine the Universe, The Nearest Neighbor Star (Proxima Centauri is 40,208,000,000,000 km away, 4.25 light-years): https://imagine.gsfc.nasa.gov/features/cosmic/nearest_star_info.html
+ESO, eso0232 (Proxima Centauri's diameter is about 1/7 of the Sun's): https://www.eso.org/public/news/eso0232/
+Spalding basketball size chart (official size 7: 29.5 in around): https://www.spalding.com/sizeguide/basketball
+New York to London great-circle distance (5,570 km) calculated from the city coordinates.
+
+Footage: none, original animation. Earth texture: NASA Blue Marble (NASA Visible Earth, public domain; NASA does not endorse this video). Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #sun #stars #shorts

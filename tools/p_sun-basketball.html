@@ -1,0 +1,163 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=c width=1080 height=1920></canvas>
+<!-- sun-basketball (sprint style C, scale shock): if the Sun were a basketball (23.85 cm, 29.5 in around), where is everything?
+ Scale k = 0.2385 m / 1,391,400 km (NSSDC Sun mean radius 695,700 km).
+ Earth: 12,742 km -> 2.2 mm, 149.6 million km -> 25.6 m. Jupiter: 139,822 km -> 2.4 cm, 778.5 million km -> 133 m.
+ Neptune: 4,515 million km -> 774 m. Proxima Centauri: 40,208,000,000,000 km (NASA Imagine) -> 6,892 km;
+ diameter about 1/7 of the Sun (ESO eso0232) -> 3.4 cm (a ping-pong ball is 4.0 cm).
+ Globe: Blue Marble texture (NASA), orthographic. Great circle from New York (40.7128 N, 74.0060 W) through London (51.5074 N, 0.1278 W): 5,570 km. -->
+<script src="tex.js"></script><script>
+const W=1080,H=1920,D=23.6,LOOP=23.2,CX=495,GY=1210;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+const lerp=(a,b,k)=>a+(b-a)*k,lerpL=(a,b,k)=>Math.exp(lerp(Math.log(a),Math.log(b),k));
+const FNT='Inter,"DejaVu Sans",Arial,sans-serif',ACC='#ffd166';
+const c=document.getElementById('c'),x=c.getContext('2d');
+// ---------- scale facts ----------
+const BALL=0.2385,SUNKM=1391400,K=BALL/(SUNKM*1000);
+const OBJ=[{n:'EARTH',d:149.598e9*K,size:'2 mm',r:12742e3*K/2,col:'#6fb7ff',t:3.9,off:6.3},
+ {n:'JUPITER',d:778.479e9*K,size:'2.4 cm',r:139822e3*K/2,col:'#e3c08d',t:6.6,off:7.7},
+ {n:'NEPTUNE',d:4514.95e9*K,size:'8 mm',r:49528e3*K/2,col:'#7aa2ff',t:7.9,off:99}];
+const PROX_KM=4.0208e16*K/1000; // 6,892 km
+// ---------- side view camera ----------
+// screen x of the Sun-ball and pixels per metre over time
+const SK=[[0,330,560],[2.3,300,540],[4.3,700/25.64,170],[5.6,700/25.64*0.93,165],[7.9,690/774,160],[9.0,690/774*0.9,160],[10.9,690/60000,160],[22.1,690/60000,160],[LOOP,330,560]];
+function sideCam(t){for(let i=0;i<SK.length-1;i++){const a=SK[i],b=SK[i+1];if(t<b[0]){const k=eio((t-a[0])/(b[0]-a[0]));return {s:lerpL(a[1],b[1],k),sx:lerp(a[2],b[2],k)}}}
+ const z=SK[SK.length-1];return {s:z[1],sx:z[2]}}
+// ---------- stars ----------
+const ST=[];(function(){let s=7;const r=()=>(s=(s*16807)%2147483647)/2147483647;for(let i=0;i<420;i++)ST.push([r()*W,r()*H,r()*1.6+.3,r(),r()])})();
+function stars(t,a){for(const s of ST){const tw=0.75+0.25*Math.sin(t*1.3+s[3]*40);x.globalAlpha=a*(0.25+0.6*s[4])*tw;x.fillStyle=s[4]>.8?'#ffe6c8':'#cfe0ff';x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill()}x.globalAlpha=1}
+// ---------- Sun basketball ----------
+function sunBall(px,py,rp,t,seams){
+ const g=x.createRadialGradient(px,py,rp*0.6,px,py,rp*4.2);g.addColorStop(0,'rgba(255,170,60,.55)');g.addColorStop(.35,'rgba(255,120,30,.16)');g.addColorStop(1,'rgba(255,90,20,0)');
+ x.fillStyle=g;x.beginPath();x.arc(px,py,rp*4.2,0,7);x.fill();
+ const b=x.createRadialGradient(px-rp*.25,py-rp*.3,rp*.1,px,py,rp);b.addColorStop(0,'#fff6d6');b.addColorStop(.45,'#ffd060');b.addColorStop(.85,'#ff9a2a');b.addColorStop(1,'#e8661a');
+ x.fillStyle=b;x.beginPath();x.arc(px,py,rp,0,7);x.fill();
+ if(rp>10){x.save();x.beginPath();x.arc(px,py,rp,0,7);x.clip();   // granulation shimmer
+  for(let i=0;i<60;i++){const a=i*2.399+t*.35*(i%2?1:-1)*0.3,rr=rp*Math.sqrt((i+.5)/60);const gx=px+Math.cos(a)*rr,gy=py+Math.sin(a)*rr;
+   x.globalAlpha=0.10+0.08*Math.sin(t*2.1+i);x.fillStyle=i%3?'#fff2c0':'#c4501a';x.beginPath();x.arc(gx,gy,rp*.11,0,7);x.fill()}
+  if(seams>0){x.globalAlpha=seams*.55;x.strokeStyle='#7a2a08';x.lineWidth=Math.max(1.5,rp*.045);
+   x.beginPath();x.moveTo(px-rp,py);x.lineTo(px+rp,py);x.moveTo(px,py-rp);x.lineTo(px,py+rp);x.stroke();
+   x.beginPath();x.ellipse(px-rp*1.05,py,rp*.62,rp*1.02,0,-1.2,1.2);x.stroke();x.beginPath();x.ellipse(px+rp*1.05,py,rp*.62,rp*1.02,0,Math.PI-1.2,Math.PI+1.2);x.stroke()}
+  x.restore()}}
+// ---------- person (1.75 m) holding the ball out in one hand ----------
+function person(px,s,al){if(al<=0)return;const P=(mx,my)=>[px+mx*s,GY-my*s];x.save();x.globalAlpha=al;x.lineCap='round';x.lineJoin='round';
+ const seg=(pts,w,col)=>{x.strokeStyle=col;x.lineWidth=w;x.beginPath();pts.forEach((p,i)=>{const q=P(p[0],p[1]);i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1])});x.stroke()};
+ const O=Math.max(2,.03*s),cB='#1b2230',cW='#f3f5f8';
+ for(const [col,o] of [[cB,O],[cW,0]]){
+  seg([[-.02,.95],[-.10,.50],[-.10,.04],[.04,.02]],.12*s+o,col);   // back leg
+  seg([[.02,.95],[.10,.50],[.08,.04],[.22,.02]],.12*s+o,col);       // front leg
+  seg([[0,.95],[.02,1.42]],.26*s+o,col);                             // torso
+  seg([[.0,1.40],[-.08,1.12],[-.06,.86]],.09*s+o,col);               // back arm
+  seg([[.04,1.40],[.24,1.30],[.44,1.36]],.09*s+o,col);               // front arm, palm up
+  const h=P(.03,1.60);x.fillStyle=col;x.beginPath();x.arc(h[0],h[1],.115*s+o/2,0,7);x.fill();}
+ x.restore()}
+// ---------- side scene ----------
+function fmtD(m){if(m<1000)return Math.round(m)+' m';const k=m/1000;return (k<10?k.toFixed(1):Math.round(k).toLocaleString('en-US'))+' km'}
+function side(t,al){const {s,sx}=sideCam(t);
+ // ground
+ const gg=x.createLinearGradient(0,GY,0,H);gg.addColorStop(0,'#1d2533');gg.addColorStop(1,'#07090d');x.fillStyle=gg;x.fillRect(0,GY,W,H-GY);
+ x.fillStyle='rgba(120,150,200,.25)';x.fillRect(0,GY,W,2);
+ // ruler ticks on a 1-2-5 grid in metres
+ const step=(()=>{const raw=140/s;const e=Math.pow(10,Math.floor(Math.log10(raw)));for(const m of [1,2,5,10])if(m*e>=raw)return m*e})();
+ x.font='500 22px '+FNT;x.textAlign='center';
+ for(let i=0;;i++){const m=i*step,X=sx+m*s;if(X>W+50)break;if(X<-50)continue;x.fillStyle='rgba(200,215,240,.35)';x.fillRect(X-1,GY+6,2,16)}
+ // ball and person
+ const ballY=GY-1.36*s-BALL/2*s,rp=Math.max(BALL/2*s,3.5);
+ person(sx-0.44*s-BALL/2*s,s,cl((s-2)/6));
+ sunBall(sx,s>20?ballY:GY-14,rp,t,(t<12?cl(1-(t-1.6)/0.8):ease((t-22.5)/.6))*cl(s/100));
+ // objects
+ for(const o of OBJ){const X=sx+o.d*s;if(X>W+20)continue;const a=ease((t-o.t)/.35);if(a<=0)continue;
+  const Y=GY-14,rr=Math.max(o.r*s,2.4);x.globalAlpha=a;x.fillStyle=o.col;x.shadowColor=o.col;x.shadowBlur=12;x.beginPath();x.arc(X,Y,rr,0,7);x.fill();x.shadowBlur=0;
+  x.strokeStyle='rgba(255,255,255,.75)';x.lineWidth=2;x.beginPath();x.arc(X,Y,14+6*(1-a),0,7);x.stroke();
+  x.fillStyle='rgba(255,255,255,.5)';x.fillRect(X-1,Y-170,2,150);x.globalAlpha=1;
+  const la=a*(1-ease((t-o.off)/.3)*(t<20?1:0)),lab=o.n,ly=Y-190;txt(lab,cl(X,130,790),ly-40,40,'center','#fff',la,800);txt(o.size+' · '+fmtD(o.d),cl(X,130,790),ly,34,'center',ACC,la,700)}
+ // distance counter: Sun to the right edge of view
+ 
+}
+// ---------- globe ----------
+let TX=null,TW=0,TH=0;
+function vec(lat,lon){const a=lat*Math.PI/180,o=lon*Math.PI/180;return [Math.cos(a)*Math.cos(o),Math.cos(a)*Math.sin(o),Math.sin(a)]}
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],RE=6371.0088;
+const NY=vec(40.7128,-74.0060),LON=vec(51.5074,-0.1278);
+const ANG=Math.acos(dot(NY,LON)),LONKM=ANG*RE; // 5,570 km
+const U=(()=>{const d=dot(NY,LON);const u=LON.map((v,i)=>v-d*NY[i]);const n=Math.hypot(...u);return u.map(v=>v/n)})();
+const gc=km=>{const th=km/RE;return NY.map((v,i)=>Math.cos(th)*v+Math.sin(th)*U[i])};
+const ll=v=>[Math.asin(v[2])*180/Math.PI,Math.atan2(v[1],v[0])*180/Math.PI];
+const MID=ll(gc(PROX_KM/2));
+// globe camera: centre (lat,lon), radius px, screen centre, roll so that the arc runs left -> right
+function gCam(t){const k=eio((t-11.0)/2.6),kb=eio((t-21.6)/1.3);
+ const c0=ll(NY),z=kb>0?kb:0;let lat=lerp(c0[0],MID[0],k),lon=lerp(c0[1],MID[1],k),R=lerpL(2200,520,k);
+ if(z>0){lat=lerp(MID[0],c0[0],z);lon=lerp(MID[1],c0[1],z);R=lerpL(520,2200,z)}
+ return {lat,lon,R,sx:CX,sy:900}}
+function proj(v,cm){const p0=cm.lat*Math.PI/180,l0=cm.lon*Math.PI/180;const [la,lo]=ll(v).map(q=>q*Math.PI/180);
+ const X=Math.cos(la)*Math.sin(lo-l0),Y=Math.cos(p0)*Math.sin(la)-Math.sin(p0)*Math.cos(la)*Math.cos(lo-l0),Z=Math.sin(p0)*Math.sin(la)+Math.cos(p0)*Math.cos(la)*Math.cos(lo-l0);
+ const r=roll();const xr=X*Math.cos(r)-Y*Math.sin(r),yr=X*Math.sin(r)+Y*Math.cos(r);return [cm.sx+xr*cm.R,cm.sy-yr*cm.R,Z]}
+let _roll=null;function roll(){if(_roll!==null)return _roll;_roll=0;const cm={lat:MID[0],lon:MID[1],R:1,sx:0,sy:0};const a=proj(NY,cm),b=proj(gc(PROX_KM),cm);
+ _roll=Math.atan2(b[1]-a[1],b[0]-a[0]);return _roll}
+const IMG=x.createImageData(W,H);
+function globe(t,al){const cm=gCam(t),p0=cm.lat*Math.PI/180,l0=cm.lon*Math.PI/180,sp=Math.sin(p0),cp=Math.cos(p0),r=roll(),cr=Math.cos(r),sr=Math.sin(r);
+ const d=IMG.data;d.fill(0);const R=cm.R;
+ const x0=Math.max(0,Math.floor(cm.sx-R-40)),x1=Math.min(W,Math.ceil(cm.sx+R+40)),y0=Math.max(0,Math.floor(cm.sy-R-40)),y1=Math.min(H,Math.ceil(cm.sy+R+40));
+ for(let py=y0;py<y1;py++)for(let px=x0;px<x1;px++){const sx=(px+.5-cm.sx)/R,sy=-(py+.5-cm.sy)/R;
+  const X=sx*cr+sy*sr,Y=-sx*sr+sy*cr;const q=X*X+Y*Y,o=(py*W+px)*4;
+  if(q>1){const e=Math.sqrt(q)-1;const a=Math.exp(-e*R/14)*0.8;if(a<0.01)continue;d[o]=70*a;d[o+1]=140*a;d[o+2]=255*a;d[o+3]=255;continue}
+  const z=Math.sqrt(1-q),la=Math.asin(z*sp+Y*cp),lo=l0+Math.atan2(X,z*cp-Y*sp);
+  let u=((lo/Math.PI+1)/2)%1;if(u<0)u+=1;const v=.5-la/Math.PI;const fx=u*TW-.5,fy=cl(v*TH-.5,0,TH-1.001);
+  const ix=Math.floor(fx),iy=Math.floor(fy),ax=fx-ix,ay=fy-iy,ix0=(ix+TW)%TW,ix1=(ix+1)%TW;
+  const lit=0.55+0.45*Math.pow(z,.6),rim=Math.pow(1-z,3)*0.6;
+  for(let ch=0;ch<3;ch++){const t00=TX[(iy*TW+ix0)*4+ch],t10=TX[(iy*TW+ix1)*4+ch],t01=TX[((iy+1)*TW+ix0)*4+ch],t11=TX[((iy+1)*TW+ix1)*4+ch];
+   const v2=(t00*(1-ax)+t10*ax)*(1-ay)+(t01*(1-ax)+t11*ax)*ay;d[o+ch]=v2*lit*1.15+[70,140,255][ch]*rim}
+  d[o+3]=255}
+ // composite: putImageData ignores alpha blending, so draw through an offscreen canvas
+ OC.getContext('2d').putImageData(IMG,0,0);x.globalAlpha=al;x.drawImage(OC,0,0);x.globalAlpha=1;
+ return cm}
+const OC=document.createElement('canvas');OC.width=W;OC.height=H;
+function arcLayer(t,cm,al){const prog=eio((t-13.0)/4.2)*(1-ease((t-21.6)/.5));const km=PROX_KM*prog;
+ const pts=[];for(let i=0;i<=120;i++){const p=proj(gc(km*i/120),cm);pts.push(p)}
+ x.save();x.globalAlpha=al;x.lineCap='round';
+ for(const [w,col] of [[14,'rgba(255,209,102,.25)'],[5,ACC]]){x.strokeStyle=col;x.lineWidth=w;x.beginPath();pts.forEach((p,i)=>i?x.lineTo(p[0],p[1]):x.moveTo(p[0],p[1]));x.stroke()}
+ x.restore();
+ const ny=proj(NY,cm);sunBall(ny[0],ny[1],10,t,0);
+ const la=ease((t-11.4)/.4)*(1-ease((t-21.4)/.3));txt('NEW YORK',ny[0]+8,ny[1]+56,30,'center','#fff',la*al,800);
+ txt('Sun-ball',ny[0]+8,ny[1]+90,26,'center',ACC,la*al,700);
+ if(km>=LONKM){const p=proj(LON,cm),a=ease((t-(13.0+4.2*0.62))/.35)*(1-ease((t-21.4)/.3));x.globalAlpha=a*al;x.fillStyle='#fff';x.beginPath();x.arc(p[0],p[1],7,0,7);x.fill();x.globalAlpha=1;
+  txt('LONDON',p[0],p[1]-62,30,'center','#fff',a*al,800);txt('5,570 km',p[0],p[1]-28,26,'center','#d6dbe3',a*al,600)}
+ // the ping-pong ball (Proxima Centauri)
+ const pa=ease((t-17.1)/.3)*(1-ease((t-21.4)/.3));if(pa>0){const e=proj(gc(PROX_KM),cm),pop=1+0.5*Math.max(0,1-(t-17.1)/.5)*Math.sin(cl((t-17.1)/.5)*Math.PI);
+  const g=x.createRadialGradient(e[0],e[1],2,e[0],e[1],60*pop);g.addColorStop(0,'rgba(255,110,80,.9)');g.addColorStop(1,'rgba(255,60,40,0)');x.globalAlpha=pa*al;x.fillStyle=g;x.beginPath();x.arc(e[0],e[1],60*pop,0,7);x.fill();
+  x.fillStyle='#ff6a4a';x.beginPath();x.arc(e[0],e[1],9*pop,0,7);x.fill();x.globalAlpha=1;
+  txt('PROXIMA',Math.min(e[0],820),e[1]+62,32,'center','#fff',pa*al,800);txt('CENTAURI',Math.min(e[0],820),e[1]+98,32,'center','#fff',pa*al,800)}
+ // km counter
+ const ca=ease((t-12.9)/.3)*(1-ease((t-21.3)/.3));txt((Math.round(km/100)*100).toLocaleString('en-US')+' km',CX,1330,64,'center','#fff',ca*al,800);
+ txt('from the Sun-ball',CX,1378,28,'center','#c9d2e0',ca*al,600)}
+// ---------- text ----------
+function txt(s,px,py,size,align,col,alpha,weight){if(alpha<=0.01)return;x.save();x.globalAlpha=cl(alpha);x.font=(weight||800)+' '+size+'px '+FNT;x.textAlign=align||'center';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=14;x.fillText(s,px,py);x.shadowBlur=4;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,weight){x.font=(weight||800)+' '+size+'px '+FNT;const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+const CARDS=[
+ {a:0,b:2.6,l:['IF THE SUN WERE','A BASKETBALL...'],sub:'WHERE IS THE NEAREST STAR?'},
+ {a:2.7,b:5.5,l:['EARTH: A 2 mm SPECK','26 METERS AWAY']},
+ {a:5.6,b:7.8,l:['JUPITER: A GRAPE','133 METERS AWAY']},
+ {a:7.9,b:10.0,l:['NEPTUNE: 774 METERS','ABOUT 8 FOOTBALL FIELDS']},
+ {a:10.1,b:12.9,l:['SO WHERE IS THE','NEAREST STAR? GUESS!']},
+ {a:13.0,b:17.0,l:['KEEP GOING...','PAST LONDON']},
+ {a:17.1,b:19.3,l:['A PING-PONG BALL IN','CENTRAL EUROPE']},
+ {a:19.4,b:21.4,l:['AND THAT IS THE','CLOSEST STAR']},
+ {a:21.5,b:22.9,l:['DID YOU','GUESS RIGHT?']},
+ {a:22.9,b:D+1,l:['IF THE SUN WERE','A BASKETBALL...'],sub:'WHERE IS THE NEAREST STAR?'}];
+function cards(t){for(const cd of CARDS){if(t<cd.a||t>=cd.b)continue;const al=Math.min(cd.a<=0?1:ease((t-cd.a)/.3),cd.b>D?1:ease((cd.b-t)/.28));
+ const big=cd.sub?76:68;const sz=Math.min(fit(cd.l[0],big,860),fit(cd.l[1],big,860));txt(cd.l[0],CX,420,sz,'center','#fff',al);txt(cd.l[1],CX,420+sz*1.14,sz,'center',ACC,al);
+ if(cd.sub){const s2=fit(cd.sub,48,860);txt(cd.sub,CX,420+sz*2.3+10,s2,'center','#fff',al,800)}}}
+const FOLLOW={a:21.6,b:23.0};
+function follow(t){if(t<FOLLOW.a||t>=FOLLOW.b)return;const al=Math.min(ease((t-FOLLOW.a)/.25),ease((FOLLOW.b-t)/.2));x.save();x.globalAlpha=al*.9;x.fillStyle='rgba(8,12,22,.8)';x.beginPath();x.roundRect(CX-300,1316,600,70,35);x.fill();x.restore();
+ txt('FOLLOW → MORE EVERY DAY',CX,1364,38,'center','#fff',al,800)}
+// ---------- frame ----------
+function draw(t){if(t>=LOOP)t=t-LOOP; // the last 0.4 s repeat the first frames exactly -> seamless loop
+ x.globalAlpha=1;x.fillStyle='#03050a';x.fillRect(0,0,W,H);stars(t,1);
+ const gA=ease((t-10.6)/.6)*(1-ease((t-22.6)/.5)),sA=1-gA;
+ if(sA>0.01){x.globalAlpha=1;x.save();x.globalAlpha=sA;side(t,sA);x.restore()}
+ if(gA>0.01){const cm=globe(t,gA);arcLayer(t,cm,gA)}
+ x.globalAlpha=1;cards(t);follow(t)}
+// texture
+const im=new Image();im.onload=()=>{const o=document.createElement('canvas');o.width=im.width;o.height=im.height;const g=o.getContext('2d');g.drawImage(im,0,0);TW=im.width;TH=im.height;TX=g.getImageData(0,0,TW,TH).data;document.fonts.ready.then(()=>{draw(0);window.TEXREADY=true})};im.src=TEXA;
+</script>
