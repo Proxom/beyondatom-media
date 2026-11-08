@@ -1,0 +1,26 @@
+You asked for it, @erwinromadan85 👇 Where is your limit: Neptune, Jupiter or the Sun?
+
+Same 70 kg person, stronger and stronger gravity. On Neptune you would feel only about 81 kg: Neptune has 17 times Earth's mass, but it is so wide that the pull at its cloud tops is just 1.15 g. On Jupiter (2.64 g) you would feel like 185 kg, and at the Sun's surface (28 g) like 1,960 kg.
+
+What stronger gravity does to your body: it pulls your blood down into your legs, so less blood reaches your brain and eyes, and your heart has to beat harder and faster to push it back up. Tested on 1,000 Navy aviators, the average relaxed person gets tunnel vision and grayout at about 4 g, blacks out at about 5 g and passes out at about 5.4 g. Fighter pilots with g-suits and a special straining-and-breathing technique can take about 9 g, but only for seconds. The longest test so far: in 1961 a US Navy study kept a person at 2 g for 24 hours.
+
+And a neutron star? Its surface gravity is about 100 billion times Earth's. A 70 kg person would weigh like 7 billion tonnes.
+
+About the video: an original computer animation (illustrative scenery and figure). Jupiter, Neptune and the Sun have no solid surface: their gravity is given at the cloud tops (the 1 bar level), and we ignore the Sun's 5,500 °C heat. "Feels like" = weight on that world compared with Earth. The blood and vision effects are simplified illustrations; the g limits are averages and vary from person to person.
+
+Sources:
+NASA Neptune Fact Sheet (gravity 11.27 m/s² mean at 1 bar = 1.15 × Earth; mass 17.15 × Earth): https://nssdc.gsfc.nasa.gov/planetary/factsheet/neptunefact.html
+NASA Jupiter Fact Sheet (gravity 25.92 m/s² mean at 1 bar = 2.64 × Earth): https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
+NASA Sun Fact Sheet (surface gravity 274.0 m/s² = 28.0 × Earth; effective temperature 5,772 K): https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html
+NASA Planetary Fact Sheet Notes (gas giant gravity given at the 1 bar level): https://nssdc.gsfc.nasa.gov/planetary/factsheet/planetfact_notes.html
+NASA Goddard, Neutron Stars (surface gravity about one hundred billion times Earth's): https://asd.gsfc.nasa.gov/Tod.Strohmayer/ns_intro.html
+FAA Advisory Circular 91-61 (1,000 Naval aviators: grayout 4.1 G, blackout 4.7 G, unconsciousness 5.4 G on average): https://www.faa.gov/documentLibrary/media/Advisory_Circular/AC%2091-61.pdf
+FAA, Acceleration in Aviation: G-Force (heart beats harder and faster; tunnel vision, grayout, blackout, G-LOC): https://www.faa.gov/pilots/safety/pilotsafetybrochures/media/acceleration.pdf
+US Air Force AFPAM 11-419, G Awareness for Aircrew (G pulls blood to the lower body; straining maneuver plus anti-G suit give over 9 G of protection): https://static.e-publishing.af.mil/production/1/af_a3_5/publication/afpam11-419/afpam11-419.pdf
+NASA NTRS 20120000085 (1961 US Navy study: a person remained at 2.0 g for 24 hours): https://ntrs.nasa.gov/citations/20120000085
+
+Footage: none, original animation. Music and sound: original.
+
+More space every day on BeyondAtom.
+
+#space #gravity #jupiter #shorts
