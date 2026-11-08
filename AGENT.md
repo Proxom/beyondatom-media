@@ -2,6 +2,17 @@
 
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
+## WEEKLY MARKET SCAN + REPORTS FOR THE GENERAL MANAGER (Erkan, 8 Nov 2026 08:38)
+Erkan reads only the general manager's (Claude's) combined report, not each agent. So every agent writes its reports as files in THIS REPO too (the general manager reads them with git), in addition to the dashboard:
+1. DAILY: the daily report also goes to reports/daily-<YYYY-MM-DD>.md (Turkish, max 25 lines: yesterday's posts with views / watch % / shares / comments, the best and worst and why, today's decision, problems, open approvals).
+2. WEEKLY MARKET SCAN, in the Monday queue-check (night) run, max 20 minutes, after the slots are safe:
+   - Find 5-10 videos or accounts in our niche on our platform that took off in the last 1-2 weeks (WebSearch, Parallel or Firecrawl search; no paid tools).
+   - For each: link, views, and what made it work (hook in the first second, length, look, title or caption, sound, series, posting pattern).
+   - Write reports/market-<YYYY-MM-DD>.md (Turkish, max 40 lines) with 1-3 concrete ideas for us and how you will test them.
+   - Never copy their videos, images or wording; learn the system only.
+3. WHAT YOU MAY CHANGE YOURSELF: at most 2 small tests per week (a hook style, title pattern, length, topic or sound idea) inside the existing rules, each measured after 72 h and reported.
+4. WHAT NEEDS ERKAN: a new style family, dropping or changing a main format, bringing back a banned style, or any change to this AGENT.md. Write it as an approval request (collection approvals) and also list it under "Onay bekleyenler" in the market report. Never edit AGENT.md yourself.
+
 ## VIEWER-REQUESTED TOPIC FOR THE NEXT SHORT (Erkan, 7 Nov 2026 21:55) — the next NEW Short you make uses this topic; ignore this block once that Short is scheduled
 A viewer (@erwinromadan85) commented under the Short "SAME JUMP, 5 WORLDS — WHO LANDS LAST?": "Human body in much more gravity please". Erkan wants that as the next Short.
 - Topic: what happens to the human body in much stronger gravity. Escalate world by world (to scale where you can): Earth 1 g → Neptune ~1.1 g → Jupiter ~2.5 g (cloud-top level) → the Sun's surface ~28 g → a white dwarf / neutron star (only as the final shock, clearly labelled).
