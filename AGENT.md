@@ -2,6 +2,14 @@
 
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
+## VIEWER-PROMISED SHORT: EARTH'S BULGE TWISTS THE ISS ORBIT (Erkan, 9 Nov 2026 18:17) — the next NEW Short you make uses this topic (it takes the next free sprint slot; count it as style C); ignore this block once it is scheduled
+A viewer (@charliebad) asked under "The ISS Is Always Falling (Newton's Cannon)": "What about the oblate spheroid bit?". Erkan replied from the channel promising "Short on it coming soon 👀", so this Short MUST be made next.
+- Topic: Earth is not a perfect sphere; the equator bulges out (equatorial diameter about 43 km larger than pole to pole). That bulge slowly turns the ISS's orbital plane (nodal precession, about 5° per day, a full turn in about 2 months), which is why the ISS passes over different places each day. Final surprise: satellites use the same effect on purpose (Sun-synchronous orbits pass over the same place at the same local time every day).
+- Visual: Earth with the bulge exaggerated and clearly labelled as exaggerated, the ISS orbit ring drawn, then the ring slowly rotating around the poles with a day counter; end on a Sun-synchronous orbit. First frame: the squashed Earth + "Earth isn't round. And it twists the ISS." Title as a question, e.g. "Why Does the ISS Orbit Twist? 🌍".
+- Verify every number from reliable sources (NASA NSSDC Earth fact sheet for equatorial and polar radius; a NASA/ESA or university orbital-mechanics source for the ISS nodal precession rate and Sun-synchronous orbits) and put them in the description.
+- First line of the description: "You asked, @charliebad 👇" plus a guess question (e.g. "How many days for a full turn? 👇"). Do not reply to comments via any tool.
+- Normal v4 rules and the hard gate apply.
+
 ## VIRAL SPRINT: 3 SHORTS A DAY, 3 STYLES (Erkan, 8 Nov 2026 09:28) — runs 9 Nov to 15 Nov 2026 inclusive; overrides the "2 Shorts a day" schedule and the Q/T rotation while it runs
 GOAL: one Short above 100,000 views (which should take the channel past 1,000 subscribers), and learning which style wins.
 DATA THAT LED HERE (channel, 8 Nov): "Same jump, 5 worlds" 7.1K and "Sun is 109 Earths tall" 5.5K beat the plain fact Shorts (Jupiter, planet speeds, Europa: 1.6-1.8K). What won: a human figure, a side-by-side comparison with live counters, one shocking number, a guess.
