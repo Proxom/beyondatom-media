@@ -2,6 +2,23 @@
 
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
+## PROVEN 1M+ TOPICS: "OUR OWN VERSION" RULE (Erkan, 9 Nov 2026 20:55)
+Erkan: find space Shorts in our niche that reached 1 million+ views and make our own versions of them. Topics and ideas are free to use; the video must be 100% ours (own animation or licensed NASA/ESA footage, own script, own title wording, own sound). Never copy footage, frames, script lines, titles word for word or thumbnails. Re-uploads or near-copies break YouTube's reused-content policy and would block monetisation.
+1. RULE: from 10 Nov, at least 1 of the 3 daily Shorts is our version of a proven 1M+ topic (it still counts as its style A, B or C in the sprint). Add a twist of our own (human figure, side-by-side race, live counter, guess question) so it is better, not a clone.
+2. STARTING LIST (found 9 Nov; views as seen then):
+   - "What if you grew 1 cm every second?" (What If channel, 3.3M) → human grows from kid to planet to star size with a live height counter; style C.
+   - "What if you got sucked into a black hole?" (~15M) / "NASA simulated falling into a black hole" (2.4M) → first-person fall with a time-dilation clock; style B.
+   - "What is inside a black hole?" (~4M) / "Interstellar's black hole vs the real one" (~2M) → side-by-side; style A.
+   - Astronaut flying through the ISS (NASA, 4.3M) → NASA public-domain footage with our own guess hook ("How long to float from one end to the other?"); style B.
+   - Felix Baumgartner's space jump (Astro Chronicles, 10M) → human + danger, the spin he fought; style B.
+   - "Our solar system is racing through the galaxy" (One Speck, 5.3M) → 6-10 s loop of the Sun dragging the planets in a helix (needs the short-loop approval; otherwise 15 s); style C.
+   - "How small is the Planck length?" (6.8M) → zoom-in scale with a live counter; style C.
+   - "Why does Starship need 12+ launches to reach the Moon?" (Everyday Astronaut, 2.6M) → rocket-fuel comparison race; style A.
+   - Monthly "sky events this month" lists (4.7M, 2.3M, 449K) → "December 2026 sky: dates to save" around 25-28 Nov.
+   - "The largest stars in the universe" (What If, 197K; long versions 35M) → size lineup from the Sun to the biggest star; style C.
+3. REFRESH: in the Monday market scan, add any new space Shorts above 1M views to reports/outliers.md (link, views, why it worked, our twist). Pick topics from that file first.
+4. Log each one in the video doc as `outlier: <original title + link>` so we can measure whether proven topics beat our own ideas (median views at 72 h).
+
 ## VIEWER-PROMISED SHORT: EARTH'S BULGE TWISTS THE ISS ORBIT (Erkan, 9 Nov 2026 18:17) — the next NEW Short you make uses this topic (it takes the next free sprint slot; count it as style C); ignore this block once it is scheduled
 A viewer (@charliebad) asked under "The ISS Is Always Falling (Newton's Cannon)": "What about the oblate spheroid bit?". Erkan replied from the channel promising "Short on it coming soon 👀", so this Short MUST be made next.
 - Topic: Earth is not a perfect sphere; the equator bulges out (equatorial diameter about 43 km larger than pole to pole). That bulge slowly turns the ISS's orbital plane (nodal precession, about 5° per day, a full turn in about 2 months), which is why the ISS passes over different places each day. Final surprise: satellites use the same effect on purpose (Sun-synchronous orbits pass over the same place at the same local time every day).
