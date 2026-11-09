@@ -5,3 +5,5 @@ Scene tools/p_iss-orbit-twist.html (WebGL oblate-ellipsoid Blue Marble + canvas 
 Facts verified: NASA Earth Fact Sheet (radii, J2); NASA GDC Orbit Primer (precession formula, Sun-synchronous 0.9856 deg/day); NASA ISS reference (51.6 deg, ~400 km); NASA Earth Observatory Catalog of Orbits (Sun-synchronous same local time). DESCRIPTION: normal, NO viewer mention/tag (Erkan 9 Nov 19:21); starts with guess question "How many days for a full turn?".
 Honesty: Earth flattening shown greatly exaggerated and labelled on screen ("shape exaggerated — real flattening is tiny"); orbit size not to scale (said in caption).
 Gate: pending render + gate check.
+
+GATE PASS (final): 1080x1920 30 fps, 690 frames = 23.0 s, H.264 CRF 18, AAC; no black first/last frame; -17.6 LUFS, TP -2.4 dBFS, >4kHz band 27.3 dB below; spelling clean; hook 78 px; safe zones clear (day counter moved below 320, ISS label clamped out of the right zone). Self-review ~8/10 (hook/visual/clarity/payoff). Media: media/iss-orbit-twist/.
