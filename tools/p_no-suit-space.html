@@ -18,7 +18,7 @@ function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return
 const ACC='#ffd166',RED='#ff6b5a',CX=495,S=290;
 // ---------- timeline: video time t -> simulated seconds in space ----------
 const T0=2.4;            // sim clock starts here
-const FF0=17.0,FF1=19.6; // fast-forward 14.2 s -> 90 s
+const FF0=17.6,FF1=20.0; // fast-forward 14.2 s -> 90 s
 const HOOKSIM=11.2;      // the hook shows this moment (bubbles on the tongue, swelling)
 function sim(t){if(t<T0)return HOOKSIM+t*.9;if(t<FF0)return t-T0;if(t<FF1){const k=eio((t-FF0)/(FF1-FF0));return lerp(FF0-T0,90,k)}return 90}
 const isHook=t=>t<T0;
@@ -80,7 +80,7 @@ function figure(st,dim){const p=st.pose,hy=.9;const J=joints(p,hy);const bp=p.sl
 // air rushing out of the mouth (0-3 s), bubbles of boiling water on the tongue (from ~8 s)
 const PUFF=[];{const r=rnd(3);for(let i=0;i<70;i++)PUFF.push([r(),r()*2-1,r()*.7+.3,r()])}
 function puffs(s,m){if(s>3.2||s<0)return;x.save();for(const p of PUFF){const age=(s*1.6+p[0]*2)%2.0,al=(1-age/2)*(1-eio((s-2.2)/1))*.55;if(al<=0)continue;
-  const d=age*260*p[2],a=-.15+p[1]*.55;x.globalAlpha=al;x.fillStyle='#e8f0ff';x.beginPath();x.arc(m.hx+Math.cos(a)*d,m.hy+Math.sin(a)*d,(6+28*age)*p[2],0,7);x.fill()}x.restore()}
+  const d=age*190*p[2],a=.12+p[1]*.5;x.globalAlpha=al;x.fillStyle='#e8f0ff';x.beginPath();x.arc(m.hx+Math.cos(a)*d,m.hy+Math.sin(a)*d,(6+28*age)*p[2],0,7);x.fill()}x.restore()}
 const BUB=[];{const r=rnd(17);for(let i=0;i<34;i++)BUB.push([r(),r()*2-1,r()*.6+.4,r()])}
 function bubbles(s,t,m){const k=eio((s-8)/1.5)*(1-eio((s-30)/20));if(k<=0)return;x.save();
  for(const b of BUB){const age=((t*.9+b[0]*1.3)%1.3)/1.3;const px=m.hx+8+b[1]*14+age*90*b[2],py=m.hy-age*150*b[2];const rr=(5+13*b[2])*(0.5+age);
@@ -89,33 +89,33 @@ function bubbles(s,t,m){const k=eio((s-8)/1.5)*(1-eio((s-30)/20));if(k<=0)return
 function txt(s,px,py,size,align,col,alpha,weight){if(alpha<=0.01)return;x.save();x.globalAlpha=cl(alpha);x.font=(weight||800)+' '+size+'px '+FNT;x.textAlign=align||'center';
  x.lineJoin='round';x.strokeStyle='rgba(0,0,0,.85)';x.lineWidth=Math.max(4,size*.12);x.strokeText(s,px,py);x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.85)';x.shadowBlur=12;x.fillText(s,px,py);x.restore()}
 function fit(s,size,maxw,weight){x.font=(weight||800)+' '+size+'px '+FNT;const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
-const HOOK=['NO SPACESUIT IN SPACE.','HOW LONG DO YOU LAST?'];
+const HOOK=['NO SPACESUIT:','HOW LONG DO','YOU LAST?'];
 const CARDS=[
  {a:-1,b:T0,l:HOOK,big:1,foot:'guess: 15 seconds, 1 minute or 5 minutes?'},
  {a:T0,b:5.4,l:['THE AIR RUSHES OUT.','BREATHE OUT!'],foot:'holding your breath would wreck your lungs'},
- {a:5.4,b:8.2,l:['DO YOU EXPLODE?','NO. YOUR SKIN IS TOO STRONG']},
- {a:8.2,b:11.0,l:['BUT YOU SWELL UP:','BODY WATER TURNS TO GAS'],foot:'illustration · amount of swelling not to scale'},
- {a:11.0,b:15.0,l:['THE WATER ON YOUR TONGUE','STARTS TO BOIL'],foot:'low pressure, not heat'},
- {a:15.0,b:17.0,l:['ABOUT 14 SECONDS:','YOU PASS OUT'],foot:'a NASA test subject in 1965 (leaking suit, vacuum chamber)'},
- {a:17.0,b:19.6,l:['PULLED BACK IN','WITHIN 60-90 SECONDS?'],foot:'fast-forward'},
- {a:19.6,b:22.4,l:['YOU COULD SURVIVE','AND RECOVER QUICKLY'],foot:'only if you did not hold your breath'},
- {a:22.4,b:D+1,l:['WHAT WAS','YOUR GUESS?']}];
+ {a:5.4,b:8.2,l:['DO YOU EXPLODE?','NO. SKIN IS TOO STRONG']},
+ {a:8.2,b:11.0,l:['BUT YOU SWELL UP:','TISSUE WATER VAPORIZES'],foot:'illustration · amount of swelling not to scale'},
+ {a:11.0,b:15.0,l:['WATER ON YOUR TONGUE','STARTS TO BOIL'],foot:'low pressure, not heat'},
+ {a:15.0,b:17.6,l:['IN ABOUT 10-15 SECONDS:','YOU PASS OUT'],foot:'NASA: about 9-11 s awake · a 1965 test subject: about 14 s'},
+ {a:17.6,b:FF1,l:['PULLED BACK IN','WITHIN 60-90 SECONDS?'],foot:'fast-forward'},
+ {a:FF1,b:22.6,l:['YOU COULD SURVIVE','IF SAVED IN TIME'],foot:'only if you did not hold your breath · no guarantee'},
+ {a:22.6,b:D+1,l:['UNDER 15 SECONDS AWAKE,','60-90 SECONDS TO BE SAVED'],foot:'did you guess right?'}];
 function cards(t){for(const c of CARDS){if(t<c.a||t>=c.b)continue;const al=Math.min(c.a<=0?1:ease((t-c.a)/.25),c.b>=D?1:ease((c.b-t)/.2));
- const base=c.big?76:66,sz=Math.min(fit(c.l[0],base,840,900),fit(c.l[1],base,840,900)),dy=(1-ease((t-c.a)/.3))*14*(c.a>0?1:0);
- txt(c.l[0],CX,420+dy,sz,'center','#fff',al,900);txt(c.l[1],CX,420+sz*1.15+dy,sz,'center',ACC,al,900);
- if(c.foot)txt(c.foot,CX,420+sz*2.1+dy,fit(c.foot,30,840,600),'center','#e6ebf2',al*.95,600)}}
+ const base=c.big?84:66,sz=Math.min(...c.l.map(l=>fit(l,base,840,900))),dy=(1-ease((t-c.a)/.3))*14*(c.a>0?1:0);
+ c.l.forEach((l,i)=>txt(l,CX,420+sz*1.15*i+dy,sz,'center',i?ACC:'#fff',al,900));
+ if(c.foot)txt(c.foot,CX,420+sz*(1.15*(c.l.length-1)+(c.l.length>2?.72:.95))+dy,fit(c.foot,30,840,600),'center','#e6ebf2',al*.95,600)}}
 // ---------- clock + status ----------
-function clock(t){const s=sim(t);const m=Math.floor(s/60),sec=Math.floor(s%60);const str=m+':'+String(sec).padStart(2,'0');
- const col=t>=19.6?'#7be0a0':(s<9?'#ffffff':(s<14?ACC:RED));const X0=575,y0=690;
+function clock(t){if(isHook(t))return;const s=sim(t);const m=Math.floor(s/60),sec=Math.floor(s%60);const str=m+':'+String(sec).padStart(2,'0');
+ const col=t>=FF1?'#7be0a0':(s<9?'#ffffff':(s<14?ACC:RED));const X0=575,y0=690;
  x.save();x.fillStyle='rgba(8,12,22,.6)';x.beginPath();x.roundRect(X0,y0,350,196,24);x.fill();x.strokeStyle='rgba(255,255,255,.25)';x.lineWidth=2;x.stroke();x.restore();
  txt('TIME IN SPACE',X0+22,y0+40,28,'left','#e6ebf2',.95,800);
  x.save();x.font='900 92px "DejaVu Sans Mono",monospace';x.textAlign='left';x.lineWidth=10;x.strokeStyle='rgba(0,0,0,.85)';x.strokeText(str,X0+20,y0+128);x.fillStyle=col;x.fillText(str,X0+20,y0+128);x.restore();
  const ff=t>=FF0&&t<FF1;if(ff){const bl=.6+.4*Math.sin(t*14);x.save();x.globalAlpha=bl;x.fillStyle=ACC;for(let i=0;i<2;i++){const bx=X0+270+i*30;x.beginPath();x.moveTo(bx,y0+70);x.lineTo(bx+28,y0+92);x.lineTo(bx,y0+114);x.fill()}x.restore()}
  let st='AWAKE',sc='#7be0a0';if(s>=9&&s<14){st='FADING';sc=ACC}else if(s>=14){st='PASSED OUT';sc=RED}
- if(t>=19.6&&!isHook(t)){st='SAVED';sc='#7be0a0'}
+ if(t>=FF1&&!isHook(t)){st='SAVED';sc='#7be0a0'}
  txt(st,X0+22,y0+176,36,'left',sc,1,900)}
 // ---------- vision (fades as consciousness goes) ----------
-function vision(t,s){let k=eio((s-8.5)/5.5);if(t>=19.6)k=lerp(.8,.25,eio((t-19.6)/1.2));else if(s>14.2)k=.8+.06*Math.sin(t*3);
+function vision(t,s){let k=eio((s-8.5)/5.5);if(t>=FF1)k=lerp(.8,.25,eio((t-FF1)/1.2));else if(s>14.2)k=.8+.06*Math.sin(t*3);
  if(isHook(t))k=.3;if(k<=0)return;x.save();x.globalCompositeOperation='saturation';x.fillStyle='rgba(128,128,128,'+cl(k*1.1)+')';x.fillRect(0,0,W,H);x.globalCompositeOperation='source-over';
  const r0=lerp(1100,150,k),r1=lerp(1500,620,k);const g=x.createRadialGradient(560,1150,r0,560,1150,r1);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,'+cl(.25+.7*k)+')');x.fillStyle=g;x.fillRect(0,0,W,H);
  x.fillStyle='rgba(0,0,0,'+(.35*k)+')';x.fillRect(0,0,W,H);x.restore()}
@@ -125,9 +125,9 @@ function follow(t){const a=ease((t-22.6)/.3)*(1-ease((t-D+.15)/.15));if(a<=0)ret
  txt('Follow → a new one every day',540,1410,36,'center','#fff',a,800)}
 // ---------- frame ----------
 function draw(t){x.globalCompositeOperation='source-over';x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
- const s=sim(t);stars(t,.95);earth(t);const light=t>=19.6?eio((t-19.6)/.8):0;hull(t,light);
- const st=figState(s,t);if(t>=19.6){st.fx=lerp(st.fx,330,eio((t-19.6)/2.6));st.fy=lerp(st.fy,1040,eio((t-19.6)/2.6));st.rot=lerp(st.rot,-.15,eio((t-19.6)/2));st.sw=lerp(st.sw,1.05,eio((t-19.6)/1.6))}
- const m=figure(st,0);puffs(s,m);if(t<19.6)bubbles(s,t,m);
+ const s=sim(t);stars(t,.95);earth(t);const light=t>=FF1?eio((t-FF1)/.8):0;hull(t,light);
+ const st=figState(s,t);if(t>=FF1){st.fx=lerp(st.fx,330,eio((t-FF1)/2.6));st.fy=lerp(st.fy,1040,eio((t-FF1)/2.6));st.rot=lerp(st.rot,-.15,eio((t-FF1)/2));st.sw=lerp(st.sw,1.05,eio((t-FF1)/1.6))}
+ const m=figure(st,0);puffs(s,m);if(t<FF1)bubbles(s,t,m);
  vision(t,s);
  // readability band behind the top text
  const g=x.createLinearGradient(0,300,0,1000);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.2,'rgba(0,0,0,.3)');g.addColorStop(.75,'rgba(0,0,0,.2)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,300,W,700);
