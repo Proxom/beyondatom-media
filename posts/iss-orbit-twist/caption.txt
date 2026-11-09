@@ -1,0 +1,22 @@
+How many days for a full turn? 👇
+
+Earth isn't a perfect sphere. It spins, so the equator bulges out: the equatorial diameter is about 43 km larger than the pole-to-pole diameter (equatorial radius 6,378.137 km, polar radius 6,356.752 km). That extra mass around the middle tugs on anything orbiting at an angle.
+
+For the ISS (about 400 km up, tilted 51.6° to the equator), the bulge slowly swings the whole orbit plane around the poles. The orbit's line of nodes drifts west about 5° per day, so the ring makes a full turn in roughly 72 days. That is one reason the station passes over different parts of the world as the days go by.
+
+The twist: satellites use the exact same effect on purpose. Tilt the orbit near-polar (around 98°) and the bulge turns the plane about 0.9856° per day — exactly the rate Earth moves around the Sun. The orbit then stays fixed relative to the Sun and crosses the equator at the same local time every day. That's a Sun-synchronous orbit, used by most Earth-observing satellites.
+
+About the video: an original computer animation. Earth's flattening is shown greatly exaggerated (the real flattening is only about 1/300); the orbit size is not to scale. The nodal-precession rate (about 5°/day for the ISS, a full turn in about 72 days) follows the standard formula dΩ/dt = −1.5 · n · J2 · (Rₑ/a)² · cos i (NASA GDC Orbit Primer). Earth texture: NASA Blue Marble.
+
+Sources:
+NASA Earth Fact Sheet (equatorial radius 6,378.137 km, polar radius 6,356.752 km, J2 = 1082.63×10⁻⁶): https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
+NASA GDC Orbit Primer (nodal precession dΩ/dt = −1.5 n J2 (Rₑ/a)² cos i; polar orbits have no nodal precession; Sun-synchronous when the rate equals the Sun's apparent 0.9856°/day): https://science.nasa.gov/wp-content/uploads/2023/05/GDC_OrbitPrimer.pdf
+NASA, International Space Station (orbital inclination 51.6°, altitude ~370–460 km): https://www.nasa.gov/reference/international-space-station/
+NASA Earth Observatory, Catalog of Earth Satellite Orbits (a Sun-synchronous orbit crosses the equator at about the same local time each day): https://earthobservatory.nasa.gov/features/OrbitsCatalog
+
+Footage: none, original animation. Earth texture: NASA Blue Marble (NASA Visible Earth, public domain; NASA does not endorse this video). Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #iss #orbit #shorts
