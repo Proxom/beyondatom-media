@@ -2,6 +2,23 @@
 
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
+## 17:00 = PROVEN 1M+ TOPIC, IN ORDER (Erkan, 9 Nov 2026 21:03) — from 10 Nov, every day; overrides rule 1 of the "PROVEN 1M+ TOPICS" block and the sprint rotation for the 17:00 slot
+1. The 17:00 Short every day is OUR OWN VERSION of a space Short that already reached 1 million+ views (same rules as the block below: 100% our own visuals, script, title wording and sound; add our twist; log `outlier: <original + link>`).
+2. ORDER: work down this list from the most viewed to the least viewed, one per day (10 Nov = #1, 11 Nov = #2, ...). Skip an item only if its hard gate cannot be met; then do the next and come back to it.
+   1. Falling into a black hole (~15M) → first-person fall with a time-dilation clock.
+   2. Felix Baumgartner's jump from the edge of space (10M) → human + danger, the flat spin he fought.
+   3. How small is the Planck length? (6.8M) → zoom-in with a live scale counter.
+   4. Our solar system racing through the galaxy (5.3M) → the Sun dragging the planets in a helix (15-20 s unless Erkan approves the 7-10 s loop test).
+   5. Astronaut flying through the ISS (NASA, 4.3M) → NASA public-domain footage plus our own guess hook.
+   6. What is inside a black hole? (~4M) → what we know vs what we don't, side by side.
+   7. What if you grew 1 cm every second? (3.3M) → human grows to building, mountain, planet, star size with a live height counter.
+   8. Why does Starship need 12+ launches to reach the Moon? (2.6M) → fuel comparison race with Saturn V.
+   9. Interstellar's black hole vs the real one (~2M) → side by side.
+   TIME-BOUND EXCEPTION: the monthly sky-events list (4.7M / 2.3M) goes out at 17:00 on 26 Nov as "December 2026 sky: dates to save"; the list continues the next day.
+3. WHEN THE LIST ENDS (or earlier, in each Monday market scan): find new space Shorts above 1,000,000 views (free web search; channel Shorts pages show view counts), add them to reports/outliers.md with link, views and why it worked, sorted by views, and continue in that order. Never repeat a topic we already made.
+4. The other two daily Shorts (01:00 and 21:00) carry the two sprint styles that the 17:00 Short does not cover that day. The viewer-promised oblate-Earth Short goes to 01:00 or 21:00, never 17:00.
+5. In every daily report: the 17:00 outlier version's views at 24 h and 72 h vs our median, so we can see whether proven topics win.
+
 ## PROVEN 1M+ TOPICS: "OUR OWN VERSION" RULE (Erkan, 9 Nov 2026 20:55)
 Erkan: find space Shorts in our niche that reached 1 million+ views and make our own versions of them. Topics and ideas are free to use; the video must be 100% ours (own animation or licensed NASA/ESA footage, own script, own title wording, own sound). Never copy footage, frames, script lines, titles word for word or thumbnails. Re-uploads or near-copies break YouTube's reused-content policy and would block monetisation.
 1. RULE: from 10 Nov, at least 1 of the 3 daily Shorts is our version of a proven 1M+ topic (it still counts as its style A, B or C in the sprint). Add a twist of our own (human figure, side-by-side race, live counter, guess question) so it is better, not a clone.
@@ -15,7 +32,7 @@ Erkan: find space Shorts in our niche that reached 1 million+ views and make our
    - "How small is the Planck length?" (6.8M) → zoom-in scale with a live counter; style C.
    - "Why does Starship need 12+ launches to reach the Moon?" (Everyday Astronaut, 2.6M) → rocket-fuel comparison race; style A.
    - Monthly "sky events this month" lists (4.7M, 2.3M, 449K) → "December 2026 sky: dates to save" around 25-28 Nov.
-   - "The largest stars in the universe" (What If, 197K; long versions 35M) → size lineup from the Sun to the biggest star; style C.
+   - (removed: "The largest stars" Short had only 197K; not a 1M+ Short)
 3. REFRESH: in the Monday market scan, add any new space Shorts above 1M views to reports/outliers.md (link, views, why it worked, our twist). Pick topics from that file first.
 4. Log each one in the video doc as `outlier: <original title + link>` so we can measure whether proven topics beat our own ideas (median views at 72 h).
 
