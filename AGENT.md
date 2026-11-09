@@ -7,7 +7,7 @@ A viewer (@charliebad) asked under "The ISS Is Always Falling (Newton's Cannon)"
 - Topic: Earth is not a perfect sphere; the equator bulges out (equatorial diameter about 43 km larger than pole to pole). That bulge slowly turns the ISS's orbital plane (nodal precession, about 5° per day, a full turn in about 2 months), which is why the ISS passes over different places each day. Final surprise: satellites use the same effect on purpose (Sun-synchronous orbits pass over the same place at the same local time every day).
 - Visual: Earth with the bulge exaggerated and clearly labelled as exaggerated, the ISS orbit ring drawn, then the ring slowly rotating around the poles with a day counter; end on a Sun-synchronous orbit. First frame: the squashed Earth + "Earth isn't round. And it twists the ISS." Title as a question, e.g. "Why Does the ISS Orbit Twist? 🌍".
 - Verify every number from reliable sources (NASA NSSDC Earth fact sheet for equatorial and polar radius; a NASA/ESA or university orbital-mechanics source for the ISS nodal precession rate and Sun-synchronous orbits) and put them in the description.
-- First line of the description: "You asked, @charliebad 👇" plus a guess question (e.g. "How many days for a full turn? 👇"). Do not reply to comments via any tool.
+- DESCRIPTION: a normal description like any other Short. Do NOT mention or tag the viewer (Erkan, 9 Nov 19:21). Start with a guess question (e.g. "How many days for a full turn? 👇"). Do not reply to comments via any tool.
 - Normal v4 rules and the hard gate apply.
 
 ## VIRAL SPRINT: 3 SHORTS A DAY, 3 STYLES (Erkan, 8 Nov 2026 09:28) — runs 9 Nov to 15 Nov 2026 inclusive; overrides the "2 Shorts a day" schedule and the Q/T rotation while it runs
