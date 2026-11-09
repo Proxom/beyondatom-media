@@ -1,0 +1,136 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=c width=1080 height=1920></canvas>
+<!-- no-suit-space: "What if you went to space with no suit?" Sprint style B (human body / what if). Same white figure as
+ jump-five-worlds / gravity-limit. Original 2D canvas animation; spacecraft and Earth are illustrative.
+ Facts (checked 9 Nov 2026), NASA "Why Do We Really Need Pressure Suits?" (Dressing for Altitude educator guide, 2017):
+  would you explode? No - your skin is too strong; the body swells because liquid in soft tissues begins to vaporize;
+  9-11 s of some consciousness, only 5-10 s to help yourself; after 13 s the brain is acutely impaired;
+  the water on your tongue would begin to boil; 1965 NASA test subject in a leaking suit stayed conscious about 14 s
+  and felt the water on his tongue begin to boil; holding your breath would be especially disastrous for the lungs;
+  recompression within about 60-90 s -> survival possible if the person did not hold their breath.
+  NASA SP-3006 Bioastronautics Data Book: consciousness 9-11 s; recompression within 60-90 s could result in survival. -->
+<script>
+const W=1080,H=1920,D=24.0,FPS=30;
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2},lerp=(a,b,k)=>a+(b-a)*k;
+const FNT='"DejaVu Sans",Arial,sans-serif';
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const ACC='#ffd166',RED='#ff6b5a',CX=495,S=290;
+// ---------- timeline: video time t -> simulated seconds in space ----------
+const T0=2.4;            // sim clock starts here
+const FF0=17.0,FF1=19.6; // fast-forward 14.2 s -> 90 s
+const HOOKSIM=11.2;      // the hook shows this moment (bubbles on the tongue, swelling)
+function sim(t){if(t<T0)return HOOKSIM+t*.9;if(t<FF0)return t-T0;if(t<FF1){const k=eio((t-FF0)/(FF1-FF0));return lerp(FF0-T0,90,k)}return 90}
+const isHook=t=>t<T0;
+// ---------- scenery ----------
+const ST=[];{const r=rnd(7);for(let i=0;i<420;i++)ST.push([r()*W,r()*H,Math.pow(r(),3)*2.3+.35,r()*6.28,r()])}
+const CLD=[];{const r=rnd(21);for(let i=0;i<160;i++)CLD.push([r(),r(),r()*.8+.3])}
+function stars(t,al){x.save();for(const s of ST){const tw=.75+.25*Math.sin(s[3]+t*1.1);x.globalAlpha=al*tw*(.3+.7*s[4]);x.fillStyle='#fff';x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill()}x.restore()}
+function earth(t){const R=2900,cx=540+40*Math.sin(t*.05),cy=1660+R;
+ const g=x.createRadialGradient(cx,cy,R-10,cx,cy,R+120);g.addColorStop(0,'rgba(120,190,255,.75)');g.addColorStop(.35,'rgba(70,140,255,.28)');g.addColorStop(1,'rgba(40,90,255,0)');x.fillStyle=g;x.beginPath();x.arc(cx,cy,R+120,0,7);x.fill();
+ const s=x.createLinearGradient(0,cy-R,0,cy-R+420);s.addColorStop(0,'#5fa8ef');s.addColorStop(.25,'#1f5fae');s.addColorStop(1,'#0b2c5e');x.fillStyle=s;x.beginPath();x.arc(cx,cy,R,0,7);x.fill();
+ x.save();x.beginPath();x.arc(cx,cy,R,0,7);x.clip();for(const c of CLD){const px=((c[0]*1500+t*9)%1500)-200,py=cy-R+20+c[1]*300;const py2=cy-R+14+Math.pow(c[1],1.6)*300;x.fillStyle='rgba(235,242,255,'+(.10+.14*c[2])+')';x.beginPath();x.ellipse(px,py2,(60+80*c[2])*(.5+c[1]),(4+9*c[1])*c[2],0,0,7);x.fill()}x.restore()}
+// spacecraft hull on the left with an open hatch (illustrative)
+function hull(t,light){x.save();const g=x.createLinearGradient(0,0,250,0);g.addColorStop(0,'#2a3140');g.addColorStop(.8,'#8d97a8');g.addColorStop(1,'#5d6676');
+ x.fillStyle=g;x.beginPath();x.moveTo(-40,330);x.lineTo(190,360);x.quadraticCurveTo(240,900,190,1500);x.lineTo(-40,1530);x.fill();
+ x.strokeStyle='rgba(20,26,36,.7)';x.lineWidth=3;for(let i=0;i<7;i++){const yy=420+i*160;x.beginPath();x.moveTo(-40,yy);x.lineTo(205+12*Math.sin(i),yy+4);x.stroke()}
+ // hatch
+ x.fillStyle='#0a0d14';x.beginPath();x.roundRect(60,720,150,300,26);x.fill();
+ const hg=x.createRadialGradient(140,870,10,140,870,260);hg.addColorStop(0,'rgba(255,214,150,'+(.55+.4*light)+')');hg.addColorStop(1,'rgba(255,170,80,0)');
+ x.fillStyle=hg;x.beginPath();x.roundRect(68,728,134,284,22);x.fill();
+ if(light>0){const lg=x.createRadialGradient(150,870,40,150,870,700);lg.addColorStop(0,'rgba(255,210,140,'+(.35*light)+')');lg.addColorStop(1,'rgba(255,190,110,0)');x.fillStyle=lg;x.fillRect(0,300,1000,1200)}
+ x.strokeStyle='#c7ced9';x.lineWidth=7;x.beginPath();x.roundRect(60,720,150,300,26);x.stroke();
+ // open hatch door
+ x.fillStyle='#b9c1cd';x.beginPath();x.moveTo(206,724);x.lineTo(268,690);x.lineTo(268,1050);x.lineTo(206,1016);x.fill();x.strokeStyle='#6b7484';x.lineWidth=3;x.stroke();
+ x.restore()}
+// ---------- figure (same build as jump-five-worlds / gravity-limit), floating ----------
+const B={thigh:.45,shin:.45,ank:.07,torso:.56,neck:.08,head:.125,ua:.30,fa:.28,foot:.2};
+const mix=(a,b,k)=>a.map((v,i)=>lerp(v,b[i],k));
+const P={float:[.10,.35,-.25,.95,.55],flail:[.0,.7,-.2,2.3,.4],limp:[.25,.45,-.05,.55,.35]};
+function joints(p,hy,arm2){const hip=[0,hy];const knee=[B.thigh*Math.sin(p[1]),hy-B.thigh*Math.cos(p[1])];
+ const ank=[knee[0]+B.shin*Math.sin(p[2]),knee[1]-B.shin*Math.cos(p[2])];const heel=[ank[0]-.05,ank[1]-B.ank],toe=[ank[0]+B.foot*.85,ank[1]-B.ank];
+ const sh=[B.torso*Math.sin(p[0]),hy+B.torso*Math.cos(p[0])];const hd=[sh[0]+(B.neck+B.head)*Math.sin(p[0]*1.1),sh[1]+(B.neck+B.head)*Math.cos(p[0]*1.1)];
+ const el=[sh[0]+B.ua*Math.sin(p[3]),sh[1]-B.ua*Math.cos(p[3])];const ea=p[3]+p[4];const hand=[el[0]+B.fa*Math.sin(ea),el[1]-B.fa*Math.cos(ea)];
+ return {hip,knee,ank,heel,toe,sh,hd,el,hand}}
+function figState(s,t){ // s = sim seconds
+ const fl=eio(s/1.5)*(1-eio((s-8)/4));          // flailing early
+ const lp=eio((s-10)/4);                         // goes limp as consciousness fades
+ let pose=mix(P.float,P.flail,fl*.6);pose=mix(pose,P.limp,lp);
+ const wob=Math.sin(t*2.6)*(.25*fl+.04);pose=pose.map((v,i)=>v+(i>=3?wob:wob*.3));
+ const sw=1+.85*eio((s-3)/6);                    // swelling (illustrative amount)
+ const rot=-.35+.09*Math.sin(t*.6)+.25*lp+ s*.004;
+ const fx=470+Math.min(s,20)*4,fy=1180+18*Math.sin(t*.7);
+ return {pose,sw,rot,fx,fy}}
+const FC=document.createElement('canvas');FC.width=W;FC.height=H;const fc=FC.getContext('2d');
+function figure(st,dim){const p=st.pose,hy=.9;const J=joints(p,hy);const bp=p.slice();bp[1]-=.35;bp[2]+=.25;bp[3]-=.5;const JB=joints(bp,hy);
+ const P2=q=>[q[0]*S,-(q[1]-1.0)*S],c=fc;c.setTransform(1,0,0,1,0,0);c.clearRect(0,0,W,H);
+ c.save();c.translate(st.fx,st.fy);c.rotate(st.rot);
+ const k=st.sw,lw={leg:.135*S*k,arm:.105*S*k,tor:.25*S*(1+(k-1)*1.2)},O=Math.max(2.5,.035*S);
+ const seg=(pts,wd)=>{c.lineWidth=wd;c.beginPath();let a=P2(pts[0]);c.moveTo(a[0],a[1]);for(let i=1;i<pts.length;i++){const b=P2(pts[i]);c.lineTo(b[0],b[1])}c.stroke()};
+ const limbs=(K,col,ow)=>{c.strokeStyle=col;c.lineCap='round';c.lineJoin='round';seg([K.hip,K.knee,K.ank],lw.leg+ow);seg([K.heel,K.toe],lw.leg*.75+ow);seg([K.sh,K.el,K.hand],lw.arm+ow)};
+ const body=(col,ow)=>{c.strokeStyle=col;c.lineCap='round';seg([J.hip,J.sh],lw.tor+ow);const h=P2(J.hd);c.fillStyle=col;c.beginPath();c.arc(h[0],h[1],B.head*S*(1+(k-1)*.7)+ow/2,0,7);c.fill()};
+ limbs(JB,'#1b2230',O);limbs(JB,'#aab3c0',0);body('#1b2230',O);limbs(J,'#1b2230',O);body('#f3f5f8',0);limbs(J,'#f3f5f8',0);
+ // sunlit rim from the left-top
+ c.restore();
+ if(dim>0){c.save();c.globalCompositeOperation='source-atop';c.fillStyle='rgba(30,36,52,'+(dim*.55)+')';c.fillRect(0,0,W,H);c.restore()}
+ x.drawImage(FC,0,0);
+ // head + mouth position in screen space
+ const h=P2(J.hd),cs=Math.cos(st.rot),sn=Math.sin(st.rot);const hx=st.fx+h[0]*cs-h[1]*sn,hyy=st.fy+h[0]*sn+h[1]*cs;
+ const mr=B.head*S*(1+(k-1)*.7);return {hx:hx+mr*.75*Math.cos(st.rot),hy:hyy+mr*.75*Math.sin(st.rot)+mr*.25,mr}}
+// air rushing out of the mouth (0-3 s), bubbles of boiling water on the tongue (from ~8 s)
+const PUFF=[];{const r=rnd(3);for(let i=0;i<70;i++)PUFF.push([r(),r()*2-1,r()*.7+.3,r()])}
+function puffs(s,m){if(s>3.2||s<0)return;x.save();for(const p of PUFF){const age=(s*1.6+p[0]*2)%2.0,al=(1-age/2)*(1-eio((s-2.2)/1))*.55;if(al<=0)continue;
+  const d=age*260*p[2],a=-.15+p[1]*.55;x.globalAlpha=al;x.fillStyle='#e8f0ff';x.beginPath();x.arc(m.hx+Math.cos(a)*d,m.hy+Math.sin(a)*d,(6+28*age)*p[2],0,7);x.fill()}x.restore()}
+const BUB=[];{const r=rnd(17);for(let i=0;i<34;i++)BUB.push([r(),r()*2-1,r()*.6+.4,r()])}
+function bubbles(s,t,m){const k=eio((s-8)/1.5)*(1-eio((s-30)/20));if(k<=0)return;x.save();
+ for(const b of BUB){const age=((t*.9+b[0]*1.3)%1.3)/1.3;const px=m.hx+8+b[1]*14+age*90*b[2],py=m.hy-age*150*b[2];const rr=(5+13*b[2])*(0.5+age);
+  x.globalAlpha=k*(1-age)*.95;x.strokeStyle='#dff3ff';x.lineWidth=3;x.beginPath();x.arc(px,py,rr,0,7);x.stroke();x.fillStyle='rgba(200,235,255,.25)';x.fill()}x.restore()}
+// ---------- text ----------
+function txt(s,px,py,size,align,col,alpha,weight){if(alpha<=0.01)return;x.save();x.globalAlpha=cl(alpha);x.font=(weight||800)+' '+size+'px '+FNT;x.textAlign=align||'center';
+ x.lineJoin='round';x.strokeStyle='rgba(0,0,0,.85)';x.lineWidth=Math.max(4,size*.12);x.strokeText(s,px,py);x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.85)';x.shadowBlur=12;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,weight){x.font=(weight||800)+' '+size+'px '+FNT;const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+const HOOK=['NO SPACESUIT IN SPACE.','HOW LONG DO YOU LAST?'];
+const CARDS=[
+ {a:-1,b:T0,l:HOOK,big:1,foot:'guess: 15 seconds, 1 minute or 5 minutes?'},
+ {a:T0,b:5.4,l:['THE AIR RUSHES OUT.','BREATHE OUT!'],foot:'holding your breath would wreck your lungs'},
+ {a:5.4,b:8.2,l:['DO YOU EXPLODE?','NO. YOUR SKIN IS TOO STRONG']},
+ {a:8.2,b:11.0,l:['BUT YOU SWELL UP:','BODY WATER TURNS TO GAS'],foot:'illustration · amount of swelling not to scale'},
+ {a:11.0,b:15.0,l:['THE WATER ON YOUR TONGUE','STARTS TO BOIL'],foot:'low pressure, not heat'},
+ {a:15.0,b:17.0,l:['ABOUT 14 SECONDS:','YOU PASS OUT'],foot:'a NASA test subject in 1965 (leaking suit, vacuum chamber)'},
+ {a:17.0,b:19.6,l:['PULLED BACK IN','WITHIN 60-90 SECONDS?'],foot:'fast-forward'},
+ {a:19.6,b:22.4,l:['YOU COULD SURVIVE','AND RECOVER QUICKLY'],foot:'only if you did not hold your breath'},
+ {a:22.4,b:D+1,l:['WHAT WAS','YOUR GUESS?']}];
+function cards(t){for(const c of CARDS){if(t<c.a||t>=c.b)continue;const al=Math.min(c.a<=0?1:ease((t-c.a)/.25),c.b>=D?1:ease((c.b-t)/.2));
+ const base=c.big?76:66,sz=Math.min(fit(c.l[0],base,840,900),fit(c.l[1],base,840,900)),dy=(1-ease((t-c.a)/.3))*14*(c.a>0?1:0);
+ txt(c.l[0],CX,420+dy,sz,'center','#fff',al,900);txt(c.l[1],CX,420+sz*1.15+dy,sz,'center',ACC,al,900);
+ if(c.foot)txt(c.foot,CX,420+sz*2.1+dy,fit(c.foot,30,840,600),'center','#e6ebf2',al*.95,600)}}
+// ---------- clock + status ----------
+function clock(t){const s=sim(t);const m=Math.floor(s/60),sec=Math.floor(s%60);const str=m+':'+String(sec).padStart(2,'0');
+ const col=t>=19.6?'#7be0a0':(s<9?'#ffffff':(s<14?ACC:RED));const X0=575,y0=690;
+ x.save();x.fillStyle='rgba(8,12,22,.6)';x.beginPath();x.roundRect(X0,y0,350,196,24);x.fill();x.strokeStyle='rgba(255,255,255,.25)';x.lineWidth=2;x.stroke();x.restore();
+ txt('TIME IN SPACE',X0+22,y0+40,28,'left','#e6ebf2',.95,800);
+ x.save();x.font='900 92px "DejaVu Sans Mono",monospace';x.textAlign='left';x.lineWidth=10;x.strokeStyle='rgba(0,0,0,.85)';x.strokeText(str,X0+20,y0+128);x.fillStyle=col;x.fillText(str,X0+20,y0+128);x.restore();
+ const ff=t>=FF0&&t<FF1;if(ff){const bl=.6+.4*Math.sin(t*14);x.save();x.globalAlpha=bl;x.fillStyle=ACC;for(let i=0;i<2;i++){const bx=X0+270+i*30;x.beginPath();x.moveTo(bx,y0+70);x.lineTo(bx+28,y0+92);x.lineTo(bx,y0+114);x.fill()}x.restore()}
+ let st='AWAKE',sc='#7be0a0';if(s>=9&&s<14){st='FADING';sc=ACC}else if(s>=14){st='PASSED OUT';sc=RED}
+ if(t>=19.6&&!isHook(t)){st='SAVED';sc='#7be0a0'}
+ txt(st,X0+22,y0+176,36,'left',sc,1,900)}
+// ---------- vision (fades as consciousness goes) ----------
+function vision(t,s){let k=eio((s-8.5)/5.5);if(t>=19.6)k=lerp(.8,.25,eio((t-19.6)/1.2));else if(s>14.2)k=.8+.06*Math.sin(t*3);
+ if(isHook(t))k=.3;if(k<=0)return;x.save();x.globalCompositeOperation='saturation';x.fillStyle='rgba(128,128,128,'+cl(k*1.1)+')';x.fillRect(0,0,W,H);x.globalCompositeOperation='source-over';
+ const r0=lerp(1100,150,k),r1=lerp(1500,620,k);const g=x.createRadialGradient(560,1150,r0,560,1150,r1);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,'+cl(.25+.7*k)+')');x.fillStyle=g;x.fillRect(0,0,W,H);
+ x.fillStyle='rgba(0,0,0,'+(.35*k)+')';x.fillRect(0,0,W,H);x.restore()}
+// ---------- follow line (last ~1.3 s, lower safe area) ----------
+function follow(t){const a=ease((t-22.6)/.3)*(1-ease((t-D+.15)/.15));if(a<=0)return;
+ x.save();x.globalAlpha=a;x.fillStyle='rgba(255,209,102,.18)';x.beginPath();x.roundRect(270,1362,540,70,35);x.fill();x.restore();
+ txt('Follow → a new one every day',540,1410,36,'center','#fff',a,800)}
+// ---------- frame ----------
+function draw(t){x.globalCompositeOperation='source-over';x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ const s=sim(t);stars(t,.95);earth(t);const light=t>=19.6?eio((t-19.6)/.8):0;hull(t,light);
+ const st=figState(s,t);if(t>=19.6){st.fx=lerp(st.fx,330,eio((t-19.6)/2.6));st.fy=lerp(st.fy,1040,eio((t-19.6)/2.6));st.rot=lerp(st.rot,-.15,eio((t-19.6)/2));st.sw=lerp(st.sw,1.05,eio((t-19.6)/1.6))}
+ const m=figure(st,0);puffs(s,m);if(t<19.6)bubbles(s,t,m);
+ vision(t,s);
+ // readability band behind the top text
+ const g=x.createLinearGradient(0,300,0,1000);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.2,'rgba(0,0,0,.3)');g.addColorStop(.75,'rgba(0,0,0,.2)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,300,W,700);
+ clock(t);cards(t);follow(t)}
+document.fonts.ready.then(()=>{draw(0);window.TEXREADY=true});
+</script>
