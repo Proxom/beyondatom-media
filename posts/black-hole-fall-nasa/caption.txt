@@ -1,0 +1,22 @@
+Guess before the end: how many seconds do you get after the edge? 👇
+
+This is NASA's own supercomputer simulation of a camera falling into a black hole like the one at the center of our galaxy: 4.3 million times the mass of the Sun, with an edge (the event horizon) about 25 million km across. We flew a vertical camera through NASA's 360° movie and told the story on top.
+
+Your friend, watching from far away, sees your image slow down and seem to freeze just outside the edge. That's why astronomers once called black holes "frozen stars". But you keep falling and cross the event horizon, the point of no return. Inside it, not even light can get back out.
+
+From there you have just 12.8 seconds before spaghettification: the pull on the end of you nearest the black hole is so much stronger than on the other end that you are stretched like a noodle. A giant black hole is the "better" choice: a small, star-sized one can rip you apart before you even reach the edge.
+
+About the video: the picture is NASA's visualization (the all-sky "camera plunge" movie), reframed for vertical with our own camera moves, timing, text and sound. The approach is sped up; the freeze is our effect to show your friend's view; the 12.8-second countdown runs in real time, but the visualization under it is retimed to fit; the final stretch is our illustration.
+
+Sources:
+NASA Science, "New NASA Black Hole Visualization Takes Viewers Beyond the Brink" (4.3 million solar masses, like the black hole at the center of the Milky Way; event horizon about 25 million km across; to a distant observer the falling image slows and seems to freeze just shy of the horizon, "frozen stars"; once the camera crosses the horizon, spaghettification is just 12.8 seconds away; stellar-mass black holes can rip objects apart before they reach the horizon): https://science.nasa.gov/supermassive-black-holes/new-nasa-black-hole-visualization-takes-viewers-beyond-the-brink/
+
+NASA Science, Black Holes (at the event horizon, gravity is strong enough that nothing, not even light, can escape): https://science.nasa.gov/universe/black-holes/
+
+Footage: "NASA Black Hole Visualization Takes Viewers Beyond the Brink", camera plunge, equidistant rectangular projection (NASA Scientific Visualization Studio, ID 14576): https://svs.gsfc.nasa.gov/14576
+Visualization: NASA's Goddard Space Flight Center / J. Schnittman and B. Powell. NASA does not endorse this video. Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #blackhole #nasa #shorts
