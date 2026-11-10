@@ -37,9 +37,9 @@ const CARDS=[
  {a:-1,b:2.5,L:[['PUT A BLACK HOLE',0],['WHERE THE SUN IS',0,'#ffb347'],['WHICH PLANETS END UP INSIDE?',0,'#cfe6ff',50]],sz:96},
  {a:2.5,b:5.6,L:[['OUR GALAXY’S BLACK HOLE',2.5],['4.3 MILLION SUNS',3.0,'#ffb347']],sz:66},
  {a:5.6,b:8.8,L:[['18 SUNS WIDE...',5.6],['BUT STILL INSIDE',6.4,'#7dffc4'],['MERCURY’S ORBIT',6.4,'#7dffc4']],sz:70},
- {a:8.8,b:12.0,L:[['NOW M87*',8.8,'#ff8a5c'],['6.5 BILLION SUNS',9.4]],sz:80},
- {a:12.0,b:15.6,L:[['IT SWALLOWS',12.0],['EVERY PLANET',12.0,'#ff8a5c']],sz:84},
- {a:15.6,b:18.6,L:[['...AND PLUTO',15.6],['ALMOST 40 BILLION km WIDE',16.2,'#ffb347']],sz:70},
+ {a:8.8,b:11.6,L:[['NOW M87*',8.8,'#ff8a5c'],['6.5 BILLION SUNS',9.4]],sz:80},
+ {a:11.6,b:15.6,L:[['IT KEEPS GROWING...',11.6],['PAST EVERY PLANET’S ORBIT',13.1,'#ff8a5c'],['AND PLUTO’S',13.5,'#ff8a5c']],sz:74},
+ {a:15.6,b:18.6,L:[['ALMOST 40 BILLION km',15.6,'#ffb347'],['WIDE',15.6]],sz:80},
  {a:18.6,b:D-0.9,L:[['VOYAGER 1, OUR',18.6],['FARTHEST SPACECRAFT:',18.6],['STILL OUTSIDE',19.1,'#7dffc4']],sz:70},
  {a:D-0.9,b:99,L:[['PUT A BLACK HOLE',0],['WHERE THE SUN IS',0,'#ffb347'],['WHICH PLANETS END UP INSIDE?',0,'#cfe6ff',50]],sz:96}];
 function drawCards(t){for(const C of CARDS){let al;
@@ -54,11 +54,11 @@ function draw(t){
  // orbits + planets
  PL.forEach((p,i)=>{const r=p[1]*k;if(r<6||r>2600)return;const inside=R>=p[1];
   x.save();x.strokeStyle=inside?'rgba(255,120,80,.35)':'rgba(150,180,230,.55)';x.lineWidth=2.5;x.setLineDash(inside?[10,10]:[]);x.beginPath();x.arc(CX,CY,r,0,7);x.stroke();x.restore();
-  const px=CX+r*Math.cos(ANG[i]),py=CY+r*Math.sin(ANG[i]);
+  const an=ANG[i]+tv(t)*0.5*Math.sqrt(57.9/p[1]);const px=CX+r*Math.cos(an),py=CY+r*Math.sin(an);
   const vis=r<1500&&px>40&&px<W-40&&py>40&&py<H-40;
   if(vis&&!inside){x.fillStyle=p[2];x.shadowColor=p[2];x.shadowBlur=12;x.beginPath();x.arc(px,py,9,0,7);x.fill();x.shadowBlur=0;
-   const la=cl(1-(r-900)/400)*cl((r-40)/40);const lx=cl(px,140,860),ly=cl(py-22,340,1420);
-   if(la>0&&ly>340)tline(p[0],lx,ly,28,la*.9,'#dfe9ff',null,800);}});
+   const la=cl(1-(r-900)/400)*cl((r-40)/40);const lx=cl(px,150,830),ly=cl(py-22,340,1420);
+   if(la>0&&ly>660)tline(p[0],lx,ly,28,la*.9,'#dfe9ff',null,800);}});
  // Sun (fades as the black hole takes its place)
  const sunA=1-ease((s-2.6)/.8);const rs=Math.max(RSUN*k,7);
  if(sunA>0){x.save();x.globalAlpha=sunA;const g=x.createRadialGradient(CX,CY,0,CX,CY,rs*3.2);g.addColorStop(0,'#fff7d8');g.addColorStop(.3,'#ffd34a');g.addColorStop(1,'#ffb34700');
@@ -66,10 +66,13 @@ function draw(t){
   tline('SUN',CX,CY+rs+52,36,sunA*cl(1-s/2.6+0.3),'#ffd84a',null,800);}
  // black hole: event horizon to scale (black disk) with an illustrative glowing ring
  if(R>0){const rp=R*k;x.save();
-  const glow=x.createRadialGradient(CX,CY,rp*.95,CX,CY,rp*1.35+10);glow.addColorStop(0,'rgba(255,170,70,.95)');glow.addColorStop(.25,'rgba(255,120,40,.45)');glow.addColorStop(1,'rgba(255,90,20,0)');
-  x.fillStyle=glow;x.beginPath();x.arc(CX,CY,rp*1.35+10,0,7);x.fill();
+  const glow=x.createRadialGradient(CX,CY,rp*.97,CX,CY,rp*1.08+6);glow.addColorStop(0,'rgba(255,170,70,.95)');glow.addColorStop(.25,'rgba(255,120,40,.45)');glow.addColorStop(1,'rgba(255,90,20,0)');
+  x.fillStyle=glow;x.beginPath();x.arc(CX,CY,rp*1.08+6,0,7);x.fill();
   x.fillStyle='#000';x.beginPath();x.arc(CX,CY,rp,0,7);x.fill();
   x.strokeStyle='rgba(255,200,120,.9)';x.lineWidth=3;x.beginPath();x.arc(CX,CY,rp,0,7);x.stroke();x.restore();
+  PL.forEach((p,i)=>{const r=p[1]*k;if(r<6||r>2600||R<p[1])return;const an=ANG[i]+tv(t)*0.5*Math.sqrt(57.9/p[1]);
+   x.save();x.strokeStyle='rgba(255,120,80,.55)';x.lineWidth=2.5;x.setLineDash([10,10]);x.beginPath();x.arc(CX,CY,r,0,7);x.stroke();
+   x.fillStyle='rgba(255,130,90,.8)';x.beginPath();x.arc(CX+r*Math.cos(an),CY+r*Math.sin(an),6,0,7);x.fill();x.restore();});
   // size counter
   const cA=ease((s-2.8)/.4)*(1-ease((t-(D-1.1))/.2));
   if(cA>0){x.save();x.globalAlpha=cA;x.fillStyle='rgba(6,8,16,.75)';x.strokeStyle='rgba(255,179,71,.8)';x.lineWidth=3;x.beginPath();x.roundRect(170,1250,740,150,26);x.fill();x.stroke();x.restore();

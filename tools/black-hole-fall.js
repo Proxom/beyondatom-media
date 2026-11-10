@@ -37,7 +37,7 @@ const CARDS=[
  {a:5.4,b:7.6,L:[['ABOUT 3 HOURS',5.4],['TO THE EDGE',5.4,'#ffb347']],sz:84},
  {a:7.6,b:TCROSS,L:[['YOUR FRIEND SEES YOU',7.6],['SLOW DOWN... AND FREEZE',8.3,'#7fd8ff']],sz:66},
  {a:TCROSS,b:12.6,L:[['YOU CROSS THE EDGE',TCROSS],['NO WAY BACK',10.4,'#ff6a4a']],sz:76},
- {a:12.6,b:15.6,L:[['128,000 km',12.6,'#ffb347'],['TO THE CENTER',12.6]],sz:84},
+ {a:12.6,b:15.6,L:[['12.8 SECONDS',12.6,'#ffb347'],['UNTIL YOU’RE TORN APART',13.2]],sz:76},
  {a:15.6,b:18.8,L:[['YOUR FRIEND STILL',15.6],['SEES YOU FROZEN',15.6,'#7fd8ff'],['AT THE EDGE',15.6]],sz:74},
  {a:18.8,b:TEND,L:[['STRETCHED',18.8],['LIKE A NOODLE',19.3,'#ffb347']],sz:88},
  {a:TEND+0.4,b:99,L:[['FALL INTO A',0],['BLACK HOLE',0,'#ffb347'],['WHO SEES YOU CROSS?',0,'#cfe6ff',58]],sz:108}];
@@ -71,9 +71,9 @@ function clocks(t){
    tline('LEFT',276,Y+240,34,fa,'#ff9a7a',null,900);}
  // FRIEND (right)
  panel(506,Y,420,PH,fa,'rgba(127,216,255,.85)');
- tline('YOUR FRIEND',716,Y+52,36,fa,'#7fd8ff',null,900);tline('(far away)',716,Y+90,26,fa*.85,'#b9c4d6',null,700);
+ tline('YOUR FRIEND',716,Y+52,36,fa,'#7fd8ff',null,900);tline(t>=12.6&&t<TEND+0.4?'(numbers illustrative)':'(far away)',716,Y+90,26,fa*.85,'#b9c4d6',null,700);
  const fh=t>=TEND+0.4?0:friendHours(t);const forever=t>=18.8&&t<TEND+0.4;
- tline(forever?'FOREVER':fmtFriend(fh),716,Y+180,forever?66:fmtFriend(fh).length>11?44:fmtFriend(fh).length>9?54:66,fa,forever?'#7fd8ff':'#fff',null,800);
+ tline(forever?'STILL WAITING':fmtFriend(fh),716,Y+180,forever?46:fmtFriend(fh).length>11?44:fmtFriend(fh).length>9?54:66,fa,forever?'#7fd8ff':'#fff',null,800);
  // friend's view of you: approaches the edge, then slows and freezes just shy of it
  const fr=t>=TEND+0.4?0:t;const ex=830,ey=Y+262;
  x.save();x.globalAlpha=fa;x.beginPath();x.roundRect(560,Y+214,312,96,16);x.clip();x.fillStyle='#04050a';x.fillRect(560,Y+214,312,96);
@@ -86,7 +86,7 @@ function clocks(t){
 SC={D,TCROSS,TEND,camAt,
  post(t){ // tidal stretch after crossing (illustration)
    if(t<TCROSS||t>=TEND+0.4)return {sy:1,sx:1,dark:0};
-   const u=cl((t-TCROSS)/12.8);const st=Math.pow(cl((t-17.5)/(TEND-17.5)),2);
+   const u=cl((t-TCROSS)/12.8);const st=Math.pow(cl((t-14)/(TEND-14)),2);
    return {sy:1+st*2.6,sx:1-st*0.55,dark:.12*u+.25*st};},
  overlay(t){
    // honest label
