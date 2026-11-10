@@ -35,17 +35,19 @@ SEG = [('hook', 3.0, 13.0, 17.0, {}),
        ('mass', 4.0, 17.0, 21.5, {}),
        ('edge', 3.5, 21.5, 28.0, {}),
        ('friend', 1.5, 28.0, 30.0, {}),
-       ('freeze', 2.5, 30.0, 30.0, {'push': (80, 70)}),
+       ('freeze', 2.5, 10.0, 10.0, {'push': (30, 25)}),  # the friend's far view, frozen
        ('plunge', 3.5, 30.0, 42.0, {}),
-       ('inside', 12.8, 42.0, 54.0, {'stretch': (11.3, 13.8)}),
-       ('noodle', 1.1, 54.0, 55.0, {'stretch': (-1.5, 1.0), 'hold': 1}),
+       ('inside', 12.8, 42.0, 54.0, {'stretch': (9.8, 13.3)}),
+       ('noodle', 1.1, 52.0, 53.0, {'stretch': (-3.0, 0.5)}),  # brighter ring frames, stretch held at max
        ('payoff', 3.1, 9.2, 13.0, {})]
 json.dump([s[:4] for s in SEG], open(os.path.join(OUT, 'segments.json'), 'w'))
 def run(cmd):
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode: print(r.stderr[-3000:]); sys.exit(1)
 files = []
+ONLY = os.environ.get('ONLY', '').split(',') if os.environ.get('ONLY') else None
 for name, od, s0, s1, ex in SEG:
+    if ONLY and name not in ONLY: files.append(os.path.join(OUT, f'{name}.mp4')); continue
     n = round(od * FPS); cmds = []
     for f in range(n):
         u = f / max(n - 1, 1)

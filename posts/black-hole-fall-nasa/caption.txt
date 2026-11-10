@@ -1,4 +1,4 @@
-Guess before the end: how many seconds do you get after the edge? 👇
+Guess before 0:18: how many seconds do you get after the edge? 👇
 
 This is NASA's own supercomputer simulation of a camera falling into a black hole like the one at the center of our galaxy: 4.3 million times the mass of the Sun, with an edge (the event horizon) about 25 million km across. We flew a vertical camera through NASA's 360° movie and told the story on top.
 
