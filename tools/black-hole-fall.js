@@ -45,9 +45,9 @@ function drawCards(t){for(const C of CARDS){let al;
   if(C.a<0)al=t<C.b?1-ease((t-(C.b-.3))/.3):0;
   else if(C.b>D)al=t>=C.a?ease((t-C.a)/.35):0;
   else al=(t>=C.a&&t<C.b)?Math.min(ease((t-C.a)/.35),ease((C.b-t)/.3)):0;
-  if(al<=0)continue;let sz=C.sz;x.font='900 '+sz+'px '+F;let mw=0;C.L.forEach(l=>{if(!l[3])mw=Math.max(mw,x.measureText(l[0]).width)});if(mw>820)sz=Math.floor(sz*820/mw);
+  if(al<=0)continue;let sz=C.sz;x.font='900 '+sz+'px '+F;let mw=0;C.L.forEach(l=>{if(!l[3])mw=Math.max(mw,x.measureText(l[0]).width)});if(mw>800)sz=Math.floor(sz*800/mw);
   let y=430;const dy=-(1-((C.a<0||C.b>D)?1:ease((t-C.a)/.35)))*22;
-  C.L.forEach((l,i)=>{const s2=l[3]||sz;const la=l[1]<=C.a||C.b>D||C.a<0?1:ease((t-l[1])/.3);tline(l[0],W/2,y+dy,s2,al*la,l[2]||'#fff');y+=s2*1.18;});}}
+  C.L.forEach((l,i)=>{const s2=l[3]||sz;const la=l[1]<=C.a||C.b>D||C.a<0?1:ease((t-l[1])/.3);tline(l[0],495,y+dy,s2,al*la,l[2]||'#fff');y+=s2*1.18;});}}
 // ---------- small astronaut glyph ----------
 function astro(px,py,s,rot,tint,al){x.save();x.globalAlpha=al;x.translate(px,py);x.rotate(rot);x.scale(s,s);
  x.fillStyle=tint;x.strokeStyle='rgba(0,0,0,.6)';x.lineWidth=2;
@@ -73,7 +73,7 @@ function clocks(t){
  panel(506,Y,420,PH,fa,'rgba(127,216,255,.85)');
  tline('YOUR FRIEND',716,Y+52,36,fa,'#7fd8ff',null,900);tline('(far away)',716,Y+90,26,fa*.85,'#b9c4d6',null,700);
  const fh=t>=TEND+0.4?0:friendHours(t);const forever=t>=18.8&&t<TEND+0.4;
- tline(forever?'FOREVER':fmtFriend(fh),716,Y+180,fmtFriend(fh).length>9&&!forever?54:66,fa,forever?'#7fd8ff':'#fff',null,800);
+ tline(forever?'FOREVER':fmtFriend(fh),716,Y+180,forever?66:fmtFriend(fh).length>11?44:fmtFriend(fh).length>9?54:66,fa,forever?'#7fd8ff':'#fff',null,800);
  // friend's view of you: approaches the edge, then slows and freezes just shy of it
  const fr=t>=TEND+0.4?0:t;const ex=830,ey=Y+262;
  x.save();x.globalAlpha=fa;x.beginPath();x.roundRect(560,Y+214,312,96,16);x.clip();x.fillStyle='#04050a';x.fillRect(560,Y+214,312,96);
@@ -92,7 +92,7 @@ SC={D,TCROSS,TEND,camAt,
    // honest label
    const fA=ease(cl((t-(TEND+0.5))/.3));
    x.save();x.globalAlpha=.8*(1-fA);x.font='600 26px '+F;x.textAlign='center';x.fillStyle='#d8d2e8';x.shadowColor='#000';x.shadowBlur=10;
-   x.fillText('Simulation (illustrative). Black hole like the Milky Way’s center',W/2,1080-24);x.restore();
+   x.fillText('Illustrative simulation (a Milky Way-type black hole)',495,1080-24);x.restore();
    clocks(t);drawCards(t);
-   if(fA>0)tline('Follow → new one tomorrow',W/2,1062,40,fA*.95,'#cfe6ff',null,800);
+   if(fA>0)tline('Follow → new one tomorrow',495,1062,40,fA*.95,'#cfe6ff',null,800);
  }};

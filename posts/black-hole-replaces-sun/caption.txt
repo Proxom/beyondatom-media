@@ -1,0 +1,24 @@
+Guess before the end: which planets end up inside? 👇
+
+Take away the Sun and put a black hole in its place. We only compare sizes here: the event horizon, the edge that nothing gets back out of.
+
+Our galaxy's black hole, Sagittarius A* (4.3 million times the Sun's mass), has an event horizon about 25 million km across. That is about 18 times wider than the Sun (1.39 million km), yet it would still fit well inside Mercury's orbit (57.9 million km from the Sun).
+
+Now swap in M87*, the black hole at the heart of the galaxy Messier 87 and the first black hole ever imaged (2019). It has 6.5 billion times the Sun's mass, and its event horizon measures just under 40 billion km across. Centered on the Sun, its edge would reach about 19 billion km out: past every planet (Neptune is 4.5 billion km from the Sun) and past Pluto's average distance (5.9 billion km). Voyager 1, our farthest spacecraft, about 26 billion km away, would still be outside.
+
+About the video: an original computer animation, seen from above. The orbit sizes and the event-horizon sizes are to scale (the view zooms out on a sliding scale). Planet dots are markers and not to scale, the planets' positions on their orbits are illustrative, and the glow around each black hole is decorative. This is a size comparison only: what such a swap would do to the planets' orbits is not shown. M87*'s horizon size is calculated from its mass (Schwarzschild radius 2GM/c², about 2.95 km per solar mass), matching ESO's "just under 40 billion km".
+
+Sources:
+NASA Science, "New NASA Black Hole Visualization Takes Viewers Beyond the Brink" (a black hole with 4.3 million solar masses, like the one at the center of the Milky Way; event horizon about 25 million km across): https://science.nasa.gov/supermassive-black-holes/new-nasa-black-hole-visualization-takes-viewers-beyond-the-brink/
+ESO, eso1907 "Astronomers Capture First Image of a Black Hole" (M87*: 6.5 billion times the Sun's mass, 55 million light-years away; event horizon just under 40 billion km across): https://www.eso.org/public/news/eso1907/
+ESO, eso2208-eht-mwe (size comparison of M87* and Sgr A* with the Solar System and Voyager 1): https://www.eso.org/public/images/eso2208-eht-mwe/
+NASA Sun Fact Sheet (mean radius 695,700 km): https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html
+NASA Planetary Fact Sheet (distance from the Sun: Mercury 57.9, Neptune 4,515, Pluto 5,906.4 million km): https://nssdc.gsfc.nasa.gov/planetary/factsheet/
+NASA, Where Are Voyager 1 and 2 Now? (Voyager 1: 25.902 billion km from Earth on 18 Nov 2026): https://science.nasa.gov/mission/voyager/where-are-voyager-1-and-voyager-2-now/
+
+Footage: none, original animation. Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #blackhole #solarsystem #shorts

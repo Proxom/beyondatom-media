@@ -1,0 +1,91 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=c width=1080 height=1920></canvas>
+<!-- black-hole-replaces-sun: put our galaxy's black hole (Sgr A*) and then M87* where the Sun is. Top-down solar system,
+     orbits and black-hole event-horizon sizes to scale (log zoom-out), planet dots are markers (not to scale).
+     Facts: NASA Science "New NASA Black Hole Visualization Takes Viewers Beyond the Brink" (4.3 million suns, horizon ~25 million km
+     across); ESO eso1907 (M87*: 6.5 billion suns, event horizon just under 40 billion km across); NSSDC planetary fact sheet
+     (distances from the Sun, 10^6 km); NSSDC Sun fact sheet (radius 695,700 km); NASA Voyager status (25.902 billion km on 18 Nov 2026). -->
+<script>
+const W=1080,H=1920,cv=document.getElementById('c'),x=cv.getContext('2d');
+const F='"DejaVu Sans",Arial,sans-serif',D=22.0;
+const ease=t=>t<0?0:t>1?1:t*t*(3-2*t), cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)), lerp=(a,b,u)=>a+(b-a)*u;
+const eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+const CX=W/2, CY=930;                                   // Sun position on screen
+const RSUN=0.6957;                                      // million km
+const PL=[['MERCURY',57.9,'#b9b2a8'],['VENUS',108.2,'#e8c98a'],['EARTH',149.6,'#5aa0ff'],['MARS',228.0,'#e0734a'],['JUPITER',778.5,'#e3b98a'],
+ ['SATURN',1432.0,'#e6d08f'],['URANUS',2867.0,'#9fe3e8'],['NEPTUNE',4515.0,'#5f7dff'],['PLUTO',5906.4,'#c9b8a6']];
+const SGR=12.5, M87=19200, VOY=25902;                   // horizon radii (million km); Voyager 1 distance
+const ANG=[2.2,0.9,-0.6,1.7,-1.2,0.3,2.7,-2.2,-0.2];       // where each planet sits on its orbit (illustrative)
+function tv(t){return t>=D-0.9?0:t;}                   // last 0.9 s = hook view again (loop)
+// view radius (million km at 470 px from the Sun), log interpolation
+function viewR(t){const s=tv(t);
+ const K=[[0,175],[2.4,175],[5.4,80],[8.4,80],[15.2,33000],[22,33000]];
+ for(let i=0;i<K.length-1;i++){const [a,va]=K[i],[b,vb]=K[i+1];if(s<=b){const u=eio((s-a)/(b-a));return Math.exp(lerp(Math.log(va),Math.log(vb),u));}}return 33000;}
+function bhR(t){const s=tv(t);                          // horizon radius shown (million km)
+ if(s<2.6)return 0;
+ if(s<5.4)return lerp(RSUN,SGR,eio((s-2.6)/2.2));
+ if(s<9.0)return SGR;
+ return Math.exp(lerp(Math.log(SGR),Math.log(M87),eio((s-9.0)/6.2)));}
+const PX=470;
+function sc(t){return PX/viewR(t);}                     // px per million km
+function stars(){const r=(()=>{let s=7;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}})();
+ for(let i=0;i<260;i++){const a=r(),b=r(),c=r();x.globalAlpha=.25+.6*c;x.fillStyle=c>.8?'#ffe6c8':'#dfe9ff';x.beginPath();x.arc(a*W,b*H,.6+c*1.5,0,7);x.fill();}x.globalAlpha=1;}
+function tline(s,px,py,size,alpha,col,align,weight){if(alpha<=0)return;x.save();x.globalAlpha=alpha;x.font=(weight||900)+' '+size+'px '+F;x.textAlign=align||'center';
+ x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=20;x.fillStyle=col||'#fff';x.fillText(s,px,py);x.fillText(s,px,py);x.restore();}
+function fmtKm(m){ if(m<1000)return Math.round(m).toLocaleString('en-US')+' MILLION km'; return (m/1000).toFixed(m<10000?1:0)+' BILLION km'; }
+const CARDS=[
+ {a:-1,b:2.5,L:[['PUT A BLACK HOLE',0],['WHERE THE SUN IS',0,'#ffb347'],['WHICH PLANETS END UP INSIDE?',0,'#cfe6ff',50]],sz:96},
+ {a:2.5,b:5.6,L:[['OUR GALAXY’S BLACK HOLE',2.5],['4.3 MILLION SUNS',3.0,'#ffb347']],sz:66},
+ {a:5.6,b:8.8,L:[['18 SUNS WIDE...',5.6],['BUT STILL INSIDE',6.4,'#7dffc4'],['MERCURY’S ORBIT',6.4,'#7dffc4']],sz:70},
+ {a:8.8,b:12.0,L:[['NOW M87*',8.8,'#ff8a5c'],['6.5 BILLION SUNS',9.4]],sz:80},
+ {a:12.0,b:15.6,L:[['IT SWALLOWS',12.0],['EVERY PLANET',12.0,'#ff8a5c']],sz:84},
+ {a:15.6,b:18.6,L:[['...AND PLUTO',15.6],['ALMOST 40 BILLION km WIDE',16.2,'#ffb347']],sz:70},
+ {a:18.6,b:D-0.9,L:[['VOYAGER 1, OUR',18.6],['FARTHEST SPACECRAFT:',18.6],['STILL OUTSIDE',19.1,'#7dffc4']],sz:70},
+ {a:D-0.9,b:99,L:[['PUT A BLACK HOLE',0],['WHERE THE SUN IS',0,'#ffb347'],['WHICH PLANETS END UP INSIDE?',0,'#cfe6ff',50]],sz:96}];
+function drawCards(t){for(const C of CARDS){let al;
+  if(C.a<0)al=t<C.b?1-ease((t-(C.b-.3))/.3):0; else if(C.b>D)al=t>=C.a?ease((t-C.a)/.3):0;
+  else al=(t>=C.a&&t<C.b)?Math.min(ease((t-C.a)/.35),ease((C.b-t)/.3)):0;
+  if(al<=0)continue;let sz=C.sz;x.font='900 '+sz+'px '+F;let mw=0;C.L.forEach(l=>{if(!l[3])mw=Math.max(mw,x.measureText(l[0]).width)});if(mw>800)sz=Math.floor(sz*800/mw);
+  let y=422;const fi=(C.a<0||C.b>D)?1:ease((t-C.a)/.35);
+  C.L.forEach(l=>{const s2=l[3]||sz;const la=(l[1]<=C.a||C.a<0||C.b>D)?1:ease((t-l[1])/.3);tline(l[0],495,y-(1-fi)*20,(l[3]?Math.min(s2,Math.floor(s2*800/Math.max(1,(x.font='900 '+s2+'px '+F,x.measureText(l[0]).width)))):s2),al*la,l[2]||'#fff');y+=s2*1.18;});}}
+function draw(t){
+ const s=tv(t),k=sc(t),R=bhR(t);
+ x.globalAlpha=1;x.fillStyle='#03040a';x.fillRect(0,0,W,H);stars();
+ // orbits + planets
+ PL.forEach((p,i)=>{const r=p[1]*k;if(r<6||r>2600)return;const inside=R>=p[1];
+  x.save();x.strokeStyle=inside?'rgba(255,120,80,.35)':'rgba(150,180,230,.55)';x.lineWidth=2.5;x.setLineDash(inside?[10,10]:[]);x.beginPath();x.arc(CX,CY,r,0,7);x.stroke();x.restore();
+  const px=CX+r*Math.cos(ANG[i]),py=CY+r*Math.sin(ANG[i]);
+  const vis=r<1500&&px>40&&px<W-40&&py>40&&py<H-40;
+  if(vis&&!inside){x.fillStyle=p[2];x.shadowColor=p[2];x.shadowBlur=12;x.beginPath();x.arc(px,py,9,0,7);x.fill();x.shadowBlur=0;
+   const la=cl(1-(r-900)/400)*cl((r-40)/40);const lx=cl(px,140,860),ly=cl(py-22,340,1420);
+   if(la>0&&ly>340)tline(p[0],lx,ly,28,la*.9,'#dfe9ff',null,800);}});
+ // Sun (fades as the black hole takes its place)
+ const sunA=1-ease((s-2.6)/.8);const rs=Math.max(RSUN*k,7);
+ if(sunA>0){x.save();x.globalAlpha=sunA;const g=x.createRadialGradient(CX,CY,0,CX,CY,rs*3.2);g.addColorStop(0,'#fff7d8');g.addColorStop(.3,'#ffd34a');g.addColorStop(1,'#ffb34700');
+  x.fillStyle=g;x.beginPath();x.arc(CX,CY,rs*3.2,0,7);x.fill();x.fillStyle='#fff3c4';x.beginPath();x.arc(CX,CY,rs,0,7);x.fill();x.restore();
+  tline('SUN',CX,CY+rs+52,36,sunA*cl(1-s/2.6+0.3),'#ffd84a',null,800);}
+ // black hole: event horizon to scale (black disk) with an illustrative glowing ring
+ if(R>0){const rp=R*k;x.save();
+  const glow=x.createRadialGradient(CX,CY,rp*.95,CX,CY,rp*1.35+10);glow.addColorStop(0,'rgba(255,170,70,.95)');glow.addColorStop(.25,'rgba(255,120,40,.45)');glow.addColorStop(1,'rgba(255,90,20,0)');
+  x.fillStyle=glow;x.beginPath();x.arc(CX,CY,rp*1.35+10,0,7);x.fill();
+  x.fillStyle='#000';x.beginPath();x.arc(CX,CY,rp,0,7);x.fill();
+  x.strokeStyle='rgba(255,200,120,.9)';x.lineWidth=3;x.beginPath();x.arc(CX,CY,rp,0,7);x.stroke();x.restore();
+  // size counter
+  const cA=ease((s-2.8)/.4)*(1-ease((t-(D-1.1))/.2));
+  if(cA>0){x.save();x.globalAlpha=cA;x.fillStyle='rgba(6,8,16,.75)';x.strokeStyle='rgba(255,179,71,.8)';x.lineWidth=3;x.beginPath();x.roundRect(170,1250,740,150,26);x.fill();x.stroke();x.restore();
+   tline('EVENT HORIZON',W/2,1300,32,cA,'#ffb347',null,900);tline(fmtKm(2*R)+' WIDE',W/2,1372,56,cA,'#fff',null,900);}}
+ // Voyager 1
+ const vA=ease((s-17.6)/.6)*(1-ease((t-(D-1.1))/.2));
+ if(vA>0){const vr=VOY*k,va=-2.62;const vx=CX+vr*Math.cos(va),vy=CY+vr*Math.sin(va);
+  x.save();x.globalAlpha=vA;x.strokeStyle='rgba(125,255,196,.6)';x.setLineDash([8,10]);x.lineWidth=2;x.beginPath();x.moveTo(CX,CY);x.lineTo(vx,vy);x.stroke();x.restore();
+  x.save();x.globalAlpha=vA;x.fillStyle='#7dffc4';x.shadowColor='#7dffc4';x.shadowBlur=16;x.beginPath();x.arc(vx,vy,10,0,7);x.fill();x.restore();
+  tline('VOYAGER 1',vx+20,vy-24,34,vA,'#7dffc4','left',900);tline('26 billion km',vx+20,vy+18,28,vA*.9,'#cfe6ff','left',700);}
+ // scale note
+ const nA=1-ease((t-(D-1.1))/.2)*(t<D-0.9?1:0);
+ tline('Orbits and black-hole sizes to scale. Planet dots not to scale.',495,1220,24,.75,'#aab4c8',null,600);
+ drawCards(t);
+ const fA=ease((t-(D-0.8))/.25);
+ if(fA>0)tline('Follow → new one tomorrow',495,1340,40,fA*.95,'#cfe6ff',null,800);
+}
+window.draw=draw;window.TEXREADY=true;
+</script>
