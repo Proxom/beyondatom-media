@@ -2,6 +2,16 @@
 
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
+## URGENT ONE-TIME: REMAKE THE BLACK-HOLE FALL SHORT TO THE CINEMATIC STANDARD (Erkan, 10 Nov 2026 18:36) — do this FIRST in the next run; ignore this block once it is scheduled
+Erkan: "make the same video again now, by the new criteria". Remake "Fall Into a Black Hole" (media/black-hole-fall) as a NEW Short, following "CINEMATIC QUALITY STANDARD" exactly:
+- FIRST look for NASA Goddard's own black-hole visualizations on svs.gsfc.nasa.gov / NASA Image and Video Library (the 2024 "falling into a black hole" visualization: 4.3 million solar masses, plunge and orbit versions; public domain). If available: use it full-frame as the main picture (vertical crop, slow push), credit "Visualization: NASA's Goddard Space Flight Center / J. Schnittman and B. Powell" in the description. If not reachable within 15 min: build our own full-frame first-person fall (big lensed black hole filling the frame, accretion glow, starfield streaks, stretching), never small or at the edge.
+- No dashboard boxes. One clean counter at a time (e.g. "12.8 s left") over the picture. Bold display font.
+- Kokoro voiceover, cinematic music bed, 25-40 s: hook ("What if you fell into a black hole?") → the two views (you vs a friend far away: you seem to freeze at the edge) → crossing → 12.8 seconds → stretched like a noodle → payoff → loop. Facts and sources as in the old description (NASA Science page).
+- Must pass the HARD GATE and the REFERENCE GATE (score 7+ next to the NASA original).
+- New title wording (do not reuse the old one), e.g. "What If You Fell Into a Black Hole? 🕳️".
+- SCHEDULE: 11 Nov 17:00 (it takes that day's 1M+ slot). The 1M+ list shifts by one day: 12 Nov 17:00 = #2 Baumgartner, 13 Nov = #3, and so on.
+- If not finished in this run, save in wip/ and finish first in the next run.
+
 ## CINEMATIC QUALITY STANDARD (Erkan, 10 Nov 2026 18:33) — applies to every Short, strictest for the 17:00 1M+ slot
 Erkan on the 10 Nov 17:00 black-hole Short: "very, very far from the quality and visual taste of the million-view original; as it is, it won't even get thousands." Diagnosis from its frames: the black hole is a small strip at the edge, most of the frame is empty black, two dashboard-style clock boxes dominate the picture, plain system font, no narration, no sense of falling.
 1. THE PICTURE IS THE STAR:
