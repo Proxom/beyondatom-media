@@ -2,6 +2,13 @@
 
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
+## OVERRIDE (Erkan, 10 Nov 2026 18:40): PUBLISH THE BLACK-HOLE REMAKE TONIGHT, NOT 11 NOV 17:00
+This replaces the scheduling part of the "URGENT ONE-TIME: REMAKE THE BLACK-HOLE FALL SHORT" block:
+- Publish the remake AS SOON AS IT IS FINISHED: schedule it in Metricool for now + 3 minutes (Europe/London). If that is within 20 minutes of another scheduled Short (e.g. 21:00), schedule it 30 minutes after that Short instead. If it is already scheduled for 11 Nov 17:00, move it.
+- The 1M+ list does NOT shift: 11 Nov 17:00 = #2 Baumgartner, 12 Nov = #3 Planck length, and so on.
+- Do not delete or edit the old black-hole Short; Erkan deletes it himself.
+- Ignore this block once the remake is published.
+
 ## URGENT ONE-TIME: REMAKE THE BLACK-HOLE FALL SHORT TO THE CINEMATIC STANDARD (Erkan, 10 Nov 2026 18:36) — do this FIRST in the next run; ignore this block once it is scheduled
 Erkan: "make the same video again now, by the new criteria". Remake "Fall Into a Black Hole" (media/black-hole-fall) as a NEW Short, following "CINEMATIC QUALITY STANDARD" exactly:
 - FIRST look for NASA Goddard's own black-hole visualizations on svs.gsfc.nasa.gov / NASA Image and Video Library (the 2024 "falling into a black hole" visualization: 4.3 million solar masses, plunge and orbit versions; public domain). If available: use it full-frame as the main picture (vertical crop, slow push), credit "Visualization: NASA's Goddard Space Flight Center / J. Schnittman and B. Powell" in the description. If not reachable within 15 min: build our own full-frame first-person fall (big lensed black hole filling the frame, accretion glow, starfield streaks, stretching), never small or at the edge.
