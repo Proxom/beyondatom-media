@@ -2,6 +2,21 @@
 
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
+## CINEMATIC QUALITY STANDARD (Erkan, 10 Nov 2026 18:33) — applies to every Short, strictest for the 17:00 1M+ slot
+Erkan on the 10 Nov 17:00 black-hole Short: "very, very far from the quality and visual taste of the million-view original; as it is, it won't even get thousands." Diagnosis from its frames: the black hole is a small strip at the edge, most of the frame is empty black, two dashboard-style clock boxes dominate the picture, plain system font, no narration, no sense of falling.
+1. THE PICTURE IS THE STAR:
+   - The main subject fills at least 60% of the frame in every shot; no large empty black areas.
+   - No dashboard/UI boxes. At most ONE small, clean counter or label at a time, integrated into the image (text with shadow over the picture, not boxes).
+   - Cinematic camera: continuous slow push-in, orbit or fall; depth (foreground/background layers, parallax, particles, starfield streaks); light and glow that feel real.
+   - Typography: a bold display font (e.g. Anton, Bebas Neue, Montserrat ExtraBold from Google Fonts, downloaded as files into tools/fonts/), big, white with a soft shadow; max 6 words on screen.
+2. USE REAL NASA/ESA VISUALS WHEN THEY EXIST: many million-view space Shorts use NASA's own visualizations (e.g. NASA Goddard's "falling into a black hole" visualization on svs.gsfc.nasa.gov, ISS footage, Webb/Hubble images). These are public domain (NASA) or CC BY (ESA/ESO with credit). For every 1M+ topic, first check NASA SVS / NASA Image and Video Library / ESA for real footage of the subject (max 15 min); if it exists, it is the main picture (vertical crop, slow zoom), and we add our own hook, narration, counter and music. That is our own work (new edit, new narration, new structure), with the credit in the description. Only make an animation when no real visual exists or ours would clearly be better.
+3. NARRATION: every 1M+ Short and every explanatory Short gets a voiceover (Kokoro, natural pace, short sentences, synced to the picture) plus a cinematic music bed (original, soft, no harsh highs).
+4. REFERENCE GATE (17:00 1M+ slot, part of the HARD GATE):
+   - Before production, write down what made the original look great (3-5 points: framing, motion, colour, pacing, sound).
+   - After the final render, a fresh reviewer subagent gets our 6 stills + the voiceover text and those 3-5 points, and answers: "Would this Short look good next to the million-view original in a Shorts feed?" Score 1-10. Below 7: improve (bigger subject, better motion, real footage) and check again. Max 2 rounds; if still below 7, schedule the best version and say so in the report.
+   - The 17:00 Short may take two runs: start it in the run before (WIP) so there is time for quality.
+5. Length for these: whatever the topic needs (typically 25-45 s); never cut explanation short.
+
 ## 17:00 = PROVEN 1M+ TOPIC, IN ORDER (Erkan, 9 Nov 2026 21:03) — from 10 Nov, every day; overrides rule 1 of the "PROVEN 1M+ TOPICS" block and the sprint rotation for the 17:00 slot
 1. The 17:00 Short every day is OUR OWN VERSION of a space Short that already reached 1 million+ views (same rules as the block below: 100% our own visuals, script, title wording and sound; add our twist; log `outlier: <original + link>`).
 2. ORDER: work down this list from the most viewed to the least viewed, one per day (10 Nov = #1, 11 Nov = #2, ...). Skip an item only if its hard gate cannot be met; then do the next and come back to it.
