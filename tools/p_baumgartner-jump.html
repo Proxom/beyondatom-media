@@ -1,0 +1,50 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:MontX;src:url(fonts/Montserrat-ExtraBold.ttf)}</style>
+<canvas id=g width=1080 height=1920 style="display:none"></canvas><canvas id=c width=1080 height=1920></canvas>
+<script id=fs type=x-shader>
+precision highp float;
+uniform vec2 R;uniform vec3 SUN,UP,EAST,NORTH,OFF;uniform mat3 CM;uniform float FOV,HB,RE,BLUR,EXPO,FISH;uniform sampler2D TEX,CLD;
+float h2(vec2 p){p=fract(p*vec2(.1031,.1030));p+=dot(p,p.yx+33.33);return fract((p.x+p.y)*p.x);}
+float n2(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h2(i),h2(i+vec2(1,0)),f.x),mix(h2(i+vec2(0,1)),h2(i+vec2(1,1)),f.x),f.y);}
+float fbm(vec2 p,float fade){float s=0.,a=.5,w=0.;for(int k=0;k<6;k++){float fw=clamp(fade-float(k),0.,1.);s+=a*fw*n2(p);w+=a*fw;p=p*2.03+vec2(17.1,9.3);a*=.5;}return w>0.?s/w:.5;}
+vec3 shade(vec3 rd){
+ float mu=dot(rd,UP);float Rc=RE+HB;float b=Rc*mu;float c=HB*(2.*RE+HB);float disc=b*b-c;
+ vec3 BLUE=vec3(.30,.55,1.0),HAZE=vec3(.62,.75,.95);
+ float sd=max(dot(rd,SUN),0.);
+ if(disc>0.&&b<0.){
+  float t=(-b-sqrt(disc))/1.;vec3 p=UP*Rc+rd*t;vec3 n=normalize(p);
+  float lon=atan(n.x,n.z);vec2 tu=vec2(fract(lon/6.28318+.5),acos(clamp(n.y,-1.,1.))/3.14159);
+  vec3 al=pow(texture2D(TEX,tu).rgb,vec3(1.7))*1.35;
+  // procedural detail on the tangent plane (km), faded with distance
+  vec3 lp=rd*t+OFF;vec2 pl=vec2(dot(lp,EAST),dot(lp,NORTH));
+  float px=t*FOV*2./R.x;                    // km per pixel at this distance
+  float f1=fbm(pl*.045,clamp(log2(.6/(px*.045+1e-4)),0.,6.));
+  float f2=fbm(pl*.6+5.,clamp(log2(.6/(px*.6+1e-4)),0.,6.));
+  float f3=fbm(pl*4.+9.,clamp(log2(.6/(px*4.+1e-4)),0.,6.));
+  float rid=1.-abs(2.*f1-1.);
+  al=mix(vec3(dot(al,vec3(.3,.59,.11))),al,1.6);
+  al*=.45+.95*f1;al*=.78+.44*f2;al*=.85+.3*f3;al=mix(al,vec3(.30,.27,.22),smoothstep(.75,.95,rid)*.55);
+  al=mix(al,al*vec3(.85,1.05,.8),smoothstep(.55,.75,fbm(pl*.02+3.,4.))*.6);
+  float cfade=smoothstep(6.,14.,HB);
+  float cd=fbm(pl*.09+31.,clamp(log2(.6/(px*.09+1e-4)),0.,6.));float cl=smoothstep(.60,.72,cd)*cfade;
+  float cs=fbm((pl+vec2(-2.5,3.0))*.09+31.,clamp(log2(.6/(px*.09+1e-4)),0.,6.));al*=1.-.45*smoothstep(.60,.72,cs)*cfade;
+  al=mix(al,vec3(1.05),cl*.95);
+  float ndl=max(dot(n,SUN),0.);vec3 col=al*(ndl*1.25+.07);
+  float dens=.035*exp(-HB*.5/7.5);float hz=1.-exp(-t*dens);
+  hz=max(hz,1.-exp(-t/900.));
+  col=mix(col,HAZE*(.35+.75*ndl),hz*.9);
+  return col;}
+ float hmin=mu>=0.?HB:max(sqrt(max(Rc*Rc*(1.-mu*mu),0.))-RE,0.);
+ float L=mu>=0.?7.5/(mu+.035):220.;
+ float tau=exp(-hmin/7.5)*L/60.;
+ vec3 sky=BLUE*(1.-exp(-tau*2.2))*1.15+vec3(.9,.95,1.)*(1.-exp(-tau*.35))*.25;
+ sky+=vec3(1.,.95,.85)*(pow(sd,900.)*6.+pow(sd,25.)*.25*(.25+.75*exp(-HB/12.)));
+ return sky;}
+void main(){
+ vec2 uv=(gl_FragCoord.xy-.5*R)/R.x;uv*=1.+FISH*dot(uv,uv);vec3 col=vec3(0.);
+ if(BLUR>0.){for(int k=0;k<7;k++){float a=BLUR*(float(k)/6.-.5);float ca=cos(a),sa=sin(a);vec2 u2=vec2(ca*uv.x-sa*uv.y,sa*uv.x+ca*uv.y);col+=shade(normalize(CM*vec3(u2*FOV*2.,-1.)));}col/=7.;}
+ else col=shade(normalize(CM*vec3(uv*FOV*2.,-1.)));
+ col*=EXPO;col=1.-exp(-col*1.25);col=pow(col,vec3(.95));gl_FragColor=vec4(col,1.);}
+</script>
+<script src="tex.js"></script>
+<script src="baumgartner-jump.js"></script>
