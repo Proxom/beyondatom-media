@@ -26,17 +26,17 @@ vec3 shade(vec3 rd){
   al*=.45+.95*f1;al*=.78+.44*f2;al*=.85+.3*f3;al=mix(al,vec3(.30,.27,.22),smoothstep(.75,.95,rid)*.55);
   al=mix(al,al*vec3(.85,1.05,.8),smoothstep(.55,.75,fbm(pl*.02+3.,4.))*.6);
   float cfade=smoothstep(6.,14.,HB);
-  float cd=fbm(pl*.09+31.,clamp(log2(.6/(px*.09+1e-4)),0.,6.));float cl=smoothstep(.60,.72,cd)*cfade;
-  float cs=fbm((pl+vec2(-2.5,3.0))*.09+31.,clamp(log2(.6/(px*.09+1e-4)),0.,6.));al*=1.-.45*smoothstep(.60,.72,cs)*cfade;
+  float cf=mix(.09,.32,smoothstep(20.,35.,HB));float cd=fbm(pl*cf+31.,clamp(log2(.6/(px*cf+1e-4)),0.,6.));float cl=smoothstep(.62,.74,cd)*cfade;
+  float cs=fbm((pl+vec2(-1.2,1.5))*cf+31.,clamp(log2(.6/(px*cf+1e-4)),0.,6.));al*=1.-.45*smoothstep(.60,.72,cs)*cfade;
   al=mix(al,vec3(1.05),cl*.95);
   float ndl=max(dot(n,SUN),0.);vec3 col=al*(ndl*1.25+.07);
   float dens=.035*exp(-HB*.5/7.5);float hz=1.-exp(-t*dens);
-  hz=max(hz,1.-exp(-t/900.));
+  hz=max(hz,1.-exp(-t/520.));
   col=mix(col,HAZE*(.35+.75*ndl),hz*.9);
   return col;}
  float hmin=mu>=0.?HB:max(sqrt(max(Rc*Rc*(1.-mu*mu),0.))-RE,0.);
  float L=mu>=0.?7.5/(mu+.035):220.;
- float tau=exp(-hmin/7.5)*L/60.;
+ float tau=exp(-hmin/9.5)*L/45.;
  vec3 sky=BLUE*(1.-exp(-tau*2.2))*1.15+vec3(.9,.95,1.)*(1.-exp(-tau*.35))*.25;
  sky+=vec3(1.,.95,.85)*(pow(sd,900.)*6.+pow(sd,25.)*.25*(.25+.75*exp(-HB/12.)));
  return sky;}
