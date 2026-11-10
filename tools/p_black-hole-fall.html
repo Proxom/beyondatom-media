@@ -1,0 +1,89 @@
+<!doctype html><meta charset=utf8><body style="margin:0;background:#000">
+<canvas id=g width=720 height=1280 style="display:none"></canvas><canvas id=c width=1080 height=1920></canvas>
+<!-- black-hole-fall: first-person fall into a supermassive black hole, two live clocks (you vs a far-away friend). -->
+<script id=fs type=x-shader>
+precision highp float;
+uniform vec2 R;uniform float T,K,AZ,EL,DIST,SWX,SWY,LY,FL;
+float h1(vec3 p){p=fract(p*vec3(.1031,.1030,.0973));p+=dot(p,p.yxz+33.33);return fract((p.x+p.y)*p.z);}
+float n3(vec3 p){vec3 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);
+ return mix(mix(mix(h1(i),h1(i+vec3(1,0,0)),f.x),mix(h1(i+vec3(0,1,0)),h1(i+vec3(1,1,0)),f.x),f.y),
+            mix(mix(h1(i+vec3(0,0,1)),h1(i+vec3(1,0,1)),f.x),mix(h1(i+vec3(0,1,1)),h1(i+vec3(1,1,1)),f.x),f.y),f.z);}
+float fbm(vec3 p){float a=.5,s=0.;for(int i=0;i<5;i++){s+=a*n3(p);p*=2.03;a*=.5;}return s;}
+vec3 bb(float t){ // temperature -> color, deep orange to white-hot
+ t=clamp(t,0.,3.);return vec3(1.,.28+.62*smoothstep(.25,1.5,t),.06+.9*smoothstep(.9,2.4,t))*t*t*.8;}
+vec3 sky(vec3 d){
+ vec3 c=vec3(0.);
+ // stars
+ for(int l=0;l<2;l++){float sc=l==0?140.:300.;vec3 q=d*sc;vec3 id=floor(q);float hs=h1(id+float(l)*7.);
+  if(hs>.86){vec3 sp=id+.5+.35*(vec3(h1(id+1.),h1(id+2.),h1(id+3.))-.5);float dd=length(q-sp);
+   float b=pow(hs-.86,1.5)*40.*exp(-dd*dd*(l==0?28.:40.));vec3 tint=mix(vec3(1.,.8,.6),vec3(.7,.8,1.),h1(id+9.));c+=b*tint;}}
+ // milky band + nebula
+ float band=exp(-pow(dot(d,normalize(vec3(.3,1.,.2)))*3.2,2.));
+ float nb=fbm(d*3.5+vec3(4.))*fbm(d*7.+vec3(1.,2.,3.));
+ c+=band*(vec3(.10,.08,.12)*nb*1.6+vec3(.02,.02,.035));
+ c+=vec3(.05,.025,.07)*pow(fbm(d*2.2+9.),3.)*1.2;
+ return c;}
+void main(){
+ vec2 uv=(gl_FragCoord.xy-.5*R)/R.x;float Tp=T+(h1(vec3(gl_FragCoord.xy,T*60.))-.5)/30.;
+ vec3 cam=DIST*vec3(cos(EL)*sin(AZ),sin(EL),cos(EL)*cos(AZ));
+ vec3 fw=normalize(-cam+vec3(SWX,SWY+LY,0.)),rt=normalize(cross(fw,vec3(0,1,0))),up=cross(rt,fw);
+ vec3 dir=normalize(fw*FL+uv.x*rt+uv.y*up);
+ vec3 p=cam,v=dir;float RB=24.;{float bq=dot(p,v),cq=dot(p,p)-RB*RB,ds=bq*bq-cq;if(ds>0.&&cq>0.)p+=v*(-bq-sqrt(ds));}float h2=dot(cross(p,v),cross(p,v));
+ vec3 col=vec3(0.);float trans=1.;bool hit=false;
+ for(int i=0;i<520;i++){
+  float r=length(p);float dt=clamp(.045*r,.02,1.1);
+  float r2=r*r;vec3 a=-1.5*h2*p/(r2*r2*r)*K;
+  vec3 pn=p+v*dt+.5*a*dt*dt;vec3 vn=v+a*dt;
+  if(p.y*pn.y<0.){float f=p.y/(p.y-pn.y);vec3 q=mix(p,pn,f);float rq=length(q);
+   if(rq>3.&&rq<15.){
+    float phi=atan(q.z,q.x);float w=.55/pow(rq,1.5);float ph=phi+w*Tp*2.6;
+    vec3 qq=vec3(cos(ph)*rq,sin(ph)*rq,rq*.7);
+    float tex=fbm(qq*.9+vec3(0.,0.,Tp*.05))*.7+fbm(vec3(rq*2.4,cos(ph)*2.,sin(ph)*2.))*.6;
+    tex=pow(clamp(tex,0.,1.3),1.6);
+    float tp=pow(3./rq,.75)*pow(max(1.-sqrt(3./rq),0.),.25)*2.2;
+    float vs=clamp(sqrt(.5/(rq-1.)),0.,.9);vec3 vv=vs*normalize(vec3(-q.z,0.,q.x));
+    vec3 n=-normalize(vn);float gam=1./sqrt(1.-vs*vs);float D=1./(gam*(1.-dot(vv,n)));
+    D*=sqrt(1.-1./rq);
+    float edge=smoothstep(3.,3.6,rq)*smoothstep(15.,10.,rq);
+    vec3 e=bb(tp*D*1.1)*pow(D,3.)*(.35+tex*1.4)*edge*1.6;
+    float al=clamp(edge*(.55+.45*tex),0.,.97);
+    col+=trans*e*al;trans*=1.-al;if(trans<.03){hit=true;break;}}}
+  p=pn;v=normalize(vn)*length(v);
+  if(length(p)<1.0){hit=true;break;}
+  if(length(p)>RB+.5&&dot(p,v)>0.)break;
+ }
+ if(!hit) col+=trans*sky(normalize(v));
+ col=1.-exp(-col*1.0);col=pow(col,vec3(1.05));
+ gl_FragColor=vec4(col,1.);}
+</script>
+<script>
+const W=1080,H=1920;
+const g=document.getElementById('g'),gl=g.getContext('webgl',{preserveDrawingBuffer:true,antialias:false});
+const GW=g.width,GH=g.height;
+function shd(t,s){const o=gl.createShader(t);gl.shaderSource(o,s);gl.compileShader(o);if(!gl.getShaderParameter(o,gl.COMPILE_STATUS))throw gl.getShaderInfoLog(o);return o}
+const pr=gl.createProgram();gl.attachShader(pr,shd(gl.VERTEX_SHADER,'attribute vec2 a;void main(){gl_Position=vec4(a,0,1);}'));
+gl.attachShader(pr,shd(gl.FRAGMENT_SHADER,document.getElementById('fs').text));gl.linkProgram(pr);gl.useProgram(pr);
+const bf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,bf);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,3,-1,-1,3]),gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,2,gl.FLOAT,false,0,0);
+const U={};for(const n of['R','T','K','AZ','EL','DIST','SWX','SWY','LY','FL'])U[n]=gl.getUniformLocation(pr,n);
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+</script>
+<script src="black-hole-fall.js"></script>
+<script>
+function gpu(t){const k=SC.camAt(t);gl.viewport(0,0,GW,GH);gl.uniform2f(U.R,GW,GH);gl.uniform1f(U.T,t>=SC.TEND+0.4?0:t);gl.uniform1f(U.K,1);
+ gl.uniform1f(U.AZ,k.az);gl.uniform1f(U.EL,k.el);gl.uniform1f(U.DIST,k.dist);gl.uniform1f(U.SWX,k.swx);gl.uniform1f(U.SWY,k.swy);gl.uniform1f(U.LY,k.ly);gl.uniform1f(U.FL,k.fl);
+ gl.drawArrays(gl.TRIANGLES,0,3);}
+function draw(t){
+ x.globalAlpha=1;x.globalCompositeOperation='source-over';x.filter='none';x.fillStyle='#000';x.fillRect(0,0,W,H);
+ x.imageSmoothingQuality='high';gpu(t);
+ const p=SC.post(t);x.save();x.translate(W/2,H*0.47);x.scale(p.sx,p.sy);x.translate(-W/2,-H*0.47);
+ x.drawImage(g,0,0,W,H);
+ x.globalCompositeOperation='lighter';x.filter='blur(46px)';x.globalAlpha=.42;x.drawImage(g,0,0,W,H);
+ x.filter='blur(12px)';x.globalAlpha=.22;x.drawImage(g,0,0,W,H);x.restore();
+ x.globalCompositeOperation='source-over';x.filter='none';x.globalAlpha=1;
+ if(p.dark>0){x.fillStyle='rgba(0,0,0,'+p.dark+')';x.fillRect(0,0,W,H);}
+ const vg=x.createRadialGradient(W/2,H*.52,H*.25,W/2,H*.52,H*.75);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.6)');
+ x.fillStyle=vg;x.fillRect(0,0,W,H);
+ SC.overlay(t);}
+window.draw=draw;window.TEXREADY=true;
+</script>

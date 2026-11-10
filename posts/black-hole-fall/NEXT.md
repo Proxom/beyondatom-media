@@ -1,0 +1,9 @@
+# black-hole-fall (YouTube Short, target slot 10 Nov 2026 17:00 Europe/London)
+Run: 10 Nov 04:07 queue-check run (yt-0407, session clever-rubin-gw8n3a). QUEUE was 1 (only iss-orbit-twist, 10 Nov 21:00; it was moved off 17:00 per the 9 Nov 21:03 rule) -> 10 Nov 17:00 slot EMPTY -> build it first.
+17:00 rule (Erkan 9 Nov 21:03): proven 1M+ topic #1 on the ordered list: "Falling into a black hole (~15M) -> first-person fall with a time-dilation clock".
+outlier: "What if you got sucked into a black hole?" (~15M views, per AGENT.md list of 9 Nov; exact Short URL not recorded there and not found in a 2-search check) / "NASA simulated falling into a black hole" (2.4M; NASA Goddard visualization, May 2024: https://science.nasa.gov/supermassive-black-holes/new-nasa-black-hole-visualization-takes-viewers-beyond-the-brink/)
+Our twist: TWO live clocks side by side (YOU vs YOUR FRIEND far away): yours runs to ~3 h then a real-time 12.8 s countdown; the friend's races to days, years, FOREVER while their view shows you freezing just outside the edge. First-person ray-traced approach (our own shader).
+Sprint style: A (side-by-side comparison with live counters). 10 Nov already has B at 01:00 (no-suit-space) and C at 21:00 (iss-orbit-twist).
+Scene tools/p_black-hole-fall.html + tools/black-hole-fall.js (shader from tools/blackhole-anim.html with LY/FL camera uniforms), sound tools/black-hole-fall.sound.py (sound-v2, root 55, low wood clock ticks + marimba). D=24.0 s.
+Facts: all from ONE NASA page (above): 4.3 million suns; horizon ~25 million km; ~3 h fall from ~640 million km; distant observer sees the image slow and freeze; 12.8 s to spaghettification; 128,000 km to the singularity; stellar-mass BHs rip you apart before the horizon.
+Honesty: "Simulation (illustrative)" label on screen; caption says the friend's clock numbers are illustrative, the 3 h fall is fast-forwarded, the inside/stretch part is an illustration.

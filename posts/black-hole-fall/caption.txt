@@ -1,0 +1,21 @@
+Guess before the end: how many seconds do you get after the edge? 👇
+
+You fall toward a black hole like the one at the center of our galaxy: 4.3 million times the mass of the Sun, with an edge (the event horizon) about 25 million km across. Your friend watches from far away. Two clocks, two very different stories.
+
+Your clock: the fall from about 640 million km out to the edge takes about 3 hours. Then you cross the event horizon, the point of no return.
+
+Your friend's view: as space-time gets more and more distorted near the horizon, your image slows down and seems to freeze just outside the edge. To anyone watching from afar, you never quite get there. That's why astronomers once called black holes "frozen stars".
+
+Inside: once you cross, you are just 12.8 seconds from being torn apart by spaghettification, stretched like a noodle on the last 128,000 km to the center. A big black hole is the "better" choice: a small, star-sized one would rip you apart before you even reached the edge.
+
+About the video: an original computer animation (our own ray-traced simulation of a non-spinning black hole, illustrative). The 3-hour fall is fast-forwarded; the 12.8-second countdown runs in real time. The friend's clock keeps counting to show that their time keeps passing while your image stays frozen; the exact numbers on it are illustrative. The inside part and the stretching are an illustration, not a simulation.
+
+Sources:
+NASA Science, "New NASA Black Hole Visualization Takes Viewers Beyond the Brink" (4.3 million solar masses; event horizon about 25 million km across; about 3 hours to fall to the event horizon from about 640 million km; to a distant observer the image slows and seems to freeze just shy of the horizon, "frozen stars"; 12.8 seconds from crossing to spaghettification; 128,000 km to the singularity; stellar-mass black holes can rip objects apart before they reach the horizon): https://science.nasa.gov/supermassive-black-holes/new-nasa-black-hole-visualization-takes-viewers-beyond-the-brink/
+
+Footage: none, original animation. Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #blackhole #physics #shorts
