@@ -8,7 +8,7 @@ Up there the air pressure is so low that, without his pressure suit, the liquids
 
 Two years later, on 24 October 2014, Alan Eustace jumped from even higher: 41,422 m, about 2.5 km above Felix's record.
 
-About the video: an original computer animation (illustrative capsule, suit and figure; not real footage). Earth is drawn from NASA Blue Marble imagery at the real altitudes, seen through a wide-angle lens, with extra clouds and terrain detail added. Times are compressed: the speed counter is illustrative between the sourced points (Mach 1 at 34 s, 1,357.6 km/h at 50 s), and the altitude counter is sped up.
+About the video: an original computer animation (illustrative capsule, suit and figure; not real footage). Earth is shown at the real altitudes through a wide-angle lens; its base colours come from NASA Blue Marble imagery, and the terrain detail and clouds are procedural (illustrative). Times are compressed: the speed counter is illustrative between the sourced points (Mach 1 at 34 s, 1,357.6 km/h at 50 s), and the altitude counter is sped up.
 
 Sources:
 FAI, "Baumgartner's Records Ratified by FAI" (exit altitude 38,969.4 m; maximum vertical speed 1,357.6 km/h; freefall 36,402.6 m; Roswell, 14 Oct 2012): https://www.fai.org/news/baumgartner%E2%80%99s-records-ratified-fai
