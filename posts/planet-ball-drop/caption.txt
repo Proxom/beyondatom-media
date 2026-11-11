@@ -2,19 +2,20 @@ Guess before the end: which ball lands last? 👇
 
 We drop the same ball from 100 m on all 8 planets, with no air, and time the fall in real time (fall time t = √(2h/g)).
 
-Round 1: Jupiter 2.94 s (gravity 23.1 m/s²), Earth 4.52 s (9.8), Saturn 4.71 s (9.0), Uranus 4.79 s (8.7). Saturn has about 95 times Earth's mass, yet the ball falls slower there than on Earth: that mass is spread over a planet more than 9 times wider (120,536 km vs 12,756 km across), so the pull at its cloud tops is weaker.
+Round 1: Jupiter 2.94 s (gravity 23.1 m/s²), Earth 4.52 s (9.8), Saturn 4.71 s (9.0), Uranus 4.79 s (8.7). Saturn has about 95 times Earth's mass, yet at its equator the ball falls slower than on Earth. That mass is spread over a planet more than 9 times wider (120,536 km vs 12,756 km across), and Saturn spins once every 10.7 hours, which flings its equator outward and weakens the net pull there to 9.0 m/s². At Saturn's poles the pull is 12.1 m/s², stronger than Earth's.
 
 Round 2: Neptune 4.26 s (11.0), Venus 4.74 s (8.9), and Mercury and Mars 7.35 s (3.7 each).
 
 Photo finish: Mars has about twice Mercury's mass (0.642 vs 0.330 × 10²⁴ kg), but it is also wider (6,792 km vs 4,879 km across), so the pull at the surface comes out almost the same. With more decimals (mean surface gravity 3.73 m/s² for Mars vs 3.70 for Mercury), Mars pulls very slightly harder and would win by about 3 hundredths of a second.
 
-About the video: an original computer animation. Gravity values are from NASA's Planetary Fact Sheet (at the equator, including the planet's spin; for Jupiter, Saturn, Uranus and Neptune, which have no solid surface, at the 1-bar pressure level in the atmosphere, shown as "the cloud tops"). No air resistance. Planet and ball sizes are not to scale; the falls run in real time.
+About the video: an original computer animation. Gravity values are from NASA's Planetary Fact Sheet (at the equator, including the planet's spin; for Jupiter, Saturn, Uranus and Neptune, which have no solid surface, at the 1-bar pressure level in the atmosphere, near the visible cloud tops). All values are at each planet's equator; a planet's spin lowers the pull there. No air resistance. Planet and ball sizes are not to scale; the falls run in real time.
 
 Sources:
 NASA NSSDC Planetary Fact Sheet (gravity: Mercury 3.7, Venus 8.9, Earth 9.8, Mars 3.7, Jupiter 23.1, Saturn 9.0, Uranus 8.7, Neptune 11.0 m/s²; mass and diameter): https://nssdc.gsfc.nasa.gov/planetary/factsheet/
 NASA NSSDC Planetary Fact Sheet notes (gravity at the equator including rotation; gas giants at the 1 bar level): https://nssdc.gsfc.nasa.gov/planetary/factsheet/planetfact_notes.html
 NASA NSSDC Mercury Fact Sheet (mean surface gravity 3.70 m/s²): https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
 NASA NSSDC Mars Fact Sheet (mean surface gravity 3.73 m/s²): https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+NASA NSSDC Saturn Fact Sheet (1-bar acceleration: equator 8.96, pole 12.14 m/s²; rotation period 10.656 h): https://nssdc.gsfc.nasa.gov/planetary/factsheet/saturnfact.html
 
 Footage (NASA public domain; NASA does not endorse this video):
 Mercury: "Mercury Globe: 0°N, 180°E" (PIA15162), NASA/Johns Hopkins University Applied Physics Laboratory/Carnegie Institution of Washington: https://images.nasa.gov/details/PIA15162

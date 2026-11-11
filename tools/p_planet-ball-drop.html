@@ -12,8 +12,8 @@ const COLS=[[0,250,125],[250,480,365],[480,710,595],[710,1080,830]];
 const GY=1250,YB0=790,PXM=(GY-YB0)/HDROP,BR=26,PR=430;
 // name, g, image, globe radius / image half size, glow colour
 const PL={
- JUPITER:[23.1,'PIA04866',1,'235,200,160'],EARTH:[9.8,'as17-148-22727',1,'120,170,255'],SATURN:[9.0,'PIA21046',340/800,'240,215,150',0.5],URANUS:[8.7,'PIA18182',1,'160,235,240'],
- NEPTUNE:[11.0,'PIA01492',1,'110,150,255'],VENUS:[8.9,'PIA23791',1,'250,225,170'],MERCURY:[3.7,'PIA15162',1,'200,200,200'],MARS:[3.7,'PIA00407',1,'255,150,110']};
+ JUPITER:[23.1,'PIA04866',1,'235,200,160'],EARTH:[9.8,'as17-148-22727',1,'120,170,255'],SATURN:[9.0,'PIA21046',340/800,'240,215,150',0.5],URANUS:[8.7,'PIA18182',0.93,'160,235,240'],
+ NEPTUNE:[11.0,'PIA01492',0.93,'110,150,255'],VENUS:[8.9,'PIA23791',0.91,'250,225,170'],MERCURY:[3.7,'PIA15162',1,'200,200,200'],MARS:[3.7,'PIA00407',1,'255,150,110']};
 const T1=0.9,T2=10.6;
 const HEATS=[{t0:T1,names:['JUPITER','EARTH','SATURN','URANUS']},{t0:T2,names:['NEPTUNE','VENUS','MERCURY','MARS']}];
 for(const h of HEATS)h.p=h.names.map((n,i)=>{const [g,img,k,glow,dx]=PL[n];return {n,g,img,k,glow,dx:dx||0,col:COLS[i],T:Math.sqrt(2*HDROP/g)}});
@@ -47,7 +47,7 @@ function drawHeat(hi,ox,t,zoom){const h=HEATS[hi];const u=heatT(hi,t);
   const im=IM[p.n],S=2*PR/p.k;const rot=(t*0.006)*(i%2?1:-1);const ddx=p.dx*PR,sag=PR-Math.sqrt(PR*PR-ddx*ddx);
   x.save();x.translate(cx-ddx,GY+PR-sag);x.rotate(rot);
   if(p.n!=='SATURN'){x.beginPath();x.arc(0,0,PR,0,7);x.clip()}
-  x.drawImage(im,-S/2,-S/2,S,S);x.restore();
+  if(p.n==='SATURN')x.globalCompositeOperation='screen';x.drawImage(im,-S/2,-S/2,S,S);x.globalCompositeOperation='source-over';x.restore();
   // limb shading so it reads as a sphere
   const sh=x.createRadialGradient(cx-PR*.25,GY+PR*.7,PR*.2,cx,GY+PR,PR*1.02);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(.85,'rgba(0,0,0,.05)');sh.addColorStop(1,'rgba(0,0,0,.45)');
   x.fillStyle=sh;x.beginPath();x.arc(cx,GY+PR,PR,0,7);x.fill();
@@ -72,13 +72,13 @@ function drawHeat(hi,ox,t,zoom){const h=HEATS[hi];const u=heatT(hi,t);
    x.fillStyle=bg;x.beginPath();x.arc(cx,by,BR,0,7);x.fill()}x.globalAlpha=1;
   const by=Math.min(ballY(p,u),GY-BR);x.strokeStyle='rgba(0,0,0,.5)';x.lineWidth=2;x.beginPath();x.arc(cx,by,BR,0,7);x.stroke();}
  // names + landing stamps
- for(const [i,p] of h.p.entries()){const cx=p.col[2],nx=Math.min(cx,850);txt(p.n,nx,700,fit(p.n,44,205),'#fff',1);
+ for(const [i,p] of h.p.entries()){const cx=p.col[2],nx=Math.max(112,Math.min(cx,850));txt(p.n,nx,700,fit(p.n,44,205),'#fff',1);
   if(u>=p.T){const k=u-p.T,al=ease(k/0.15),pop=1+0.25*Math.exp(-k/0.12);const first=Math.min(...h.p.map(q=>q.T))===p.T,last=Math.max(...h.p.map(q=>q.T))===p.T;
    txt(p.T.toFixed(2)+' s',nx,752,44*pop,last?'#ff8a6a':(first?'#9df0bf':'#ffd166'),al)}}
  x.restore();
  return u;}
 // cards: [a,b,line1,line2]
-const CARDS=[[0,3.8,'100 m DROP.','WHICH LANDS LAST?'],[3.9,5.75,'JUPITER WINS',''],[5.9,9.3,'SATURN: 95× EARTH’S MASS','STILL SLOWER'],
+const CARDS=[[0,3.8,'100 m DROP.','WHICH LANDS LAST?'],[3.9,5.75,'JUPITER WINS',''],[5.9,9.75,'SATURN: 95× EARTH’S MASS','SLOWER AT ITS EQUATOR'],
  [9.8,10.6,'ROUND 2',''],[10.6,15.4,'WHICH LANDS LAST?',''],[15.5,17.9,'STILL FALLING…',''],[18.0,19.2,'PHOTO FINISH!',''],
  [19.3,22.0,'MARS: 2× THE MASS','BUT IT’S WIDER'],[22.0,25.1,'SAME PULL:','3.7 m/s² ON BOTH'],[25.2,26.9,'WHICH SURPRISED YOU?',''],[27.2,D+1,'100 m DROP.','WHICH LANDS LAST?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.22),b>D?1:ease((b-t)/.2));
@@ -92,12 +92,12 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
  // race clock (one counter)
  const hi=t<20?0:1,h=HEATS[hi];const u=t-HEATS[t<10?0:1].t0;const hh=HEATS[t<10?0:1];const Tm=Math.max(...hh.p.map(p=>p.T));
  let ca=(t>0.5&&t<9.3)||(t>10.3&&t<19.2)?1:0;ca*=Math.min(1,ease((t-(t<10?0.5:10.3))/.3));const end=t<10?9.3:19.2;ca*=ease((end-t)/.3);
- if(ca>0){const v=cl(u,0,Tm);txt(v.toFixed(2)+' s',465,648,58,u>0&&u<Tm?'#ffd166':'#ffffff',ca)}
+ if(ca>0){const v=cl(u,0,Tm);txt(v.toFixed(2)+' s',465,1372,72,u>0&&u<Tm?'#ffd166':'#ffffff',ca)}
  cards(t);
  // tie bracket between Mercury and Mars
- if(t>=T2+HEATS[1].p[2].T&&t<25.1){const k=t-(T2+HEATS[1].p[2].T),al=ease(k/.2)*ease((25.1-t)/.3);txt('=',710,752,54,'#ffd166',al)}
+ if(t>=T2+HEATS[1].p[2].T&&t<25.1){const k=t-(T2+HEATS[1].p[2].T),al=ease(k/.2)*ease((25.1-t)/.3);txt('TIE',712,748,44,'#ffd166',al)}
  // footnote on the hook (and the loop seam)
- const fa=(t<3.8?1:0)*ease((3.8-t)/.3)+(t>27.2?ease((t-27.2)/.3):0);txt('same ball · no air · giants: at the cloud tops',465,578,30,'#d9dee6',fa*.95,'Mont');
+ const fa=(t<3.8?1:0)*ease((3.8-t)/.3)+(t>27.2?ease((t-27.2)/.3):0);txt('same ball · no air · at each equator',465,578,30,'#d9dee6',fa*.95,'Mont');
  // follow line
  if(t>=25.4&&t<26.9){const al=Math.min(ease((t-25.4)/.25),ease((26.9-t)/.2));txt('FOLLOW → MORE EVERY DAY',465,1395,46,'#fff',al)}
  // vignette
