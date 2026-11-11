@@ -11,8 +11,8 @@ L = {
  'p6': "Its nucleus.",
  'p7': "One proton.",
  'p8': "That took thirteen zooms. Now, twenty more. Into a scale no one has ever seen.",
- 'p9': "The Planck length. One point six times ten to the minus thirty-five meters.",
- 'p10': "Physicists think gravity and quantum physics must meet down here. And nobody knows what space looks like.",
+ 'p9': "The Planck length. A proton is a hundred billion billion times bigger.",
+ 'p10': "Physicists suspect this is where gravity and quantum physics meet. Nobody knows what's down here.",
 }
 for n, s in L.items():
     a, sr = k.create(s, voice='am_michael', speed=1.08, lang='en-us'); sf.write(f'/tmp/claude-0/pl/vo/{n}.wav', a, sr); print(n, round(len(a)/sr, 2))

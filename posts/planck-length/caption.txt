@@ -1,12 +1,12 @@
-Guess first: how many 10× zooms from a proton down to the Planck length? 👇
+Guess before the end: how many 10× zooms from your fingertip to the Planck length? 👇
 
-We start at your fingertip and zoom in, every step 10 times smaller: skin cells, DNA, one atom, its nucleus, one proton. From a 1 cm view to a proton is about 13 zooms.
+We start at your fingertip and zoom in, every step 10 times smaller: skin cells, DNA, one atom, a nucleus, one proton. From a 1 cm view to a proton is about 13 zooms.
 
 Then it gets strange. A proton is about 0.84 femtometers in radius (about 1.7 × 10⁻¹⁵ m across). The Planck length is 1.616 × 10⁻³⁵ m. That is 20 more zooms: a proton is about 100 billion billion (10²⁰) times bigger than the Planck length.
 
 Why does it matter? The Planck length is built only from three constants of nature (gravity's G, the speed of light c and Planck's constant ħ). Physicists have long suspected that this is roughly the scale where gravity has to be described by quantum physics, and no one knows yet what space is like down there.
 
-About the video: an original computer animation. Every picture is an illustration, not a microscope image. The scale counter shows the width of the screen, rounded to a power of ten; sizes are approximate. The atom is drawn as a hydrogen-like electron cloud (to scale its nucleus is far too small to see), the proton's three quarks and the "foam" at the Planck length are artistic.
+About the video: an original computer animation. Every picture is an illustration, not a microscope image. The scale counter shows the width of the screen, rounded to a power of ten; sizes are approximate. The atom is drawn as a simplified electron cloud (to scale, its nucleus is far too small to see), the nucleus as a small cluster of protons and neutrons, and the proton's three quarks and the "foam" at the Planck length are artistic.
 
 Sources:
 NIST CODATA 2022, Planck length 1.616255 × 10⁻³⁵ m: https://physics.nist.gov/cgi-bin/cuu/Value?plkl

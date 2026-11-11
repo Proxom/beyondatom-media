@@ -7,15 +7,15 @@
      (NIST CODATA), three valence quarks + gluons (DOE); Bohr radius 5.29e-11 m (NIST). From a 1 cm view to a proton (1.68e-15 m) ~13
      powers of ten; proton to Planck length: log10(1.68e-15/1.616e-35) = 20.0. All pictures are illustrations (not microscope images). -->
 <script>
-const W=1080,H=1920,CX=540,CY=960,D=37.0;
+const W=1080,H=1920,CX=540,CY=960,D=36.0;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ss=(a,b,v)=>{const t=cl((v-a)/(b-a));return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
 function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
 const cv=document.getElementById('c'),x=cv.getContext('2d');
 const off=document.createElement('canvas');off.width=W;off.height=H;const o=off.getContext('2d');
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('40px Mont')]).then(()=>{window.TEXREADY=true});
 // ---------- camera: monotone cubic through keyframes (t, z) ----------
-const K=[[0,-1.74],[2.0,-1.86],[5.9,-3.80],[6.9,-3.95],[8.5,-8.00],[9.6,-8.12],[10.4,-9.55],[11.8,-9.68],[12.5,-13.95],[13.4,-14.06],
- [14.1,-14.55],[17.8,-14.85],[23.6,-34.62],[35.0,-34.79],[37.0,-34.84]];
+const K=[[0,-1.74],[2.0,-2.08],[5.4,-3.80],[6.4,-3.95],[8.0,-8.00],[9.0,-8.12],[9.8,-9.55],[11.0,-9.68],[11.7,-13.95],[12.5,-14.06],
+ [13.2,-14.55],[15.0,-14.80],[24.0,-34.62],[30.0,-34.79],[36.0,-35.05]];
 const MS=(()=>{const n=K.length,d=[],m=[];for(let i=0;i<n-1;i++)d.push((K[i+1][1]-K[i][1])/(K[i+1][0]-K[i][0]));
  m[0]=d[0];m[n-1]=d[n-2];for(let i=1;i<n-1;i++)m[i]=(d[i-1]*d[i]<=0)?0:(d[i-1]+d[i])/2;
  for(let i=0;i<n-1;i++){if(d[i]==0){m[i]=m[i+1]=0;continue}const a=m[i]/d[i],b=m[i+1]/d[i],s=a*a+b*b;if(s>9){const tt=3/Math.sqrt(s);m[i]=tt*a*d[i];m[i+1]=tt*b*d[i]}}return m})();
@@ -37,12 +37,16 @@ const FOAM=[];{const r=rnd(42);for(let i=0;i<90;i++)FOAM.push({x:r()*W,y:r()*H,r
 const SPARK=[];{const r=rnd(77);for(let i=0;i<700;i++)SPARK.push([r(),r(),r(),r()])}
 // ---------- levels: native screen width zL (log10 m); draw(g,u) with u = px per level-unit at current zoom ----------
 function skinBg(g){const gr=g.createRadialGradient(330,560,80,540,960,1300);gr.addColorStop(0,'#f2c7a8');gr.addColorStop(.45,'#d99a7b');gr.addColorStop(1,'#6e3b2c');g.fillStyle=gr;g.fillRect(0,0,W,H)}
-function drawFinger(g,u,t){if(u>1080*60){g.fillStyle="#d99a7b";g.fillRect(0,0,W,H);return}g.fillStyle='#0b0605';g.fillRect(0,0,W,H);
+const U0=1080*6;let FC=null;
+function drawFinger(g,u,t){if(u>U0&&!g.__fc){if(!FC){FC=document.createElement('canvas');FC.width=2*W;FC.height=2*H;const c=FC.getContext('2d');c.__fc=1;c.setTransform(2,0,0,2,0,0);drawFinger(c,U0,0)}
+  g.save();g.fillStyle='#d99a7b';g.fillRect(0,0,W,H);g.translate(CX,CY);const f=u/U0/2;g.scale(f,f);g.drawImage(FC,-W,-H);g.restore();return}
+ drawFinger0(g,u,t)}
+function drawFinger0(g,u,t){if(u>1080*60){g.fillStyle="#d99a7b";g.fillRect(0,0,W,H);return}g.fillStyle='#0b0605';g.fillRect(0,0,W,H);
  // finger pad ~1.5 cm wide in a 2 cm view (0.75 units); the view starts at 2.5 cm so the whole pad is visible
  g.save();g.translate(CX,CY+u*.08);const pw=.4*u,ph=.62*u;
  const bl=g.createRadialGradient(0,0,pw*.7,0,0,ph*1.25);bl.addColorStop(0,'rgba(255,170,130,.22)');bl.addColorStop(1,'rgba(255,120,80,0)');g.fillStyle=bl;g.beginPath();g.arc(0,0,ph*1.25,0,7);g.fill();
- g.beginPath();g.ellipse(0,0,pw,ph,0,0,7);g.save();g.clip();
- const sk=g.createRadialGradient(-pw*.35,-ph*.35,pw*.1,0,0,ph*1.05);sk.addColorStop(0,'#f6cfb2');sk.addColorStop(.5,'#dc9f80');sk.addColorStop(1,'#7a3f2e');g.fillStyle=sk;g.fillRect(-pw,-ph,2*pw,2*ph);
+ const fpath=()=>{g.beginPath();g.ellipse(0,0,pw,ph,0,Math.PI,0);g.lineTo(pw*1.04,H*2);g.lineTo(-pw*1.04,H*2);g.closePath()};fpath();g.save();g.clip();
+ const sk=g.createRadialGradient(-pw*.35,-ph*.35,pw*.1,0,0,ph*1.05);sk.addColorStop(0,'#f6cfb2');sk.addColorStop(.5,'#dc9f80');sk.addColorStop(1,'#7a3f2e');g.fillStyle=sk;g.fillRect(-pw*1.1,-ph,2.2*pw,H*3);
  g.lineCap='round';const lw=Math.max(1,u*.0058);
  for(const R of RIDGES){const rr=R.r;if(rr*u<4||rr*u>2600)continue;const N=Math.max(40,Math.min(220,Math.floor(rr*u*.3)));
   g.beginPath();for(let k=0;k<=N;k++){const a=k/N*6.2832;
@@ -51,7 +55,8 @@ function drawFinger(g,u,t){if(u>1080*60){g.fillStyle="#d99a7b";g.fillRect(0,0,W,
   g.strokeStyle='rgba(118,50,36,.6)';g.lineWidth=lw*1.9;g.stroke();g.save();g.translate(-lw*.45,-lw*.55);g.strokeStyle='rgba(255,228,208,.4)';g.lineWidth=lw*.7;g.stroke();g.restore()}
  g.fillStyle='rgba(95,38,28,.55)';for(const [ri,an,sc] of PORES){const R=RIDGES[ri];const rr=R.r;const rad=rr*(1+R.a[0]*.25*Math.sin(2*an+R.ph[0])+R.a[1]*.2*Math.sin(3*an+R.ph[1])+R.a[2]*.25*Math.sin(5*an+R.ph[2]))*(1+.18*Math.sin(an));
   const px=Math.cos(an)*rad*u*.82,py=Math.sin(an)*rad*u*1.15-rr*u*.18;if(Math.abs(px)>800||Math.abs(py)>1200)continue;g.beginPath();g.arc(px,py,Math.max(.8,u*.0022*sc),0,7);g.fill()}
- const sh=g.createRadialGradient(-pw*.3,-ph*.3,pw*.2,0,0,ph*1.02);sh.addColorStop(0,'rgba(255,240,225,.16)');sh.addColorStop(.75,'rgba(60,20,10,0)');sh.addColorStop(1,'rgba(30,8,4,.7)');g.fillStyle=sh;g.fillRect(-pw,-ph,2*pw,2*ph);
+ const sh=g.createRadialGradient(-pw*.3,-ph*.3,pw*.2,0,0,ph*1.02);sh.addColorStop(0,'rgba(255,240,225,.16)');sh.addColorStop(.75,'rgba(60,20,10,0)');sh.addColorStop(1,'rgba(30,8,4,.7)');g.fillStyle=sh;g.fillRect(-pw*1.1,-ph,2.2*pw,H*3);const ed=g.createLinearGradient(-pw*1.05,0,pw*1.05,0);ed.addColorStop(0,'rgba(40,12,6,.75)');ed.addColorStop(.18,'rgba(40,12,6,0)');ed.addColorStop(.82,'rgba(40,12,6,0)');ed.addColorStop(1,'rgba(40,12,6,.75)');g.fillStyle=ed;g.fillRect(-pw*1.1,-ph*1.1,2.2*pw,H*3);
+ g.strokeStyle='rgba(90,35,25,.7)';g.lineWidth=Math.max(3,u*.012);g.beginPath();g.moveTo(-pw*1.1,ph*1.12);g.quadraticCurveTo(0,ph*1.2,pw*1.1,ph*1.1);g.stroke();
  g.restore();g.strokeStyle='rgba(255,200,170,.35)';g.lineWidth=Math.max(2,u*.004);g.beginPath();g.ellipse(0,0,pw,ph,0,Math.PI*1.05,Math.PI*1.6);g.stroke();g.restore()}
 function drawCells(g,u,t){const bg=g.createRadialGradient(CX,CY,50,CX,CY,1300);bg.addColorStop(0,'#0a1630');bg.addColorStop(1,'#02040a');g.fillStyle=bg;g.fillRect(0,0,W,H);
  g.save();g.translate(CX,CY);g.globalCompositeOperation='lighter';
@@ -59,7 +64,7 @@ function drawCells(g,u,t){const bg=g.createRadialGradient(CX,CY,50,CX,CY,1300);b
   g.save();g.translate(px,py);g.rotate(c.rot+.05*Math.sin(t*.6+c.wob[0]));
   // membrane glow
   g.beginPath();for(let k=0;k<=40;k++){const a=k/40*6.2832,w=1+c.wob[2]*8*Math.sin(3*a+c.wob[0])+c.wob[2]*5*Math.sin(5*a+c.wob[1]);const ex=Math.cos(a)*rx*w,ey=Math.sin(a)*ry*w;k?g.lineTo(ex,ey):g.moveTo(ex,ey)}g.closePath();
-  g.fillStyle='rgba(20,60,70,'+(.25+.15*c.c)+')';g.fill();g.strokeStyle='rgba(70,230,190,.55)';g.lineWidth=Math.max(1.2,u*.006);g.shadowColor='rgba(60,255,200,.9)';g.shadowBlur=Math.min(30,u*.02);g.stroke();
+  g.fillStyle='rgba(20,60,70,'+(.25+.15*c.c)+')';g.fill();g.strokeStyle='rgba(60,255,200,.16)';g.lineWidth=Math.max(4,u*.02);g.stroke();g.strokeStyle='rgba(70,230,190,.6)';g.lineWidth=Math.max(1.2,u*.006);g.stroke();
   // nucleus
   g.shadowBlur=0;const nr=u*.026;const ng=g.createRadialGradient(c.nx*u,c.ny*u,0,c.nx*u,c.ny*u,nr*1.35);ng.addColorStop(0,'rgba(120,140,255,.95)');ng.addColorStop(.7,'rgba(70,80,230,.6)');ng.addColorStop(1,'rgba(40,40,200,0)');
   g.fillStyle=ng;g.beginPath();g.ellipse(c.nx*u,c.ny*u,nr*1.35,nr*1.2,0,0,7);g.fill();g.restore()}
@@ -113,8 +118,8 @@ function drawProton(g,u,t){const bg=g.createRadialGradient(CX,CY,30,CX,CY,1100);
   g.strokeStyle='rgba(255,220,150,.55)';g.lineWidth=Math.max(1.5,R*.022);g.stroke()}
  Q.forEach(([px,py],i)=>{const qg=g.createRadialGradient(px,py,0,px,py,R*.2);qg.addColorStop(0,'rgba(255,255,255,1)');qg.addColorStop(.25,'rgba('+QC[i]+',.95)');qg.addColorStop(1,'rgba('+QC[i]+',0)');g.fillStyle=qg;g.beginPath();g.arc(px,py,R*.2,0,7);g.fill()});
  g.restore()}
-function drawFoam(g,u,t){g.fillStyle='#030008';g.fillRect(0,0,W,H);g.save();g.globalCompositeOperation='lighter';
- for(const f of FOAM){const r=f.r*(1+.35*Math.sin(t*f.f*2.2+f.p))*Math.min(2.2,Math.max(.6,u/1080));const px=CX+(f.x-CX)*(.9+.1*Math.sin(t*.4+f.p)),py=CY+(f.y-CY)*(.9+.1*Math.cos(t*.37+f.p));
+function drawFoam(g,u,t){g.fillStyle='#030008';g.fillRect(0,0,W,H);g.save();g.translate(CX,CY);g.rotate(t*.05);g.translate(-CX,-CY);g.globalCompositeOperation='lighter';
+ for(const f of FOAM){const r=f.r*(1+.4*Math.sin(t*f.f*3.2+f.p))*Math.min(2.6,Math.max(.6,u/1080));const zf=Math.min(2.6,Math.max(.6,u/1080));const px=CX+(f.x-CX)*zf*(.9+.12*Math.sin(t*.7+f.p)),py=CY+(f.y-CY)*zf*(.9+.12*Math.cos(t*.63+f.p));
   const hue=f.h<.5?275+f.h*40:180+f.h*30;const al=.10+.10*Math.sin(t*f.f*3+f.p*2);
   const gr=g.createRadialGradient(px,py,r*.55,px,py,r);gr.addColorStop(0,'hsla('+hue+',90%,60%,0)');gr.addColorStop(.85,'hsla('+hue+',95%,65%,'+cl(al+.08)+')');gr.addColorStop(1,'hsla('+hue+',90%,50%,0)');g.fillStyle=gr;g.beginPath();g.arc(px,py,r,0,7);g.fill()}
  const r=rnd(Math.floor(t*20)+5);for(const s of SPARK){if(r()<.55)continue;g.fillStyle='rgba(220,200,255,'+(.2+.6*r())+')';g.fillRect(s[0]*W,s[1]*H,1.6+s[2]*1.6,1.6+s[2]*1.6)}
@@ -134,19 +139,20 @@ function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measu
 const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
 function scaleTxt(z){const n=Math.round(z);const M={'-1':'10 cm','-2':'1 cm','-3':'1 mm','-4':'0.1 mm','-5':'10 µm','-6':'1 µm','-7':'100 nm','-8':'10 nm','-9':'1 nm','-10':'0.1 nm'};
  if(M[n])return M[n];return '10'+String(n).split('').map(c=>SUP[c]).join('')+' m'}
-const LABELS=[[0,2.0,'HOW SMALL CAN','THINGS GET?'],[2.0,5.7,'YOUR FINGERTIP',''],[5.9,7.1,'SKIN CELLS',''],[8.3,9.8,'DNA',''],[10.3,12.0,'ONE ATOM',''],[12.4,13.6,'ITS NUCLEUS',''],
- [13.9,15.9,'ONE PROTON',''],[15.9,17.9,'13 ZOOMS SO FAR',''],[17.9,23.7,'20 MORE ZOOMS',''],[23.7,28.9,'THE PLANCK LENGTH',''],[28.9,34.9,'NOBODY KNOWS','WHAT’S DOWN HERE'],[36.55,D+1,'HOW SMALL CAN','THINGS GET?']];
-function cards(t,z){let shown=false;for(const [a,b,l1,l2] of LABELS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ss(0,.2,t-a),b>D?1:ss(0,.18,b-t));
-  const sz=Math.min(fit(l1,104,800),l2?fit(l2,104,800):999);txt(l1,495,500,sz,'#fff',al);if(l2)txt(l2,495,500+sz*1.08,sz,'#ffd166',al);
-  if(!l2){// the counter line: screen width
-   const s=(t>=23.7&&t<28.9)?'1.6 × 10⁻³⁵ m':'↔ '+scaleTxt(z)+' across';txt(s,495,500+78,52,'#ffd166',al,'Mont')}shown=true}
- if(!shown&&t>2&&t<34.9)txt('↔ '+scaleTxt(z)+' across',495,578,52,'#ffd166',1,'Mont')}
+const LABELS=[[0,1.9,'HOW SMALL CAN','THINGS GET?'],[1.9,4.3,'YOUR FINGERTIP',''],[4.4,6.9,'SKIN CELLS',''],[7.8,9.2,'DNA',''],[9.7,11.2,'ONE ATOM',''],[11.6,12.8,'A NUCLEUS',''],
+ [13.0,14.6,'ONE PROTON',''],[14.6,15.8,'13 ZOOMS SO FAR',''],[15.85,24.0,'20 MORE ZOOMS',''],[24.0,28.5,'THE PLANCK LENGTH',''],[28.5,34.5,'NOBODY KNOWS','WHAT’S DOWN HERE'],[35.55,D+1,'HOW SMALL CAN','THINGS GET?']];
+function cards(t,z){let lab=null,al=1;for(const L of LABELS){const [a,b]=L;if(t<a||t>=b)continue;lab=L;al=Math.min(a<=0?1:ss(0,.2,t-a),b>D?1:ss(0,.18,b-t))}
+ if(lab&&lab[3]){const [a,b,l1,l2]=lab;const sz=Math.min(fit(l1,104,800),fit(l2,104,800));txt(l1,495,500,sz,'#fff',al);txt(l2,495,500+sz*1.08,sz,'#ffd166',al);return}
+ if(t>=34.5)return;
+ // the hero: a big screen-width counter, with a small label above it
+ const s=(t>=24.0&&t<28.5)?'1.6 × 10⁻³⁵ m':scaleTxt(z);txt(s,495,600,fit(s,150,820,'Anton'),'#ffd166',1,'Anton');
+ if(lab)txt(lab[2],495,455,fit(lab[2],60,800,'Mont'),'#fff',al,'Mont');else if(t<24)txt('ACROSS THE SCREEN',495,455,40,'rgba(255,255,255,.8)',1,'Mont')}
 // ---------- frame ----------
 function draw(t){const z=Z(t),dz=(Z(t+1/30)-Z(t-1/30))*15;x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.globalCompositeOperation='source-over';x.fillStyle='#000';x.fillRect(0,0,W,H);
  // which levels are visible: a level shows from k=0.06 (a small bright portal at the centre) and covers the screen by k~0.9
  const voidA=ss(-15.0,-15.6,z)*(1-ss(-33.6,-34.5,z));
  let base=-1;for(let i=0;i<LV.length;i++){const k=Math.pow(10,LV[i].z-z);if(k>=.9&&(i==LV.length-1||Math.pow(10,LV[i+1].z-z)<.9))base=i}
- if(base<0)base=0;const deep=z<-15.0;
+ if(base<0)base=0;const deep=z<-15.6;
  if(!deep||base==LV.length-1){const L=LV[base];L.f(x,1080*Math.pow(10,L.z-z),t)}
  for(let i=base+1;i<LV.length;i++){const L=LV[i],k=Math.pow(10,L.z-z);if(k<.05)break;if(deep&&i<LV.length-1)continue;
   const u=1080*k;o.setTransform(1,0,0,1,0,0);o.globalAlpha=1;o.globalCompositeOperation='source-over';o.clearRect(0,0,W,H);L.f(o,u,t);
@@ -158,11 +164,11 @@ function draw(t){const z=Z(t),dz=(Z(t+1/30)-Z(t-1/30))*15;x.setTransform(1,0,0,1
   // the proton flies past at the start of the dive (drawn over the void, fading)
  }
  // loop: last 0.45 s cross-fades back to the first frame (fingertip at t=0)
- if(t>36.55){const a=ss(36.55,36.95,t);x.globalAlpha=a;drawFinger(x,1080*Math.pow(10,LV[0].z-Z(0)),0);x.globalAlpha=1}
+ if(t>35.55){const a=ss(35.55,35.95,t);x.globalAlpha=a;drawFinger(x,1080*Math.pow(10,LV[0].z-Z(0)),0);x.globalAlpha=1}
  // zoom flash on fast dives
  const fl=cl((Math.abs(dz)-2.2)/6)*.18;if(fl>0){const g=x.createRadialGradient(CX,CY,0,CX,CY,900);g.addColorStop(0,'rgba(255,255,255,'+fl+')');g.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=g;x.fillRect(0,0,W,H)}
  const vg=x.createRadialGradient(CX,CY,560,CX,CY,1300);vg.addColorStop(0,'rgba(0,0,0,0)');vg.addColorStop(1,'rgba(0,0,0,.4)');x.fillStyle=vg;x.fillRect(0,0,W,H);
  cards(t,z);
- if(t>=35.0&&t<36.5){const al=Math.min(ss(35.0,35.3,t),ss(36.5,36.25,t));txt('FOLLOW → MORE EVERY DAY',495,1370,50,'#fff',al)}}
+ if(t>=34.5&&t<35.6){const al=Math.min(ss(34.5,34.8,t),ss(35.6,35.35,t));txt('FOLLOW → MORE EVERY DAY',495,1370,50,'#fff',al)}}
 window.Z=Z;
 </script>
