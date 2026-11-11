@@ -1,0 +1,28 @@
+Guess before the end: how deep did NASA's probe get? 👇
+
+Jupiter is a gas giant: it has no true surface to land on. So what happens if you fall in? NASA found out with a robot. On 7 December 1995, the Galileo atmospheric probe slammed into Jupiter's atmosphere at 170,590 km/h (47.6 km/s), then slowed down and parachuted through the clouds.
+
+It sent back data for 58 minutes. By then the pressure around it was about 23 times Earth's air pressure at sea level, and temperatures had topped 300 °F (about 150 °C). Then it went silent; deeper down, it was eventually vaporized.
+
+How deep did it get? About 156 km (97 miles). Jupiter's equatorial radius is 71,492 km, so that is about 0.22 % of the way to the center: not even a quarter of one percent.
+
+About the video: an edit of real NASA images with our own animation. The falling figure, the probe and its parachute are illustrative silhouettes. Time is compressed (58 minutes of descent shown in about 14 seconds), and the depth counter is illustrative between 0 and 156 km. The red mark for the probe's depth on the last view of Jupiter is drawn to scale.
+
+Sources:
+NASA Science, Galileo Jupiter Atmospheric Probe (hit the atmosphere 7 Dec 1995 at 170,590 km/h; returned data for 58 minutes): https://science.nasa.gov/mission/galileo-jupiter-atmospheric-probe/
+NASA Science, Galileo (probe speed into Jupiter's atmosphere 47.6 km/s; data from a depth with a pressure 23 times the average on Earth's surface): https://science.nasa.gov/mission/galileo/
+NASA History, "30 Years Ago: Galileo off to Orbit Jupiter" (58 minutes during a descent of 97 miles; 23 atmospheres; temperatures topped 300 °F; eventually vaporized in the deeper layers): https://www.nasa.gov/history/30-years-ago-galileo-off-to-orbit-jupiter/
+JPL, Galileo End of Mission press kit (the probe was designed to slow down when entering and parachute gently through the clouds): https://www.jpl.nasa.gov/news/press_kits/galileo-end.pdf
+NASA Science, Jupiter Facts ("As a gas giant, Jupiter doesn't have a true surface"): https://science.nasa.gov/jupiter/jupiter-facts/
+NASA NSSDC Jupiter Fact Sheet (equatorial radius 71,492 km): https://nssdc.gsfc.nasa.gov/planetary/factsheet/jupiterfact.html
+
+Footage:
+"Cassini Jupiter Portrait" (PIA04866), NASA/JPL/Space Science Institute (public domain; NASA does not endorse this video): https://images.nasa.gov/details/PIA04866
+"Mocha Swirls in Jupiter's Turbulent Atmosphere" (PIA23610), image data: NASA/JPL-Caltech/SwRI/MSSS, image processing by Brian Swift, CC BY: https://images.nasa.gov/details/PIA23610
+"Jupiter Swirling Storms" (PIA24971), image data: NASA/JPL-Caltech/SwRI/MSSS, image processing by Brian Swift, CC BY: https://images.nasa.gov/details/PIA24971
+Narration: AI voice (Kokoro). Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #jupiter #nasa #shorts

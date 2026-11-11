@@ -1,0 +1,106 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- jupiter-fall (style B): what if you fell into Jupiter? Told with NASA's Galileo probe (1995).
+     Facts: entry 170,590 km/h (47.6 km/s); 58 min of data; ~23 bar; temperatures topped 300 F (~150 C); ~156 km (97 mi) deep;
+     Jupiter has no true surface; equatorial radius 71,492 km (156 km = 0.22 %).
+     Images (img/): PIA04866 Cassini Jupiter portrait (NASA/JPL/SSI, public domain); PIA23610 and PIA24971 JunoCam
+     (image data NASA/JPL-Caltech/SwRI/MSSS, processing Brian Swift, CC BY). Figure and probe silhouettes illustrative. -->
+<script>
+const W=1080,H=1920,FPS=30,D=35.6;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2},lerp=(a,b,k)=>a+(b-a)*k;
+const IM={};let NL=0;const NEED=['PIA04866','PIA23610','PIA24971'];
+for(const n of NEED){const im=new Image();im.onload=()=>{if(++NL==NEED.length)Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true})};im.src='img/'+n+'.jpg';IM[n]=im}
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const STARS=[];{const r=rnd(7);for(let i=0;i<500;i++)STARS.push([r()*W,r()*H,Math.pow(r(),3)*1.8+.3,r()])}
+// Jupiter portrait geometry (source px): disk centre (1050,960), r 887
+const JC=[1050,960],JR=887;
+// draw an image so that source point (sx,sy) lands at screen (px,py) with scale s
+function img(n,sx,sy,px,py,s,al){const im=IM[n];x.save();x.globalAlpha=al==null?1:al;x.drawImage(im,px-sx*s,py-sy*s,im.width*s,im.height*s);x.restore()}
+function stars(al){x.save();for(const s of STARS){x.globalAlpha=al*(.25+.6*s[3]);x.fillStyle='#fff';x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill()}x.restore()}
+function txt(s,px,py,size,col,al,font){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign='center';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.92)';x.shadowBlur=20;x.fillText(s,px,py);x.shadowBlur=6;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+// astronaut silhouette, height ~ h px, rim light from below (Jupiter)
+function astro(cx,cy,h,rot,al){x.save();x.globalAlpha=al;x.translate(cx,cy);x.rotate(rot);const u=h/10;
+ const parts=()=>{x.beginPath();x.arc(0,-3.6*u,1.25*u,0,7);x.fill();x.beginPath();x.roundRect(-1.5*u,-2.4*u,3*u,4*u,1.1*u);x.fill();x.beginPath();x.roundRect(-2.1*u,-2.2*u,1.2*u,3.2*u,.5*u);x.fill();};
+ const limbs=()=>{x.lineCap='round';x.lineWidth=1.05*u;x.beginPath();x.moveTo(-1.1*u,-1.8*u);x.lineTo(-2.6*u,-.4*u);x.lineTo(-3.2*u,-1.9*u);x.moveTo(1.1*u,-1.8*u);x.lineTo(2.7*u,-2.8*u);x.lineTo(3.4*u,-4.2*u);
+  x.moveTo(-.7*u,1.4*u);x.lineTo(-1.4*u,3.6*u);x.lineTo(-1.0*u,5.6*u);x.moveTo(.7*u,1.4*u);x.lineTo(1.9*u,3.2*u);x.lineTo(2.6*u,5.0*u);x.stroke()};
+ x.shadowColor='rgba(255,170,90,.9)';x.shadowBlur=h*.18;x.shadowOffsetY=h*.03;x.fillStyle='#120d0b';x.strokeStyle='#120d0b';parts();limbs();
+ x.shadowBlur=0;x.shadowOffsetY=0;x.fillStyle='rgba(255,200,140,.55)';x.beginPath();x.ellipse(.25*u,-3.7*u,.75*u,.5*u,0,0,7);x.fill();x.restore()}
+// Galileo entry probe: blunt heat shield + plasma trail (pointing down)
+function probeEntry(cx,cy,s,glow,al){x.save();x.globalAlpha=al;
+ const tg=x.createLinearGradient(cx,cy-9*s,cx,cy);tg.addColorStop(0,'rgba(255,140,60,0)');tg.addColorStop(.7,'rgba(255,170,90,'+(.55*glow)+')');tg.addColorStop(1,'rgba(255,240,210,'+(.95*glow)+')');
+ x.fillStyle=tg;x.beginPath();x.moveTo(cx-1.25*s,cy);x.quadraticCurveTo(cx-.6*s,cy-5*s,cx,cy-9.5*s);x.quadraticCurveTo(cx+.6*s,cy-5*s,cx+1.25*s,cy);x.fill();
+ const g=x.createRadialGradient(cx,cy+.2*s,0,cx,cy+.2*s,2.6*s);g.addColorStop(0,'rgba(255,250,235,'+glow+')');g.addColorStop(.35,'rgba(255,190,110,'+(.7*glow)+')');g.addColorStop(1,'rgba(255,120,40,0)');x.fillStyle=g;x.beginPath();x.arc(cx,cy+.2*s,2.6*s,0,7);x.fill();
+ x.fillStyle='#16100d';x.beginPath();x.moveTo(cx-1.2*s,cy-.25*s);x.quadraticCurveTo(cx,cy+.75*s,cx+1.2*s,cy-.25*s);x.lineTo(cx+.55*s,cy-.95*s);x.lineTo(cx-.55*s,cy-.95*s);x.closePath();x.fill();x.restore()}
+// probe under its parachute
+function probeChute(cx,cy,s,al,sway){x.save();x.globalAlpha=al;x.translate(cx,cy);x.rotate(sway);
+ x.shadowColor='rgba(255,215,160,.75)';x.shadowBlur=s*.9;x.fillStyle='#17110e';x.strokeStyle='#17110e';
+ x.beginPath();x.moveTo(-2.4*s,-4.4*s);x.quadraticCurveTo(0,-7.6*s,2.4*s,-4.4*s);x.quadraticCurveTo(0,-5.1*s,-2.4*s,-4.4*s);x.fill();
+ x.lineWidth=Math.max(1,s*.07);x.beginPath();for(const k of [-2.3,-1.1,0,1.1,2.3]){x.moveTo(k*s,-4.6*s);x.lineTo(0,-.55*s)}x.stroke();
+ x.beginPath();x.moveTo(-.65*s,-.5*s);x.lineTo(.65*s,-.5*s);x.lineTo(.5*s,.45*s);x.lineTo(-.5*s,.45*s);x.closePath();x.fill();x.restore()}
+const CARDS=[[0,1.9,'FALL INTO JUPITER?',''],[1.95,3.7,'NO GROUND. EVER.',''],[3.8,7.2,'1995: NASA DROPS','A PROBE IN'],
+ [11.6,14.2,'PARACHUTE OUT',''],[14.35,17.45,'THICKER. HOTTER.',''],[17.6,21.3,'23× EARTH’S','AIR PRESSURE'],[21.3,24.2,'ABOUT 150 °C',''],[24.3,26.05,'58 MINUTES:','SIGNAL LOST'],
+ [26.3,29.6,'THAT DEEP: 156 km',''],[29.6,33.2,'NOT EVEN 0.25%','OF THE WAY DOWN'],[33.3,34.9,'WOULD YOU JUMP?',''],[35.0,D+1,'FALL INTO JUPITER?','']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.22),b>D?1:ease((b-t)/.2));
+ const sz=Math.min(fit(l1,96,800),l2?fit(l2,96,800):99);const y1=l2?470:520;txt(l1,495,y1,sz,'#fff',al);if(l2)txt(l2,495,y1+sz*1.08,sz,'#ffd166',al)}}
+// scene A/B: Jupiter portrait push-in, s(t) and focus point
+function jupA(t){// returns scale & screen pos of source focus
+ const k=eio(t/11.4);const s=lerp(1.0,7.5,Math.pow(k,1.6));return s}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ // focus on a lit cloud band near the disk centre-left
+ const F=[880,1000];
+ if(t<12.2){const s=jupA(t);stars(cl(1-(s-1)/1.5));img('PIA04866',F[0],F[1],540,1060,s);
+  // crossfade into the Juno close-up as we get close
+  const cf=ease((t-7.0)/3.0);if(cf>0){const s2=lerp(0.9,1.35,ease((t-7)/5));img('PIA23610',690,960,540,960,s2,cf)}
+  // astronaut (hook) falls toward the planet, shrinking
+  const aa=1-ease((t-3.3)/0.6);if(aa>0){const k=t/3.9;astro(540+40*Math.sin(t*.7),lerp(800,1180,ease(k)),lerp(150,40,ease(k)),-.35+t*.35,aa)}
+  // probe entry with plasma trail
+  if(t>4.2&&t<12.2){const k=(t-4.2)/7.4;const al=ease((t-4.2)/.4)*(1-ease((t-11.8)/.4));const glow=.55+.45*Math.sin(t*23)*.15+.4*ease((t-6)/2);
+   probeEntry(540+20*Math.sin(t*1.3),lerp(700,1000,ease(k)),lerp(10,26,ease(k)),cl(glow),al)}
+  // entry speed counter
+  if(t>7.25&&t<11.5){const k=ease((t-7.3)/1.6),al=ease((t-7.25)/.25)*ease((11.5-t)/.25);const v=Math.round(170590*k/10)*10;
+   txt(v.toLocaleString('en-US')+' km/h',495,560,110,'#ffd166',al);txt('entry speed',495,628,40,'#e8e2d6',al*.95,'Mont')}
+  // heat flash at the hand-over
+  const fl=Math.exp(-Math.pow((t-11.9)/0.25,2));if(fl>.01){x.fillStyle='rgba(255,220,170,'+(.55*fl)+')';x.fillRect(0,0,W,H)}
+ }
+ if(t>=11.6&&t<26.4){// descent through the clouds (Juno PIA24971), sinking: image drifts up, push-in, haze thickens
+  const u=t-11.6,al=ease(u/.6)*(1-ease((t-26.0)/.4));const s=lerp(1.05,1.6,ease(u/14.6));
+  img('PIA24971',592,lerp(820,1180,u/14.6),540,960,s,al);
+  // haze layers (parallax): warm, darker with depth
+  const dk=ease((u-1)/13);x.save();x.globalAlpha=al;
+  for(let i=0;i<3;i++){const yy=((u*(90+i*70)+i*700)%2600)-340;const g=x.createLinearGradient(0,yy-260,0,yy+260);g.addColorStop(0,'rgba(210,150,95,0)');g.addColorStop(.5,'rgba(215,160,105,'+(.18+.1*i)+')');g.addColorStop(1,'rgba(210,150,95,0)');x.fillStyle=g;x.fillRect(0,yy-260,W,520)}
+  x.fillStyle='rgba(60,22,8,'+(.62*dk)+')';x.fillRect(0,0,W,H);
+  const rg=x.createRadialGradient(540,1000,200,540,1000,1150);rg.addColorStop(0,'rgba(0,0,0,0)');rg.addColorStop(1,'rgba(12,4,0,'+(.35+.5*dk)+')');x.fillStyle=rg;x.fillRect(0,0,W,H);x.restore();
+  // the probe under its chute
+  const pa=al*(1-ease((t-24.4)/0.5));if(pa>0)probeChute(540+30*Math.sin(u*.8),lerp(880,980,ease(u/14)),lerp(26,19,ease(u/14)),pa,.08*Math.sin(u*1.3));
+  // silence glow when the signal stops
+  const sg=Math.exp(-Math.pow((t-24.6)/0.3,2));if(sg>.01){const g=x.createRadialGradient(540,950,0,540,950,260);g.addColorStop(0,'rgba(255,190,120,'+(.6*sg)+')');g.addColorStop(1,'rgba(255,190,120,0)');x.fillStyle=g;x.fillRect(0,0,W,H)}
+  // depth counter (the one counter)
+  const ca=ease((u-.2)/.3)*ease((26.0-t)/.3);const dep=Math.round(156*ease(cl((u-.2)/13.0)*1.0));
+  txt(dep+' km',495,1350,108,'#ffd166',ca);txt('descent depth',495,1410,38,'#f0e6d8',ca*.95,'Mont')}
+ if(t>=26.1){// pull out: whole Jupiter, the probe depth marked at the limb
+  const u=t-26.1;const al=ease(u/.5);
+  // camera: start tight on the top limb, pull out to the whole disk, then (33.3+) push back to the opening framing
+  const k=eio(u/3.2),back=eio((t-33.3)/2.3);
+  const LX=JC[0]-JR,LY=JC[1];
+  let s=Math.exp(lerp(Math.log(4.0),Math.log(0.55),k)),fx=LX,fy=LY,px=lerp(540,540-JR*0.55,k),py=lerp(980,1000,k);
+  if(back>0){s=Math.exp(lerp(Math.log(0.55),Math.log(1.0),back));fx=lerp(JC[0],F[0],back);fy=lerp(JC[1],F[1],back);py=lerp(1000,1060,back)}
+  stars(1);img('PIA04866',fx,fy,px,py,s);
+  // the probe depth: 156 km of 71,492 km, marked at the lit left limb
+  const mk=ease((u-.6)/.5)*(1-back);if(mk>0){const cx=px+(JC[0]-fx)*s,cy=py+(JC[1]-fy)*s,R=JR*s,dr=Math.max(2.5,R*156/71492);
+   x.save();x.globalAlpha=mk;x.strokeStyle='#ff5a3c';x.lineWidth=dr;x.beginPath();x.arc(cx,cy,R-dr/2,Math.PI-.16,Math.PI+.16);x.stroke();
+   const ra=ease((u-3.3)/.6)*mk;x.globalAlpha=ra;x.setLineDash([16,12]);x.lineWidth=4;x.strokeStyle='rgba(255,255,255,.9)';x.beginPath();x.moveTo(cx-R,cy);x.lineTo(cx,cy);x.stroke();x.setLineDash([]);
+   x.fillStyle='#fff';x.beginPath();x.arc(cx,cy,9,0,7);x.fill();x.restore();
+   txt('71,492 km to the center',cx-R/2+40,cy-28,40,'#fff',ra,'Mont');
+   const la=ease((u-.8)/.4)*mk*(1-ease((u-3.1)/.4));const ax=cx-R,ay=cy;
+   const lx=cl(ax+300,360,640),ly=ay+210;x.save();x.globalAlpha=la;x.strokeStyle='#ff8a6a';x.lineWidth=5;x.beginPath();x.moveTo(lx-150,ly-50);x.lineTo(ax+14,ay+12);x.stroke();x.restore();
+   txt('probe: 156 km',lx,ly,56,'#ff8a6a',la,'Mont')}
+  x.fillStyle='rgba(0,0,0,'+(1-al)+')';x.fillRect(0,0,W,H)}
+ if(t>34.95)astro(540,800,150,-.35,ease((t-34.95)/.5));
+ cards(t);
+ if(t>=33.4&&t<34.9){const al=Math.min(ease((t-33.4)/.25),ease((34.9-t)/.2));txt('FOLLOW → MORE EVERY DAY',495,1380,48,'#fff',al)}
+ const g=x.createRadialGradient(540,960,560,540,960,1300);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.42)');x.fillStyle=g;x.fillRect(0,0,W,H);}
+</script>
