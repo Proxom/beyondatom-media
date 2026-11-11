@@ -43,7 +43,7 @@ function probeChute(cx,cy,s,al,sway){x.save();x.globalAlpha=al;x.translate(cx,cy
  x.beginPath();x.moveTo(-.65*s,-.5*s);x.lineTo(.65*s,-.5*s);x.lineTo(.5*s,.45*s);x.lineTo(-.5*s,.45*s);x.closePath();x.fill();x.restore()}
 const CARDS=[[0,1.9,'FALL INTO JUPITER?',''],[1.95,3.7,'NO GROUND. EVER.',''],[3.8,7.2,'1995: NASA DROPS','A PROBE IN'],
  [11.6,14.2,'PARACHUTE OUT',''],[14.35,17.45,'THICKER. HOTTER.',''],[17.6,21.3,'23× EARTH’S','AIR PRESSURE'],[21.3,24.2,'ABOUT 150 °C',''],[24.3,26.05,'58 MINUTES:','SIGNAL LOST'],
- [26.3,29.6,'THAT DEEP: 156 km',''],[29.6,33.2,'NOT EVEN 0.25%','OF THE WAY DOWN'],[33.3,34.9,'WOULD YOU JUMP?',''],[35.0,D+1,'FALL INTO JUPITER?','']];
+ [26.3,29.6,'THAT DEEP: 156 km',''],[29.6,33.2,'ONLY ABOUT 0.2%','OF THE WAY DOWN'],[33.3,34.9,'WOULD YOU JUMP?',''],[35.0,D+1,'FALL INTO JUPITER?','']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.22),b>D?1:ease((b-t)/.2));
  const sz=Math.min(fit(l1,96,800),l2?fit(l2,96,800):99);const y1=l2?470:520;txt(l1,495,y1,sz,'#fff',al);if(l2)txt(l2,495,y1+sz*1.08,sz,'#ffd166',al)}}
 // scene A/B: Jupiter portrait push-in, s(t) and focus point
@@ -87,7 +87,7 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
   const k=eio(u/3.2),back=eio((t-33.3)/2.3);
   const LX=JC[0]-JR,LY=JC[1];
   let s=Math.exp(lerp(Math.log(4.0),Math.log(0.55),k)),fx=LX,fy=LY,px=lerp(540,540-JR*0.55,k),py=lerp(980,1000,k);
-  if(back>0){s=Math.exp(lerp(Math.log(0.55),Math.log(1.0),back));fx=lerp(JC[0],F[0],back);fy=lerp(JC[1],F[1],back);py=lerp(1000,1060,back)}
+  if(back>0){px=540;s=Math.exp(lerp(Math.log(0.55),Math.log(1.0),back));fx=lerp(JC[0],F[0],back);fy=lerp(JC[1],F[1],back);py=lerp(1000,1060,back)}
   stars(1);img('PIA04866',fx,fy,px,py,s);
   // the probe depth: 156 km of 71,492 km, marked at the lit left limb
   const mk=ease((u-.6)/.5)*(1-back);if(mk>0){const cx=px+(JC[0]-fx)*s,cy=py+(JC[1]-fy)*s,R=JR*s,dr=Math.max(2.5,R*156/71492);
