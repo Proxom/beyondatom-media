@@ -147,7 +147,7 @@ function draw(t){const z=Z(t),dz=(Z(t+1/30)-Z(t-1/30))*15;x.setTransform(1,0,0,1
  const voidA=ss(-15.0,-15.6,z)*(1-ss(-33.6,-34.5,z));
  let base=-1;for(let i=0;i<LV.length;i++){const k=Math.pow(10,LV[i].z-z);if(k>=.9&&(i==LV.length-1||Math.pow(10,LV[i+1].z-z)<.9))base=i}
  if(base<0)base=0;const deep=z<-15.0;
- if(!deep){const L=LV[base];L.f(x,1080*Math.pow(10,L.z-z),t)}
+ if(!deep||base==LV.length-1){const L=LV[base];L.f(x,1080*Math.pow(10,L.z-z),t)}
  for(let i=base+1;i<LV.length;i++){const L=LV[i],k=Math.pow(10,L.z-z);if(k<.05)break;if(deep&&i<LV.length-1)continue;
   const u=1080*k;o.setTransform(1,0,0,1,0,0);o.globalAlpha=1;o.globalCompositeOperation='source-over';o.clearRect(0,0,W,H);L.f(o,u,t);
   const rad=Math.max(40,1.25*u);o.globalCompositeOperation='destination-in';const m=o.createRadialGradient(CX,CY,rad*.45,CX,CY,rad);m.addColorStop(0,'rgba(0,0,0,1)');m.addColorStop(1,'rgba(0,0,0,0)');o.fillStyle=m;o.fillRect(0,0,W,H);
