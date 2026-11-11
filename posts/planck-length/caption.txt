@@ -1,0 +1,25 @@
+Guess first: how many 10× zooms from a proton down to the Planck length? 👇
+
+We start at your fingertip and zoom in, every step 10 times smaller: skin cells, DNA, one atom, its nucleus, one proton. From a 1 cm view to a proton is about 13 zooms.
+
+Then it gets strange. A proton is about 0.84 femtometers in radius (about 1.7 × 10⁻¹⁵ m across). The Planck length is 1.616 × 10⁻³⁵ m. That is 20 more zooms: a proton is about 100 billion billion (10²⁰) times bigger than the Planck length.
+
+Why does it matter? The Planck length is built only from three constants of nature (gravity's G, the speed of light c and Planck's constant ħ). Physicists have long suspected that this is roughly the scale where gravity has to be described by quantum physics, and no one knows yet what space is like down there.
+
+About the video: an original computer animation. Every picture is an illustration, not a microscope image. The scale counter shows the width of the screen, rounded to a power of ten; sizes are approximate. The atom is drawn as a hydrogen-like electron cloud (to scale its nucleus is far too small to see), the proton's three quarks and the "foam" at the Planck length are artistic.
+
+Sources:
+NIST CODATA 2022, Planck length 1.616255 × 10⁻³⁵ m: https://physics.nist.gov/cgi-bin/cuu/Value?plkl
+NIST CODATA 2022, proton rms charge radius 0.84075 fm: https://physics.nist.gov/cgi-bin/cuu/Value?rp
+NIST CODATA 2022, Bohr radius 5.29 × 10⁻¹¹ m: https://physics.nist.gov/cgi-bin/cuu/Value?bohrrada0
+NCBI StatPearls, Genetics, DNA Packaging (DNA helical diameter 2 nm): https://www.ncbi.nlm.nih.gov/books/NBK534207/
+U.S. Department of Energy, "Scientists Locate the Missing Mass Inside the Proton" (a proton's core consists of three valence quarks, plus quark-antiquark pairs and gluons): https://www.energy.gov/science/np/articles/scientists-locate-missing-mass-inside-proton
+Symmetry magazine (Fermilab/SLAC), "The Planck scale" (the proton is about 100 million trillion times larger than the Planck length; physicists don't know what goes on at the Planck scale): https://www.symmetrymagazine.org/article/the-planck-scale
+John Baez, UC Riverside, "The Planck Length" (defined from ħ, G and c; physicists have long suspected quantum gravity becomes important at about this scale): https://math.ucr.edu/home/baez/planck/node2.html
+
+Footage: none, original animation. Narration: AI voice (Kokoro). Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #physics #quantum #shorts

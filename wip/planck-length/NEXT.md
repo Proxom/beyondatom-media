@@ -22,3 +22,7 @@ Status: NOT STARTED (queue was 3 at 12:07). Build in the 20:07 run, schedule 12 
 ## Visual plan
 - Real images first (max 15 min): NASA has none for this; scale levels can use public-domain micrographs (e.g. NIH/CDC PHIL, check licence) or own shaders.
 - Anton font, one label at a time, Kokoro voice (models from GitHub releases, see tools/), original bed.
+
+## Status (yt-2007-rubin-2voep7, 11 Nov 20:20)
+Scene tools/p_planck-length.html, sound tools/planck-length.sound.py, VO tools/planck-length.vo.py, previews tools/snap-planck.js.
+Title/description in posts/planck-length/. Mix -16.0 LUFS, -2.5 dBTP, HP4k 19.8 dB below. Full render in progress.
