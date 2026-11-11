@@ -1,0 +1,105 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- planet-ball-drop (style A): the same ball dropped from 100 m on all 8 planets, in two heats of 4, in real time.
+     g (m/s^2) from the NASA NSSDC Planetary Fact Sheet (equator, incl. rotation; giants at the 1 bar level):
+     Mercury 3.7, Venus 8.9, Earth 9.8, Mars 3.7, Jupiter 23.1, Saturn 9.0, Uranus 8.7, Neptune 11.0. No air. t = sqrt(2h/g).
+     Planet pictures: NASA/JPL public-domain images (see posts/planet-ball-drop/caption.txt). Planet and ball sizes not to scale. -->
+<script>
+const W=1080,H=1920,FPS=30,D=27.8,HDROP=100;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+const COLS=[[0,250,125],[250,480,365],[480,710,595],[710,1080,830]];
+const GY=1250,YB0=790,PXM=(GY-YB0)/HDROP,BR=26,PR=430;
+// name, g, image, globe radius / image half size, glow colour
+const PL={
+ JUPITER:[23.1,'PIA04866',1,'235,200,160'],EARTH:[9.8,'as17-148-22727',1,'120,170,255'],SATURN:[9.0,'PIA21046',340/800,'240,215,150',0.5],URANUS:[8.7,'PIA18182',1,'160,235,240'],
+ NEPTUNE:[11.0,'PIA01492',1,'110,150,255'],VENUS:[8.9,'PIA23791',1,'250,225,170'],MERCURY:[3.7,'PIA15162',1,'200,200,200'],MARS:[3.7,'PIA00407',1,'255,150,110']};
+const T1=0.9,T2=10.6;
+const HEATS=[{t0:T1,names:['JUPITER','EARTH','SATURN','URANUS']},{t0:T2,names:['NEPTUNE','VENUS','MERCURY','MARS']}];
+for(const h of HEATS)h.p=h.names.map((n,i)=>{const [g,img,k,glow,dx]=PL[n];return {n,g,img,k,glow,dx:dx||0,col:COLS[i],T:Math.sqrt(2*HDROP/g)}});
+const IM={};let LOADED=0;for(const n in PL){const im=new Image();im.onload=()=>{LOADED++;if(LOADED==8)Promise.all([document.fonts.load('88px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true})};im.src='pl/'+PL[n][1]+'.jpg';IM[n]=im}
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const STARS=[];{const r=rnd(42);for(let i=0;i<420;i++)STARS.push([r()*W,r()*GY,Math.pow(r(),3)*1.8+.35,r(),r()])}
+// timeline: which heat is on screen and its x offset (whip pans)
+const WH=[[9.4,10.0,0,1],[26.9,27.4,1,0]];
+function view(t){for(const [a,b,f,to] of WH){if(t>=a&&t<b){const k=eio((t-a)/(b-a));return [[f,-k*W],[to,(1-k)*W]]}}
+ if(t<9.4)return [[0,0]];if(t<26.9)return [[1,0]];return [[0,0]]}
+function tl(h,t){return t-h.t0}                       // heat clock
+function heatT(hi,t){// local heat time; heat 1 resets at the loop seam (seen again after the whip back)
+ const h=HEATS[hi];if(hi==0&&t>20)return -1;return t-h.t0}
+function ballY(p,u){if(u<=0)return YB0-BR;const tt=Math.min(u,p.T);return YB0-BR+PXM*0.5*p.g*tt*tt}
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=18;x.fillText(s,px,py);x.shadowBlur=5;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+function drawHeat(hi,ox,t,zoom){const h=HEATS[hi];const u=heatT(hi,t);
+ x.save();
+ // slow push-in toward the impact line
+ const zc=[540,1150];x.translate(zc[0]+ox,zc[1]);x.scale(zoom,zoom);x.translate(-zc[0],-zc[1]);
+ for(const [i,p] of h.p.entries()){const [a,b,cx]=p.col;x.save();x.beginPath();x.rect(a,-200,b-a,H+400);x.clip();
+  // sky
+  let g=x.createLinearGradient(0,0,0,GY);g.addColorStop(0,'#000');g.addColorStop(.7,'#020308');g.addColorStop(1,'rgba('+p.glow+',.10)');x.fillStyle=g;x.fillRect(a,-200,b-a,GY+200);
+  for(const s of STARS){const sx=a+((s[0]*1.7+i*311)%(b-a));const tw=.55+.45*Math.sin(t*1.3+s[4]*20);x.globalAlpha=(.25+.6*s[3])*tw;x.fillStyle='#fff';x.beginPath();x.arc(sx,s[1],s[2],0,7);x.fill()}x.globalAlpha=1;
+  // atmosphere glow above the limb
+  const rg=x.createRadialGradient(cx,GY+PR,PR*0.98,cx,GY+PR,PR*1.22);rg.addColorStop(0,'rgba('+p.glow+',.55)');rg.addColorStop(.25,'rgba('+p.glow+',.18)');rg.addColorStop(1,'rgba('+p.glow+',0)');
+  x.fillStyle=rg;x.fillRect(a,GY-140,b-a,600);
+  // planet (real NASA image), top of the globe at GY
+  const im=IM[p.n],S=2*PR/p.k;const rot=(t*0.006)*(i%2?1:-1);const ddx=p.dx*PR,sag=PR-Math.sqrt(PR*PR-ddx*ddx);
+  x.save();x.translate(cx-ddx,GY+PR-sag);x.rotate(rot);
+  if(p.n!=='SATURN'){x.beginPath();x.arc(0,0,PR,0,7);x.clip()}
+  x.drawImage(im,-S/2,-S/2,S,S);x.restore();
+  // limb shading so it reads as a sphere
+  const sh=x.createRadialGradient(cx-PR*.25,GY+PR*.7,PR*.2,cx,GY+PR,PR*1.02);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(.85,'rgba(0,0,0,.05)');sh.addColorStop(1,'rgba(0,0,0,.45)');
+  x.fillStyle=sh;x.beginPath();x.arc(cx,GY+PR,PR,0,7);x.fill();
+  // impact: soft dust / cloud ring
+  if(u>p.T){const k=u-p.T;const ra=ease(k/0.25)*(1-ease((k-0.3)/1.2));if(ra>0){const rr=20+150*Math.sqrt(cl(k/1.4));x.save();x.globalAlpha=ra*.75;
+    const dg=x.createRadialGradient(cx,GY,rr*.2,cx,GY,rr);dg.addColorStop(0,'rgba(255,245,225,.0)');dg.addColorStop(.6,'rgba(255,240,215,.55)');dg.addColorStop(1,'rgba(255,240,215,0)');x.fillStyle=dg;
+    x.beginPath();x.ellipse(cx,GY-4,rr,rr*.32,0,0,7);x.fill();x.restore()}
+   const fl=Math.exp(-k/0.12);if(fl>0.02){const fg=x.createRadialGradient(cx,GY-10,0,cx,GY-10,90);fg.addColorStop(0,'rgba(255,240,200,'+(.7*fl)+')');fg.addColorStop(1,'rgba(255,240,200,0)');x.fillStyle=fg;x.fillRect(cx-90,GY-100,180,180)}}
+  x.restore();
+  // drop line marker
+ }
+ // after the photo finish: dim the two finished columns so Mercury and Mars stand out
+ if(hi==1){const dk=ease((u-7.5)/0.5)*(1-ease((t-26.6)/0.3));if(dk>0){x.fillStyle='rgba(0,0,0,'+(0.5*dk)+')';x.fillRect(COLS[0][0]-60,-200,COLS[2][0]-COLS[0][0]+60,H+400)}}
+ // dividers
+ for(let i=1;i<4;i++){const px=COLS[i][0];x.fillStyle='rgba(0,0,0,.75)';x.fillRect(px-2,-200,4,H+400);x.fillStyle='rgba(255,255,255,.08)';x.fillRect(px+2,-200,1,H+400)}
+ // 100 m start line
+ x.save();x.setLineDash([12,12]);x.lineWidth=2;x.strokeStyle='rgba(255,255,255,.28)';x.beginPath();x.moveTo(0,YB0);x.lineTo(W,YB0);x.stroke();x.restore();
+ txt('100 m',165,YB0+34,26,'rgba(235,240,248,.85)',1,'Mont','left');
+ // balls (motion blur from sub-frames)
+ for(const p of h.p){const cx=p.col[2];const NS=6;for(let s=0;s<NS;s++){const uu=u+((s+.5)/NS-.5)/FPS*0.9;const by=Math.min(ballY(p,uu),GY-BR);
+   x.globalAlpha=1/NS*1.6;const bg=x.createRadialGradient(cx-BR*.4,by-BR*.45,BR*.1,cx,by,BR);bg.addColorStop(0,'#ffffff');bg.addColorStop(.35,'#dfe3ea');bg.addColorStop(1,'#5d6470');
+   x.fillStyle=bg;x.beginPath();x.arc(cx,by,BR,0,7);x.fill()}x.globalAlpha=1;
+  const by=Math.min(ballY(p,u),GY-BR);x.strokeStyle='rgba(0,0,0,.5)';x.lineWidth=2;x.beginPath();x.arc(cx,by,BR,0,7);x.stroke();}
+ // names + landing stamps
+ for(const [i,p] of h.p.entries()){const cx=p.col[2],nx=Math.min(cx,850);txt(p.n,nx,700,fit(p.n,44,205),'#fff',1);
+  if(u>=p.T){const k=u-p.T,al=ease(k/0.15),pop=1+0.25*Math.exp(-k/0.12);const first=Math.min(...h.p.map(q=>q.T))===p.T,last=Math.max(...h.p.map(q=>q.T))===p.T;
+   txt(p.T.toFixed(2)+' s',nx,752,44*pop,last?'#ff8a6a':(first?'#9df0bf':'#ffd166'),al)}}
+ x.restore();
+ return u;}
+// cards: [a,b,line1,line2]
+const CARDS=[[0,3.8,'100 m DROP.','WHICH LANDS LAST?'],[3.9,5.75,'JUPITER WINS',''],[5.9,9.3,'SATURN: 95× EARTH’S MASS','STILL SLOWER'],
+ [9.8,10.6,'ROUND 2',''],[10.6,15.4,'WHICH LANDS LAST?',''],[15.5,17.9,'STILL FALLING…',''],[18.0,19.2,'PHOTO FINISH!',''],
+ [19.3,22.0,'MARS: 2× THE MASS','BUT IT’S WIDER'],[22.0,25.1,'SAME PULL:','3.7 m/s² ON BOTH'],[25.2,26.9,'WHICH SURPRISED YOU?',''],[27.2,D+1,'100 m DROP.','WHICH LANDS LAST?']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.22),b>D?1:ease((b-t)/.2));
+ const sz=Math.min(fit(l1,88,790),l2?fit(l2,88,790):99);const y1=l2?445:500;txt(l1,465,y1,sz,'#fff',al);if(l2)txt(l2,465,y1+sz*1.08,sz,'#ffd166',al)}}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ const V=view(t);
+ for(const [hi,ox] of V){const h=HEATS[hi];const u=heatT(hi,t);const z=hi==1?1+0.07*ease((u+0.5)/17):1+0.035*ease((u+0.5)/9);
+  // motion blur on whips
+  if(V.length>1){for(let s=0;s<4;s++){x.globalAlpha=1;const off=ox+(s-1.5)*14;x.save();x.globalAlpha=s==0?1:0.45;drawHeat(hi,off,t,z);x.restore()}}else drawHeat(hi,ox,t,z)}
+ x.globalAlpha=1;
+ // race clock (one counter)
+ const hi=t<20?0:1,h=HEATS[hi];const u=t-HEATS[t<10?0:1].t0;const hh=HEATS[t<10?0:1];const Tm=Math.max(...hh.p.map(p=>p.T));
+ let ca=(t>0.5&&t<9.3)||(t>10.3&&t<19.2)?1:0;ca*=Math.min(1,ease((t-(t<10?0.5:10.3))/.3));const end=t<10?9.3:19.2;ca*=ease((end-t)/.3);
+ if(ca>0){const v=cl(u,0,Tm);txt(v.toFixed(2)+' s',465,648,58,u>0&&u<Tm?'#ffd166':'#ffffff',ca)}
+ cards(t);
+ // tie bracket between Mercury and Mars
+ if(t>=T2+HEATS[1].p[2].T&&t<25.1){const k=t-(T2+HEATS[1].p[2].T),al=ease(k/.2)*ease((25.1-t)/.3);txt('=',710,752,54,'#ffd166',al)}
+ // footnote on the hook (and the loop seam)
+ const fa=(t<3.8?1:0)*ease((3.8-t)/.3)+(t>27.2?ease((t-27.2)/.3):0);txt('same ball · no air · giants: at the cloud tops',465,578,30,'#d9dee6',fa*.95,'Mont');
+ // follow line
+ if(t>=25.4&&t<26.9){const al=Math.min(ease((t-25.4)/.25),ease((26.9-t)/.2));txt('FOLLOW → MORE EVERY DAY',465,1395,46,'#fff',al)}
+ // vignette
+ const g=x.createRadialGradient(540,1000,520,540,1000,1300);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.4)');x.fillStyle=g;x.fillRect(0,0,W,H);}
+</script>
