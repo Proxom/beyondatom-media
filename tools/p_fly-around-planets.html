@@ -1,0 +1,94 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- fly-around-planets (sprint style A): a jet flies non-stop at 900 km/h around the equator of every planet, 2 rounds of 4, then the Sun.
+     Equatorial diameters from the NASA NSSDC Planetary Fact Sheet; Sun volumetric mean radius 695,700 km (NSSDC Sun fact sheet).
+     Lap time = pi * D / 900 km/h. Planet pictures: NASA public-domain images (posts/fly-around-planets/caption.txt), cropped to pl/<id>.jpg.
+     Sizes not to scale; time compressed. -->
+<script>
+const W=1080,H=1920,FPS=30,D=34.6,V=900;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+const lap=d=>Math.PI*d/V; // hours
+const R=225,CY=1070,CELLS=[[270,820],[770,820],[270,1320],[770,1320]];
+// name, diameter km, image, glow
+const PL={MERCURY:[4879,'PIA15162','200,200,200'],VENUS:[12104,'PIA23791','250,225,170'],EARTH:[12756,'as17-148-22727','120,170,255'],MARS:[6792,'PIA00407','255,150,110'],
+ JUPITER:[142984,'PIA04866','235,200,160'],SATURN:[120536,'PIA21046','240,215,150'],URANUS:[51118,'PIA18182','160,235,240'],NEPTUNE:[49528,'PIA01492','110,150,255'],SUN:[2*695700,'PIA26681','255,170,60']};
+// rounds: clock start/end (scene s), unit, names in grid order
+const RD=[{a:2.5,b:9.6,unit:'h',names:['MERCURY','VENUS','EARTH','MARS']},{a:11.4,b:19.4,unit:'d',names:['JUPITER','SATURN','URANUS','NEPTUNE']}];
+for(const r of RD){r.p=r.names.map((n,i)=>({n,d:PL[n][0],img:PL[n][1],glow:PL[n][2],c:CELLS[i],T:lap(PL[n][0])}));r.Tm=Math.max(...r.p.map(p=>p.T))}
+const SUN={a:22.6,b:27.6,T:lap(PL.SUN[0])};
+const IM={};let LOADED=0;const NIM=Object.keys(PL).length;
+for(const n in PL){const im=new Image();im.onload=()=>{LOADED++;if(LOADED==NIM)Promise.all([document.fonts.load('88px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true})};im.src='pl/'+PL[n][1]+'.jpg';IM[n]=im}
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const STARS=[];{const r=rnd(7);for(let i=0;i<700;i++)STARS.push([r()*W,r()*H,Math.pow(r(),3)*1.9+.35,r(),r()])}
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=20;x.fillText(s,px,py);x.shadowBlur=6;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+// scene clock -> elapsed hours in a round
+function hoursIn(r,t){return cl((t-r.a)/(r.b-r.a))*r.Tm}
+function fmt(h,unit){return unit=='h'?h.toFixed(1)+' h':(h/24).toFixed(1)+' days'}
+// jet silhouette pointing +x
+function jet(px,py,ang,sc,al){x.save();x.globalAlpha=al;x.translate(px,py);x.rotate(ang);x.scale(sc,sc);x.shadowColor='rgba(0,0,0,.8)';x.shadowBlur=6;x.fillStyle='#fff';
+ x.beginPath();x.moveTo(14,0);x.quadraticCurveTo(11,-2.2,4,-2.2);x.lineTo(1,-2.2);x.lineTo(-4,-12);x.lineTo(-7,-12);x.lineTo(-4,-2.2);x.lineTo(-10,-2);x.lineTo(-13,-6.5);x.lineTo(-15,-6.5);x.lineTo(-13.5,0);
+ x.lineTo(-15,6.5);x.lineTo(-13,6.5);x.lineTo(-10,2);x.lineTo(-4,2.2);x.lineTo(-7,12);x.lineTo(-4,12);x.lineTo(1,2.2);x.lineTo(4,2.2);x.quadraticCurveTo(11,2.2,14,0);x.fill();x.restore()}
+// orbit ellipse: centre, rx, ry, tilt; theta 0 = right end, increasing = along the FRONT (bottom) first
+function ept(o,th){const c=Math.cos(o.tl),s=Math.sin(o.tl),ex=o.rx*Math.cos(th),ey=o.ry*Math.sin(th);return [o.cx+ex*c-ey*s,o.cy+ex*s+ey*c]}
+function arc(o,th0,th1,part,col,lw,al){// part: 'back' (sin<0) or 'front'
+ if(th1<=th0)return;x.save();x.globalAlpha=al;x.strokeStyle=col;x.lineWidth=lw;x.lineCap='round';x.beginPath();let on=false;const N=Math.max(8,Math.ceil((th1-th0)/0.03));
+ for(let i=0;i<=N;i++){const th=th0+(th1-th0)*i/N;const f=Math.sin(th)>=0;const vis=part=='front'?f:!f;const [px,py]=ept(o,th);if(vis){if(!on){x.moveTo(px,py);on=true}else x.lineTo(px,py)}else on=false}
+ x.stroke();x.restore()}
+function orbitLayer(o,frac,part,done,glow){const TH=Math.PI*2*frac;
+ arc(o,0,Math.PI*2,part,'rgba(255,255,255,.22)',2,1);
+ arc(o,0,TH,part,'rgba('+glow+',.35)',16,done?0.9:0.7);arc(o,0,TH,part,done?'#fff3c4':'#ffd166',4.5,1);}
+function jetOn(o,frac,part,sc){const th=Math.PI*2*frac;const f=Math.sin(th)>=0;if((part=='front')!=f)return;const [px,py]=ept(o,th),[qx,qy]=ept(o,th+0.01);
+ const depth=0.75+0.25*Math.sin(th);jet(px,py,Math.atan2(qy-py,qx-px),sc*depth,1)}
+function globe(p,cx,cy,r,t,i){const im=IM[p.n];
+ // atmosphere glow
+ const rg=x.createRadialGradient(cx,cy,r*.95,cx,cy,r*1.25);rg.addColorStop(0,'rgba('+p.glow+',.35)');rg.addColorStop(1,'rgba('+p.glow+',0)');x.fillStyle=rg;x.beginPath();x.arc(cx,cy,r*1.3,0,7);x.fill();
+ if(p.n=='SATURN'){const S=r*2.5;x.save();x.globalCompositeOperation='screen';x.drawImage(im,cx-S/2,cy-S/2,S,S);x.restore();return}
+ const rot=(t*0.01)*(i%2?1:-1);x.save();x.translate(cx,cy);x.rotate(rot);x.beginPath();x.arc(0,0,r,0,7);x.clip();x.drawImage(im,-r*1.005,-r*1.005,r*2.01,r*2.01);x.restore();
+ const sh=x.createRadialGradient(cx-r*.3,cy-r*.3,r*.2,cx,cy,r*1.01);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(.8,'rgba(0,0,0,.08)');sh.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=sh;x.beginPath();x.arc(cx,cy,r,0,7);x.fill()}
+function orbitFor(p,cx,cy,r){if(p.n=='SATURN')return {cx,cy:cy+2,rx:r*0.62,ry:r*0.2,tl:-0.03};return {cx,cy,rx:r*1.1,ry:r*0.3,tl:-0.2}}
+function stars(ox,t,k){for(const s of STARS){const tw=.55+.45*Math.sin(t*1.3+s[4]*20);x.globalAlpha=(.2+.6*s[3])*tw*k;x.fillStyle='#fff';x.beginPath();x.arc(((s[0]+ox)%W+W)%W,s[1],s[2],0,7);x.fill()}x.globalAlpha=1}
+function drawRound(ri,ox,t){const r=RD[ri];const tt=(ri==0&&t>30)?0:t;const h=hoursIn(r,tt);
+ x.save();const z=1+0.04*ease((tt-(ri?10.8:0))/(ri?10:10));x.translate(540+ox,CY);x.scale(z,z);x.translate(-540,-CY);
+ for(const [i,p] of r.p.entries()){const [cx,cy]=p.c;const o=orbitFor(p,cx,cy,R);const frac=cl(h/p.T),done=h>=p.T;
+  orbitLayer(o,frac,'back',done,p.glow);jetOn(o,frac,'back',1.5);globe(p,cx,cy,R,tt,i);orbitLayer(o,frac,'front',done,p.glow);jetOn(o,frac,'front',1.5);
+  if(done){const k=(tt-(r.a+(r.b-r.a)*p.T/r.Tm));const fl=Math.exp(-k/0.18);if(fl>0.02){x.save();x.globalAlpha=fl*.6;x.fillStyle='#fff3c4';x.beginPath();x.arc(cx,cy,R*1.05,0,7);x.fill();x.restore()}}}
+ // names + stamps
+ for(const [i,p] of r.p.entries()){const [cx,cy]=p.c,nx=Math.max(150,Math.min(cx,800));txt(p.n,nx,cy-R+62,fit(p.n,40,230,'Mont'),'#fff',.95,'Mont');
+  if(h>=p.T){const k=tt-(r.a+(r.b-r.a)*p.T/r.Tm),al=ease(k/0.15),pop=1+0.3*Math.exp(-k/0.12);const last=p.T==r.Tm,first=p.T==Math.min(...r.p.map(q=>q.T));
+   txt(fmt(p.T,r.unit),Math.min(nx,745),cy+28,fit(fmt(p.T,r.unit),74,300)*pop,last?'#ff8a6a':(first?'#9df0bf':'#ffd166'),al)}}
+ x.restore();
+ // shared clock between the four globes
+ const ca=ease((tt-(r.a-0.6))/.3)*(ri==0?1-ease((t-10.0)/.3)*(t<30?1:0):1-ease((t-21.0)/.3));
+ if(ca>0.01){x.save();x.globalAlpha=cl(ca);const s=fmt(h,r.unit);x.font='84px Anton';const w=x.measureText(s).width+60;x.fillStyle='rgba(0,0,0,.55)';x.beginPath();x.roundRect(540+ox-w/2,CY-62,w,90,45);x.fill();x.restore();
+  txt(s,540+ox,CY+16,84,h>0&&h<r.Tm?'#ffd166':'#ffffff',ca)}}
+function drawSun(ox,t){const p={n:'SUN',glow:PL.SUN[2]};const u=t-SUN.a;const z=1+0.06*ease((t-21.6)/9);
+ x.save();x.translate(540+ox,1300);x.scale(z,z);x.translate(-540,-1300);
+ const cx=540,cy=1330,r=700,o={cx,cy:cy-30,rx:r*1.02,ry:150,tl:-0.06};
+ const gl=x.createRadialGradient(cx,cy,r*.9,cx,cy,r*1.6);gl.addColorStop(0,'rgba(255,170,60,.55)');gl.addColorStop(.3,'rgba(255,140,40,.18)');gl.addColorStop(1,'rgba(255,120,30,0)');x.fillStyle=gl;x.fillRect(-200,0,W+400,H);
+ const frac=cl(eio(u/(SUN.b-SUN.a)));
+ orbitLayer(o,frac,'back',frac>=1,'255,220,150');jetOn(o,frac,'back',2.2);
+ x.save();x.translate(cx,cy);x.rotate(t*0.004);x.beginPath();x.arc(0,0,r,0,7);x.clip();x.drawImage(IM.SUN,-r*1.005,-r*1.005,r*2.01,r*2.01);x.restore();
+ const sh=x.createRadialGradient(cx,cy,r*.5,cx,cy,r*1.01);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(60,20,0,.35)');x.fillStyle=sh;x.beginPath();x.arc(cx,cy,r,0,7);x.fill();
+ orbitLayer(o,frac,'front',frac>=1,'255,220,150');jetOn(o,frac,'front',2.2);x.restore();
+ const days=frac*SUN.T/24;const ca=ease((t-(SUN.a-0.5))/.3)*(1-ease((t-31.0)/.3));
+ if(ca>0.01){const s=Math.round(days)+' DAYS';txt(s,540+ox,1060,frac>=1?150:130,frac>=1?'#ffffff':'#ffe2a0',ca)}}
+const CARDS=[[0,4.8,'FLY AROUND EVERY PLANET','WHICH TAKES LONGEST?'],[4.9,10.1,'ROCKY PLANETS',''],[10.6,21.2,'THE GIANTS',''],
+ [21.6,27.7,'AND THE SUN?',''],[27.8,30.9,'MORE THAN','HALF A YEAR'],[31.0,32.7,'WHICH SURPRISED YOU?',''],[34.1,D+1,'FLY AROUND EVERY PLANET','WHICH TAKES LONGEST?']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.22),b>D?1:ease((b-t)/.2));
+ const sz=Math.min(fit(l1,92,800),l2?fit(l2,92,800):99);const y1=l2?425:470;txt(l1,495,y1,sz,'#fff',al);if(l2)txt(l2,495,y1+sz*1.06,sz,'#ffd166',al)}}
+const WH=[[10.2,10.8,0,1],[21.3,21.9,1,2],[33.8,34.3,2,0]];
+function view(t){for(const [a,b,f,to] of WH){if(t>=a&&t<b){const k=eio((t-a)/(b-a));return [[f,-k*W],[to,(1-k)*W]]}}
+ if(t<10.2)return [[0,0]];if(t<21.3)return [[1,0]];if(t<33.8)return [[2,0]];return [[0,0]]}
+function scene(si,ox,t){if(si==2)drawSun(ox,t);else drawRound(si,ox,t)}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ const Vw=view(t);stars(Vw.length>1?Vw[0][1]*0.3:0,t,1);
+ for(const [si,ox] of Vw){if(Vw.length>1){for(let s=0;s<3;s++){x.save();x.globalAlpha=s==0?1:0.4;scene(si,ox+(s-1)*16,t);x.restore()}}else scene(si,ox,t)}
+ x.globalAlpha=1;cards(t);
+ const fa=(t<4.8?1:0)*ease((4.8-t)/.3)+(t>34.1?1:0);txt('jet · 900 km/h · non-stop · not to scale',495,572,30,'#d9dee6',fa*.95,'Mont');
+ if(t>=32.6&&t<33.8){const al=Math.min(ease((t-32.6)/.25),ease((33.8-t)/.2));txt('FOLLOW → MORE EVERY DAY',495,1400,50,'#fff',al)}
+ const g=x.createRadialGradient(540,1000,560,540,1000,1350);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.4)');x.fillStyle=g;x.fillRect(0,0,W,H);}
+</script>

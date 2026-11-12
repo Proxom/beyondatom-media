@@ -1,0 +1,33 @@
+Guess before the end: how long would the Sun take, weeks or months? 👇
+
+We fly a jet non-stop at 900 km/h around the equator of every planet, then the Sun. Trip time = equator length (π × diameter) ÷ 900 km/h.
+
+Rocky planets: Mercury 17.0 h (4,879 km across), Mars 23.7 h (6,792 km), Venus 42.3 h (12,104 km), Earth 44.5 h (12,756 km): almost 2 days.
+
+The giants: Neptune 7.2 days (49,528 km), Uranus 7.4 days (51,118 km), Saturn 17.5 days (120,536 km), Jupiter 20.8 days (142,984 km): almost 3 weeks.
+
+The Sun: about 1,391,400 km across (radius 695,700 km), so one lap is about 4.37 million km: 202 days non-stop. More than half a year without ever landing.
+
+About the video: an original animation using real NASA images. It's a thought experiment: a jet can't really fly on Mercury, Mars or the Sun. Distances are measured around each equator (for the giant planets, at the 1-bar level near the cloud tops). Planet sizes are not to scale and the clocks are sped up.
+
+Sources:
+NASA NSSDC Planetary Fact Sheet (equatorial diameters: Mercury 4,879, Venus 12,104, Earth 12,756, Mars 6,792, Jupiter 142,984, Saturn 120,536, Uranus 51,118, Neptune 49,528 km): https://nssdc.gsfc.nasa.gov/planetary/factsheet/
+NASA NSSDC Planetary Fact Sheet notes (diameter at the equator; gas giants at the 1-bar level): https://nssdc.gsfc.nasa.gov/planetary/factsheet/planetfact_notes.html
+NASA NSSDC Sun Fact Sheet (volumetric mean radius 695,700 km): https://nssdc.gsfc.nasa.gov/planetary/factsheet/sunfact.html
+
+Footage (NASA public domain; NASA does not endorse this video):
+Mercury: "Mercury Globe: 0°N, 180°E" (PIA15162), NASA/Johns Hopkins University Applied Physics Laboratory/Carnegie Institution of Washington: https://images.nasa.gov/details/PIA15162
+Venus: "Venus from Mariner 10" (PIA23791), NASA/JPL-Caltech (processing: Kevin M. Gill): https://images.nasa.gov/details/PIA23791
+Earth: "View of the Earth seen by the Apollo 17 crew" (AS17-148-22727), NASA: https://images.nasa.gov/details/as17-148-22727
+Mars: "Global Color Views of Mars" (PIA00407), NASA/JPL/USGS: https://images.nasa.gov/details/PIA00407
+Jupiter: "Cassini Jupiter Portrait" (PIA04866), NASA/JPL/Space Science Institute: https://images.nasa.gov/details/PIA04866
+Saturn: "Saturn, Approaching Northern Summer" (PIA21046), NASA/JPL-Caltech/Space Science Institute: https://images.nasa.gov/details/PIA21046
+Uranus: "Uranus as seen by NASA Voyager 2" (PIA18182), NASA/JPL-Caltech: https://images.nasa.gov/details/PIA18182
+Neptune: Voyager 2 (PIA01492), NASA/JPL: https://images.nasa.gov/details/PIA01492
+Sun: "Image of Sun From NASA's Solar Dynamics Observatory" (PIA26681), NASA/SDO: https://images.nasa.gov/details/PIA26681
+Narration: AI voice (Kokoro). Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #planets #solarsystem #shorts
