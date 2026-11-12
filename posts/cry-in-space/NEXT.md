@@ -1,0 +1,6 @@
+# cry-in-space (YouTube Short, sprint style B, target slot 13 Nov 2026 01:00 Europe/London)
+Run: 12 Nov 04:07 queue-check run (yt-0407-rubin-51rnmg). QUEUE was 1 -> 2 Shorts this run; this is the second (topic (a) humans in space, sprint style B idea "why astronauts can't cry").
+Look: original rim-lit profile illustration of a face (not a real person) on a blurred NASA ISS photo, an animated water ball on the eye; Earth beat (warm, tears roll down and drip); real NASA photo of Don Pettit with a surface-tension water ball (iss072e742508) as the proof shot with slow push-in.
+Scene tools/p_cry-in-space.html (needs tools/cry -> dir with bg.jpg = iss072e742488 large, right 45 % crop, blur 28, 1080x1920; pettit_v.jpg = iss072e742508 orig, x0 2992 w 3096 full height, 1080x1920). Serve tools/ over http (BASE=http://127.0.0.1:8765).
+Sound tools/cry-in-space.sound.py, VO tools/cry-in-space.vo.py, mix tools/mix-vo.py (l1 .15, l2 2.4, l3 5.6, l4 7.9, l5 11.5, l6 16.7, l7 19.3, l8 22.7, l9 26.0).
+Facts: CSA "Tears in space (don't fall)" transcript (ball on the eye; grows until it crosses the nose into the other eye, evaporates or spreads over the cheek; tears don't fall). NASA caption iss072e742508 (water ball held by surface tension).

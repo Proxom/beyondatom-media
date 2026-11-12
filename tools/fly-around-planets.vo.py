@@ -8,7 +8,7 @@ L = {
  'l3': "Earth? Almost two days.",
  'l4': "Now the giants.",
  'l5': "Neptune and Uranus, about a week.",
- 'l6': "Saturn, seventeen days. Jupiter, almost three weeks!",
+ 'l6': "Saturn, seventeen and a half days. Jupiter, almost three weeks!",
  'l7': "But what about the Sun?",
  'l8': "Two hundred and two days. More than half a year, without ever landing.",
  'l9': "Which one surprised you?",

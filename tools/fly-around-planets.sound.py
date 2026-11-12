@@ -15,10 +15,10 @@ def add(sig, pan=0.0, i0=0):
     L[i0:i0 + n] += sig[:n] * np.cos(a); R[i0:i0 + n] += sig[:n] * np.sin(a)
 import math
 lap = lambda d: math.pi * d / 900
-R1 = (2.5, 9.6, [4879, 12104, 12756, 6792]); R2 = (11.4, 19.4, [142984, 120536, 51118, 49528])
+R1 = (1.2, 8.9, [4879, 12104, 12756, 6792]); R2 = (11.0, 19.4, [142984, 120536, 51118, 49528])
 def fin(r):
     a, b, ds = r; T = [lap(d) for d in ds]; m = max(T); return [a + (b - a) * x / m for x in T]
-land1 = sorted(fin(R1)); land2 = sorted(fin(R2)); SUNT = 27.6
+land1 = sorted(fin(R1)); land2 = sorted(fin(R2)); SUNT = 27.1
 # 1. pad (filtered saws)
 def pad(freqs, t0, t1, amp, fc=750):
     n0, n1 = int(t0 * SR), int(min(t1, D) * SR); tt = np.arange(n1 - n0) / SR; s = np.zeros(n1 - n0)
@@ -32,7 +32,7 @@ P += pad([130.81, 164.81, 196.0], 10.3, 21.6, .045, 650) + pad([98.0, 146.83, 19
 P += pad([87.31, 130.81, 174.61], 27.6, 31.5, .06) + pad([110.0, 130.81, 164.81], 31.2, D, .05)
 add(P, -.25); add(np.roll(P, 900), .25)
 # 2. sub drone (A, 55 Hz) with slow swell
-da = env([(0, .35), (9.6, .45), (10.5, .3), (19.4, .5), (21.6, .3), (27.6, .8), (29.5, .45), (34.6, .35)])
+da = env([(0, .35), (9.6, .45), (10.5, .3), (19.4, .5), (21.6, .3), (27.1, .8), (29.0, .45), (34.6, .35)])
 for m, a in [(1, .5), (2, .22), (3, .08)]:
     add(da * a * np.sin(2 * np.pi * 55 * m * t + m), 0)
 # 3. soft pulse (muted low pluck) that speeds up while balls are in the air
@@ -40,7 +40,7 @@ def pluck(t0, f, amp, pan):
     n = int(.5 * SR); tt = np.arange(n) / SR
     s = np.sin(2 * np.pi * f * tt) * np.exp(-tt / .12) * (1 - np.exp(-tt / .006)); s += .3 * np.sin(4 * np.pi * f * tt) * np.exp(-tt / .06)
     add(lp(s, 900) * amp, pan, int(t0 * SR))
-for a, b, f in [(2.5, 9.6, 220.0), (11.4, 19.4, 196.0), (22.6, 27.6, 174.61)]:
+for a, b, f in [(1.2, 8.9, 220.0), (11.0, 19.4, 196.0), (22.6, 27.1, 174.61)]:
     tb = a; k = 0
     while tb < b - .05:
         pluck(tb, f if k % 2 == 0 else f * 0.75, .16, -.3 if k % 2 else .3); per = .42 - .2 * min(1, (tb - a) / (b - a)); tb += per; k += 1

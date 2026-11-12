@@ -1,0 +1,113 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- cry-in-space (sprint style B): what happens to tears in microgravity. Facts: CSA "Tears in space (don't fall)", Chris Hadfield, 2013;
+     NASA photo iss072e742508 (Don Pettit, water ball held by surface tension, Kibo, 2 Mar 2025). Face = original illustration (not a real person).
+     Background = NASA iss072e742488, cropped and heavily blurred. -->
+<script>
+const W=1080,H=1920,FPS=30,D=29.2;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+const lerp=(a,b,k)=>a+(b-a)*k;
+const IM={};let L=0;const SRC={bg:'cry/bg.jpg',pet:'cry/pettit_v.jpg'};
+for(const k in SRC){const im=new Image();im.onload=()=>{L++;if(L==2)Promise.all([document.fonts.load('88px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true})};im.src=SRC[k];IM[k]=im}
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const MOTES=[];{const r=rnd(5);for(let i=0;i<90;i++)MOTES.push([r()*W,r()*H,r()*2.2+.6,r()*6.28,r()*.6+.2])}
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=22;x.fillText(s,px,py);x.shadowBlur=6;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+// ---- head (local coords, facing right) ----
+function headPath(){const p=new Path2D();p.moveTo(230,2100);p.lineTo(235,1460);p.bezierCurveTo(150,1350,110,1150,130,980);p.bezierCurveTo(150,700,330,560,520,575);
+ p.bezierCurveTo(640,585,690,700,680,830);p.bezierCurveTo(678,870,668,890,676,915);p.bezierCurveTo(660,935,640,945,645,965);p.bezierCurveTo(670,1010,715,1070,742,1112);
+ p.bezierCurveTo(748,1124,735,1138,712,1138);p.bezierCurveTo(695,1140,690,1150,692,1162);p.bezierCurveTo(706,1180,705,1196,690,1204);p.bezierCurveTo(700,1215,700,1232,686,1242);
+ p.bezierCurveTo(672,1250,662,1262,668,1280);p.bezierCurveTo(680,1320,668,1352,630,1368);p.bezierCurveTo(590,1385,560,1400,545,1430);p.lineTo(540,2100);p.closePath();return p}
+const HP=headPath();
+const EYE=[648,965];
+function head(warm){
+ const g=x.createLinearGradient(150,0,760,0);g.addColorStop(0,'#07090d');g.addColorStop(.7,warm?'#2a1d17':'#151b25');g.addColorStop(1,warm?'#5a3b2c':'#2c3a4d');x.fillStyle=g;x.fill(HP);
+ // rim light on the face side
+ x.save();x.clip(HP);x.lineJoin='round';
+ x.strokeStyle=warm?'rgba(255,190,140,.25)':'rgba(140,200,255,.25)';x.lineWidth=34;x.stroke(HP);x.strokeStyle=warm?'rgba(255,215,180,.85)':'rgba(190,230,255,.9)';x.lineWidth=7;x.stroke(HP);
+ // cheek shading
+ const cg=x.createRadialGradient(600,1120,10,600,1120,180);cg.addColorStop(0,warm?'rgba(150,95,70,.35)':'rgba(90,120,160,.22)');cg.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=cg;x.fillRect(400,900,400,450);
+ x.restore();
+ // mask the rim on the back of the head (light comes from the right)
+ x.save();x.clip(HP);const mg=x.createLinearGradient(130,0,560,0);mg.addColorStop(0,'rgba(7,9,13,1)');mg.addColorStop(1,'rgba(7,9,13,0)');x.fillStyle=mg;x.fillRect(100,500,460,1700);x.restore();
+ // ear
+ x.save();x.strokeStyle=warm?'rgba(255,200,160,.18)':'rgba(160,210,255,.16)';x.lineWidth=5;x.beginPath();x.ellipse(335,1010,36,62,-.15,0,7);x.stroke();x.restore();
+ // eye
+ x.save();x.beginPath();x.moveTo(620,953);x.quadraticCurveTo(640,952,650,963);x.quadraticCurveTo(638,975,621,976);x.closePath();x.fillStyle='rgba(225,230,236,.92)';x.fill();
+ x.beginPath();x.arc(643,964,6.5,0,7);x.fillStyle='#1b2430';x.fill();x.beginPath();x.arc(645,962,1.8,0,7);x.fillStyle='#fff';x.fill();
+ x.strokeStyle='rgba(10,10,12,.95)';x.lineWidth=3.5;x.beginPath();x.moveTo(616,950);x.quadraticCurveTo(638,946,652,962);x.stroke();
+ for(let i=0;i<4;i++){x.lineWidth=1.8;x.beginPath();const ax=630+i*6,ay=950-i*.3+(i>2?3:0);x.moveTo(ax,ay);x.lineTo(ax+5,ay-7);x.stroke()}
+ x.strokeStyle='rgba(10,10,12,.7)';x.lineWidth=2;x.beginPath();x.moveTo(620,978);x.quadraticCurveTo(638,977,648,968);x.stroke();
+ // eyebrow
+ x.strokeStyle='rgba(8,8,10,.9)';x.lineWidth=9;x.lineCap='round';x.beginPath();x.moveTo(612,918);x.quadraticCurveTo(640,906,668,912);x.stroke();x.restore()}
+// ---- water ball ----
+function ball(cx,cy,r,t,warm){if(r<1)return;const w=Math.sin(t*5.2)*.035*Math.min(1,r/30),rx=r*(1+w),ry=r*(1-w);
+ x.save();x.beginPath();x.ellipse(cx,cy,rx,ry,0,0,7);x.clip();
+ // lens: the scene behind, flipped and magnified
+ x.save();x.globalAlpha=.55;x.translate(cx,cy);x.scale(-1,-1);x.drawImage(IM.bg,-W*.7,-H*.7,W*1.4,H*1.4);x.fillStyle='rgba(10,16,26,.35)';x.fillRect(-W,-H,2*W,2*H);x.restore();
+ const g=x.createRadialGradient(cx-r*.2,cy-r*.2,r*.1,cx,cy,r);g.addColorStop(0,'rgba(200,235,255,.10)');g.addColorStop(.75,'rgba(120,180,230,.18)');g.addColorStop(1,'rgba(160,215,255,.55)');x.fillStyle=g;x.fillRect(cx-r*1.2,cy-r*1.2,r*2.4,r*2.4);
+ // bright refracted crescent on the dark side (light from the right focuses on the left)
+ const cg=x.createRadialGradient(cx-r*.55,cy+r*.35,0,cx-r*.55,cy+r*.35,r*.75);cg.addColorStop(0,'rgba(220,240,255,.55)');cg.addColorStop(1,'rgba(220,240,255,0)');x.fillStyle=cg;x.fillRect(cx-r*1.2,cy-r*1.2,r*2.4,r*2.4);
+ x.restore();
+ x.save();x.strokeStyle='rgba(230,245,255,.55)';x.lineWidth=Math.max(1.5,r*.03);x.beginPath();x.ellipse(cx,cy,rx,ry,0,0,7);x.stroke();
+ x.strokeStyle='rgba(255,255,255,.85)';x.lineWidth=Math.max(2,r*.06);x.beginPath();x.ellipse(cx,cy,rx*.93,ry*.93,0,-1.1,-0.15);x.stroke();
+ x.fillStyle='rgba(255,255,255,.95)';x.beginPath();x.ellipse(cx+r*.38,cy-r*.42,r*.15,r*.09,-.7,0,7);x.fill();
+ x.fillStyle='rgba(255,255,255,.6)';x.beginPath();x.arc(cx-r*.3,cy+r*.55,r*.05,0,7);x.fill();x.restore()}
+// tear drop on Earth: slides along the cheek, then falls
+const CHEEK=[[646,978],[638,1010],[628,1060],[622,1120],[620,1180],[618,1240],[612,1300],[600,1350],[588,1388]];
+function along(k){const n=CHEEK.length-1,f=cl(k)*n,i=Math.min(n-1,Math.floor(f)),u=f-i;return [lerp(CHEEK[i][0],CHEEK[i+1][0],u),lerp(CHEEK[i][1],CHEEK[i+1][1],u)]}
+function drop(px,py,s,al){x.save();x.globalAlpha=al;x.translate(px,py);const g=x.createRadialGradient(-2,-2,1,0,0,s);g.addColorStop(0,'rgba(255,250,240,.95)');g.addColorStop(.5,'rgba(255,225,200,.45)');g.addColorStop(1,'rgba(255,220,190,.15)');
+ x.fillStyle=g;x.beginPath();x.moveTo(0,-s*1.8);x.quadraticCurveTo(s,-s*.2,s*.8,s*.3);x.arc(0,s*.3,s*.8,0,Math.PI);x.quadraticCurveTo(-s,-s*.2,0,-s*1.8);x.fill();x.restore()}
+function earthTears(u){// u = seconds into the Earth scene
+ for(const [t0,dur] of [[0.1,1.9],[1.0,1.9]]){const k=(u-t0)/dur;if(k<0)continue;
+  // wet streak
+  if(k>0){x.save();x.strokeStyle='rgba(255,225,200,.28)';x.lineWidth=5;x.lineCap='round';x.beginPath();x.moveTo(...CHEEK[0]);for(let j=1;j<=30;j++){const p=along(Math.min(k,1)*j/30);x.lineTo(p[0],p[1])}x.stroke();x.restore()}
+  if(k<=1){const p=along(ease(k));drop(p[0],p[1],9,1)}else{const ff=(k-1)*dur;const p=along(1);drop(p[0]-ff*20,p[1]+ff*ff*1400,9,1-ease((ff-0.6)/0.2))}}}
+function scene(name,t,cam){x.save();x.translate(540,1000);x.scale(cam.z,cam.z);x.translate(-cam.x,-cam.y);
+ const warm=name=='earth';
+ // background (blurred ISS module) + motes
+ x.save();x.setTransform(1,0,0,1,0,0);x.drawImage(IM.bg,0,0,W,H);x.fillStyle=warm?'rgba(40,20,8,.62)':'rgba(4,10,22,.55)';x.fillRect(0,0,W,H);
+ if(warm){const g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'rgba(255,170,90,.18)');g.addColorStop(1,'rgba(0,0,0,.3)');x.fillStyle=g;x.fillRect(0,0,W,H)}
+ else{for(const m of MOTES){const a=m[3]+t*.15*m[4];x.globalAlpha=.25+.25*Math.sin(t*.7+m[3]);x.fillStyle='#cfe6ff';x.beginPath();x.arc((m[0]+Math.cos(a)*20*m[4]+W)%W,(m[1]+Math.sin(a)*20*m[4]+H)%H,m[2],0,7);x.fill()}x.globalAlpha=1}
+ // window light from the right
+ const lg=x.createRadialGradient(1150,850,50,1150,850,900);lg.addColorStop(0,warm?'rgba(255,200,140,.35)':'rgba(170,220,255,.3)');lg.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=lg;x.fillRect(0,0,W,H);x.restore();
+ head(warm);x.restore()}
+function withCam(cam,f){x.save();x.translate(540,1000);x.scale(cam.z,cam.z);x.translate(-cam.x,-cam.y);f();x.restore()}
+// ball radius over time (space scenes)
+function R(t){if(t<2.3)return 50+3*Math.sin(t*2);if(t<5.6)return 0;
+ if(t<11.3)return 46*ease((t-5.9)/3.2);
+ if(t<16.6)return 46;
+ if(t<28.6)return lerp(46,150,ease((t-16.7)/5.2));return lerp(150,50,ease((t-28.6)/0.6))}
+function ballPos(r){return [EYE[0]+r*.78,EYE[1]+r*.12]}
+function camAt(t){// zoom on the eye; pull back a bit as the ball grows
+ if(t<2.3)return {x:640,y:990,z:2.05+0.06*t/2.3};
+ if(t<5.6)return {x:610,y:1130,z:1.8+0.08*(t-2.3)/3.3};
+ if(t<11.3)return {x:645,y:985,z:lerp(1.75,2.1,ease((t-5.6)/5.7))};
+ if(t<28.6)return {x:lerp(660,690,ease((t-16.6)/6)),y:1000,z:lerp(1.95,1.5,ease((t-16.6)/6))+0.04*ease((t-23)/5)};
+ return {x:lerp(690,640,ease((t-28.6)/.6)),y:lerp(1000,990,ease((t-28.6)/.6)),z:lerp(1.54,2.05,ease((t-28.6)/.6))}}
+function pettit(t){const u=(t-11.3)/5.3;const z=lerp(1.0,1.22,ease(u));const fx=354,fy=834;
+ x.save();x.translate(540,1000);x.scale(z,z);x.translate(-lerp(540,fx+60,ease(u)),-lerp(960,fy-60,ease(u)));x.drawImage(IM.pet,0,0,W,H);x.restore();
+ const g=x.createRadialGradient(540,1000,500,540,1000,1300);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.45)');x.fillStyle=g;x.fillRect(0,0,W,H)}
+function drawSpace(t){const cam=camAt(t);scene('space',t,cam);const r=R(t);if(r>0.5){const [bx,by]=ballPos(r);withCam(cam,()=>ball(bx,by,r,t,false))}}
+const CARDS=[[0,2.3,'CRY IN SPACE?','WHERE DO TEARS GO?'],[2.4,5.5,'ON EARTH:','GRAVITY PULLS THEM DOWN'],[5.7,7.8,'IN SPACE:','NOTHING PULLS THEM'],[7.9,11.2,'THEY STAY','ON YOUR EYE'],
+ [16.7,19.2,'KEEP CRYING…',''],[19.3,22.5,'IT CROSSES YOUR NOSE','INTO YOUR OTHER EYE'],[22.7,25.9,'TEARS','DON’T FALL'],[26.0,27.5,'WOULD YOU CRY','UP THERE?'],[28.9,D+1,'CRY IN SPACE?','WHERE DO TEARS GO?']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),b>D?1:ease((b-t)/.2));
+ const big=(l1=='TEARS');const sz=Math.min(fit(l1,big?130:96,800),l2?fit(l2,big?130:96,800):999);const y1=l2?440:500;txt(l1,495,y1,sz,'#fff',al);if(l2)txt(l2,495,y1+sz*1.06,sz,big?'#9fd8ff':'#ffd166',al)}}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ if(t>=2.3&&t<5.6){const cam=camAt(t);scene('earth',t,cam);withCam(cam,()=>earthTears(t-2.4))}
+ else if(t>=11.3&&t<16.6){pettit(t)}
+ else drawSpace(t);
+ // cross-fades at the cuts
+ for(const c of [2.3,5.6,11.3,16.6]){const k=1-Math.abs(t-c)/0.15;if(k>0){x.fillStyle='rgba(0,0,0,'+(k*.8)+')';x.fillRect(0,0,W,H)}}
+ // labels
+ if(t>=11.3&&t<16.6){const a=Math.min(ease((t-11.5)/.25),ease((16.5-t)/.2));txt('REAL PHOTO · SPACE STATION',495,1260,46,'#fff',a,'Mont');
+  const b=Math.min(ease((t-13.6)/.25),ease((16.5-t)/.2));txt('WATER HELD IN A BALL',495,1350,80,'#fff',b);txt('BY SURFACE TENSION',495,1430-4,80,'#ffd166',b);
+  txt('NASA',880,1418,26,'#d9dee6',a*.8,'Mont','right')}
+ cards(t);
+ if(t>=27.5&&t<28.7){const al=Math.min(ease((t-27.5)/.25),ease((28.7-t)/.2));txt('FOLLOW → MORE EVERY DAY',495,1400,50,'#fff',al)}
+ if(t<16.6&&t>=0&&!(t>=2.3&&t<5.6)&&!(t>=11.3)){}
+ const g=x.createRadialGradient(540,1000,520,540,1000,1350);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.45)');x.fillStyle=g;x.fillRect(0,0,W,H);}
+</script>

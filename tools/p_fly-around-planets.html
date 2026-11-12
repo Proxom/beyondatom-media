@@ -14,9 +14,9 @@ const R=225,CY=1070,CELLS=[[270,820],[770,820],[270,1320],[770,1320]];
 const PL={MERCURY:[4879,'PIA15162','200,200,200'],VENUS:[12104,'PIA23791','250,225,170'],EARTH:[12756,'as17-148-22727','120,170,255'],MARS:[6792,'PIA00407','255,150,110'],
  JUPITER:[142984,'PIA04866','235,200,160'],SATURN:[120536,'PIA21046','240,215,150'],URANUS:[51118,'PIA18182','160,235,240'],NEPTUNE:[49528,'PIA01492','110,150,255'],SUN:[2*695700,'PIA26681','255,170,60']};
 // rounds: clock start/end (scene s), unit, names in grid order
-const RD=[{a:2.5,b:9.6,unit:'h',names:['MERCURY','VENUS','EARTH','MARS']},{a:11.4,b:19.4,unit:'d',names:['JUPITER','SATURN','URANUS','NEPTUNE']}];
+const RD=[{a:1.2,b:8.9,unit:'h',names:['MERCURY','VENUS','EARTH','MARS']},{a:11.0,b:19.4,unit:'d',names:['JUPITER','SATURN','URANUS','NEPTUNE']}];
 for(const r of RD){r.p=r.names.map((n,i)=>({n,d:PL[n][0],img:PL[n][1],glow:PL[n][2],c:CELLS[i],T:lap(PL[n][0])}));r.Tm=Math.max(...r.p.map(p=>p.T))}
-const SUN={a:22.6,b:27.6,T:lap(PL.SUN[0])};
+const SUN={a:22.6,b:27.1,T:lap(PL.SUN[0])};
 const IM={};let LOADED=0;const NIM=Object.keys(PL).length;
 for(const n in PL){const im=new Image();im.onload=()=>{LOADED++;if(LOADED==NIM)Promise.all([document.fonts.load('88px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true})};im.src='pl/'+PL[n][1]+'.jpg';IM[n]=im}
 const cv=document.getElementById('c'),x=cv.getContext('2d');
@@ -59,6 +59,7 @@ function drawRound(ri,ox,t){const r=RD[ri];const tt=(ri==0&&t>30)?0:t;const h=ho
  // names + stamps
  for(const [i,p] of r.p.entries()){const [cx,cy]=p.c,nx=Math.max(150,Math.min(cx,800));txt(p.n,nx,cy-R+62,fit(p.n,40,230,'Mont'),'#fff',.95,'Mont');
   if(h>=p.T){const k=tt-(r.a+(r.b-r.a)*p.T/r.Tm),al=ease(k/0.15),pop=1+0.3*Math.exp(-k/0.12);const last=p.T==r.Tm,first=p.T==Math.min(...r.p.map(q=>q.T));
+   {const sx=Math.min(nx,745),ss=fmt(p.T,r.unit);x.save();x.globalAlpha=al*.6;x.font='74px Anton';const ww=x.measureText(ss).width+44;x.fillStyle='#000';x.beginPath();x.roundRect(sx-ww/2,cy-44,ww,90,45);x.fill();x.restore()}
    txt(fmt(p.T,r.unit),Math.min(nx,745),cy+28,fit(fmt(p.T,r.unit),74,300)*pop,last?'#ff8a6a':(first?'#9df0bf':'#ffd166'),al)}}
  x.restore();
  // shared clock between the four globes
@@ -77,7 +78,7 @@ function drawSun(ox,t){const p={n:'SUN',glow:PL.SUN[2]};const u=t-SUN.a;const z=
  const days=frac*SUN.T/24;const ca=ease((t-(SUN.a-0.5))/.3)*(1-ease((t-31.0)/.3));
  if(ca>0.01){const s=Math.round(days)+' DAYS';txt(s,540+ox,1060,frac>=1?150:130,frac>=1?'#ffffff':'#ffe2a0',ca)}}
 const CARDS=[[0,4.8,'FLY AROUND EVERY PLANET','WHICH TAKES LONGEST?'],[4.9,10.1,'ROCKY PLANETS',''],[10.6,21.2,'THE GIANTS',''],
- [21.6,27.7,'AND THE SUN?',''],[27.8,30.9,'MORE THAN','HALF A YEAR'],[31.0,32.7,'WHICH SURPRISED YOU?',''],[34.1,D+1,'FLY AROUND EVERY PLANET','WHICH TAKES LONGEST?']];
+ [21.6,27.2,'AND THE SUN?',''],[27.3,30.9,'MORE THAN','HALF A YEAR'],[31.0,32.7,'WHICH SURPRISED YOU?',''],[34.1,D+1,'FLY AROUND EVERY PLANET','WHICH TAKES LONGEST?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.22),b>D?1:ease((b-t)/.2));
  const sz=Math.min(fit(l1,92,800),l2?fit(l2,92,800):99);const y1=l2?425:470;txt(l1,495,y1,sz,'#fff',al);if(l2)txt(l2,495,y1+sz*1.06,sz,'#ffd166',al)}}
 const WH=[[10.2,10.8,0,1],[21.3,21.9,1,2],[33.8,34.3,2,0]];
