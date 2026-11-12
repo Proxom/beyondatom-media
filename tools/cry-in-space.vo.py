@@ -7,9 +7,9 @@ L = {
  'l2': "On Earth, gravity pulls your tears down your cheeks.",
  'l3': "In space, nothing pulls them down.",
  'l4': "So the tears just stay on your eye, in a ball of water.",
- 'l5': "This is real. Water on the Space Station, held in a ball by surface tension.",
+ 'l5': "Here's real water on the Space Station, held in a ball by surface tension.",
  'l6': "Keep crying, and the ball just keeps growing...",
- 'l7': "until it crosses your nose, into your other eye!",
+ 'l7': "It can even cross your nose, into your other eye!",
  'l8': "Your eyes still cry. The tears just don't fall.",
  'l9': "Would you cry up there?",
 }
