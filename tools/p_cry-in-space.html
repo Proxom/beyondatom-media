@@ -95,7 +95,7 @@ function drawSpace(t){const cam=camAt(t);scene('space',t,cam);const r=R(t);if(r>
 const CARDS=[[0,2.3,'CRY IN SPACE?','WHERE DO TEARS GO?'],[2.4,5.5,'ON EARTH:','GRAVITY PULLS THEM DOWN'],[5.7,7.8,'IN SPACE:','NOTHING PULLS THEM'],[7.9,11.2,'THEY STAY','ON YOUR EYE'],
  [16.7,19.2,'KEEP CRYING…',''],[19.3,22.5,'IT CROSSES YOUR NOSE','INTO YOUR OTHER EYE'],[22.7,25.9,'TEARS','DON’T FALL'],[26.0,27.5,'WOULD YOU CRY','UP THERE?'],[28.9,D+1,'CRY IN SPACE?','WHERE DO TEARS GO?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),b>D?1:ease((b-t)/.2));
- const big=(l1=='TEARS');const sz=Math.min(fit(l1,big?130:96,800),l2?fit(l2,big?130:96,800):999);const y1=l2?440:500;txt(l1,495,y1,sz,'#fff',al);if(l2)txt(l2,495,y1+sz*1.06,sz,big?'#9fd8ff':'#ffd166',al)}}
+ const big=(l1=='TEARS');const sz=Math.min(fit(l1,big?130:96,800),l2?fit(l2,big?130:96,800):999);const y1=l2?(big?470:440):500;txt(l1,495,y1,sz,'#fff',al);if(l2)txt(l2,495,y1+sz*1.06,sz,big?'#9fd8ff':'#ffd166',al)}}
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
  if(t>=2.3&&t<5.6){const cam=camAt(t);scene('earth',t,cam);withCam(cam,()=>earthTears(t-2.4))}
  else if(t>=11.3&&t<16.6){pettit(t)}
