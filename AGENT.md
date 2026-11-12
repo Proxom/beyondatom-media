@@ -2,6 +2,14 @@
 
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
+
+## TOP OVERRIDE (Erkan, 12 Nov 2026 18:30): 2 SHORTS A DAY, 01:00 AND 17:00 ONLY – to save weekly Claude credits
+- From now on: exactly 2 Shorts a day, at 01:00 and 17:00 Europe/London. The 21:00 slot is CLOSED: never schedule anything new at 21:00. This overrides the 3-a-day rule/sprint below and any other mention of 21:00.
+- Posts already scheduled for 21:00 stay as they are (already made); do not make new ones for 21:00.
+- 17:00 keeps its current rule (1M+ list); 01:00 carries the other style/family of the day (rotate styles day by day as before).
+- QUEUE rule from now on: QUEUE = future non-draft posts + finished gate-passed Shorts not yet scheduled. QUEUE >= 2: short check only, no new Shorts. QUEUE 1: make 1. QUEUE 0: make 2.
+- Keep runs short and lean; no extra experiments that cost credits. The 16 Nov 3-a-day/sprint result report is replaced by a short note in the daily report: views per Short and followers per day with 3 a day vs 2 a day.
+
 ## OVERRIDE (Erkan, 10 Nov 2026 18:40): PUBLISH THE BLACK-HOLE REMAKE TONIGHT, NOT 11 NOV 17:00
 This replaces the scheduling part of the "URGENT ONE-TIME: REMAKE THE BLACK-HOLE FALL SHORT" block:
 - Publish the remake AS SOON AS IT IS FINISHED: schedule it in Metricool for now + 3 minutes (Europe/London). If that is within 20 minutes of another scheduled Short (e.g. 21:00), schedule it 30 minutes after that Short instead. If it is already scheduled for 11 Nov 17:00, move it.
