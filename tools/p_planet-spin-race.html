@@ -1,0 +1,95 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- planet-spin-race (style A): one full spin (sidereal rotation period) of every planet, 2 rounds of 4, then Venus up close.
+     Rotation periods from the NASA NSSDC Planetary Fact Sheet (hours): Me 1407.6, Ve -5832.5, Ea 23.9, Ma 24.6, Ju 9.9, Sa 10.7, Ur -17.2, Ne 16.1.
+     Venus orbital period 224.7 days. Planet pictures: NASA public-domain images, cropped to pl/<id>.jpg (see posts/planet-spin-race/NEXT.md).
+     A glowing marker rides each equator ring once per spin (Venus and Uranus turn the other way). Sizes not to scale; time compressed. -->
+<script>
+const W=1080,H=1920,FPS=30,D=32.4;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
+const R=225,CY=1070,CELLS=[[270,820],[770,820],[270,1320],[770,1320]];
+// name: [rotation period h (negative = retrograde), image, glow, stamp text]
+const PL={JUPITER:[9.9,'PIA04866','235,200,160','9.9 h'],SATURN:[10.7,'PIA21046','240,215,150','10.7 h'],NEPTUNE:[16.1,'PIA01492','110,150,255','16.1 h'],URANUS:[-17.2,'PIA18182','160,235,240','17.2 h'],
+ EARTH:[23.9,'as17-148-22727','120,170,255','23.9 h'],MARS:[24.6,'PIA00407','255,150,110','24.6 h'],MERCURY:[1407.6,'PIA15162','200,200,200','58.6 DAYS'],VENUS:[-5832.5,'PIA23791','250,225,170','243 DAYS']};
+// rounds: clock start/end (scene s), k = clock acceleration (0 = linear), names in grid order
+const RD=[{a:0.35,b:8.0,k:0,names:['JUPITER','SATURN','NEPTUNE','URANUS']},{a:10.0,b:19.5,k:8,names:['EARTH','MARS','MERCURY','VENUS']}];
+for(const r of RD){r.p=r.names.map((n,i)=>({n,T:Math.abs(PL[n][0]),dir:Math.sign(PL[n][0]),img:PL[n][1],glow:PL[n][2],st:PL[n][3],c:CELLS[i]}));r.Tm=Math.max(...r.p.map(p=>p.T))}
+// clock mapping: u in [0,1] -> hours
+function hU(r,u){u=cl(u);return r.k?r.Tm*(Math.exp(r.k*u)-1)/(Math.exp(r.k)-1):r.Tm*u}
+function uH(r,h){return r.k?Math.log(1+h/r.Tm*(Math.exp(r.k)-1))/r.k:h/r.Tm}
+function finT(r,p){return r.a+(r.b-r.a)*uH(r,p.T)}
+const IM={};let LOADED=0;const NIM=Object.keys(PL).length;
+for(const n in PL){const im=new Image();im.onload=()=>{LOADED++;if(LOADED==NIM)Promise.all([document.fonts.load('88px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true})};im.src='pl/'+PL[n][1]+'.jpg';IM[n]=im}
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const STARS=[];{const r=rnd(11);for(let i=0;i<700;i++)STARS.push([r()*W,r()*H,Math.pow(r(),3)*1.9+.35,r(),r()])}
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=20;x.fillText(s,px,py);x.shadowBlur=6;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+function fmt(h){return h<48?h.toFixed(1)+' h':Math.floor(h/24)+' DAYS'}
+// equator ring: centre, rx, ry, tilt; theta 0 = right end, increasing = along the FRONT (bottom) first
+function ept(o,th){const c=Math.cos(o.tl),s=Math.sin(o.tl),ex=o.rx*Math.cos(th),ey=o.ry*Math.sin(th);return [o.cx+ex*c-ey*s,o.cy+ex*s+ey*c]}
+function arc(o,th0,th1,part,col,lw,al){if(th1<=th0)return;x.save();x.globalAlpha=al;x.strokeStyle=col;x.lineWidth=lw;x.lineCap='round';x.beginPath();let on=false;const N=Math.max(8,Math.ceil((th1-th0)/0.03));
+ for(let i=0;i<=N;i++){const th=th0+(th1-th0)*i/N;const f=Math.sin(th)>=0;const vis=part=='front'?f:!f;const [px,py]=ept(o,th);if(vis){if(!on){x.moveTo(px,py);on=true}else x.lineTo(px,py)}else on=false}
+ x.stroke();x.restore()}
+// marker starts at the front centre (theta = pi/2) and goes once around; dir -1 = the other way
+function ringLayer(o,frac,dir,part,done,glow,lw){const s0=Math.PI/2,TH=Math.PI*2*frac;const [a,b]=dir>0?[s0,s0+TH]:[s0-TH,s0];
+ arc(o,0,Math.PI*2,part,'rgba(255,255,255,.22)',2,1);arc(o,a,b,part,'rgba('+glow+',.35)',(lw||1)*16,done?0.9:0.7);arc(o,a,b,part,done?'#fff3c4':'#ffd166',(lw||1)*4.5,1)}
+function marker(o,frac,dir,part,sc){const th=Math.PI/2+dir*Math.PI*2*frac;const f=Math.sin(th)>=0;if((part=='front')!=f)return;const [px,py]=ept(o,th);const dp=0.7+0.3*Math.sin(th);
+ x.save();const g=x.createRadialGradient(px,py,0,px,py,26*sc*dp);g.addColorStop(0,'rgba(255,240,190,1)');g.addColorStop(.35,'rgba(255,209,102,.8)');g.addColorStop(1,'rgba(255,170,60,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,26*sc*dp,0,7);x.fill();
+ x.fillStyle='#fff';x.beginPath();x.arc(px,py,7*sc*dp,0,7);x.fill();x.restore()}
+function globe(n,glow,cx,cy,r){const im=IM[n];
+ const rg=x.createRadialGradient(cx,cy,r*.95,cx,cy,r*1.25);rg.addColorStop(0,'rgba('+glow+',.35)');rg.addColorStop(1,'rgba('+glow+',0)');x.fillStyle=rg;x.beginPath();x.arc(cx,cy,r*1.3,0,7);x.fill();
+ if(n=='SATURN'){const S=r*2.5;x.save();x.globalCompositeOperation='screen';x.drawImage(im,cx-S/2,cy-S/2,S,S);x.restore();return}
+ x.save();x.beginPath();x.arc(cx,cy,r,0,7);x.clip();x.drawImage(im,cx-r*1.005,cy-r*1.005,r*2.01,r*2.01);x.restore();
+ const sh=x.createRadialGradient(cx-r*.3,cy-r*.3,r*.2,cx,cy,r*1.01);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(.8,'rgba(0,0,0,.08)');sh.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=sh;x.beginPath();x.arc(cx,cy,r,0,7);x.fill()}
+function ringFor(n,cx,cy,r){if(n=='SATURN')return {cx,cy:cy+2,rx:r*0.62,ry:r*0.2,tl:-0.03};if(n=='URANUS')return {cx,cy,rx:r*1.12,ry:r*0.3,tl:-1.45};return {cx,cy,rx:r*1.1,ry:r*0.3,tl:-0.2}}
+function stars(ox,t,k){for(const s of STARS){const tw=.55+.45*Math.sin(t*1.3+s[4]*20);x.globalAlpha=(.2+.6*s[3])*tw*k;x.fillStyle='#fff';x.beginPath();x.arc(((s[0]+ox)%W+W)%W,s[1],s[2],0,7);x.fill()}x.globalAlpha=1}
+function drawRound(ri,ox,t){const r=RD[ri];const tt=(ri==0&&t>25)?0:t;const h=hU(r,(tt-r.a)/(r.b-r.a));
+ x.save();const z=1+0.04*ease((tt-(ri?9.8:0))/10);x.translate(540+ox,CY);x.scale(z,z);x.translate(-540,-CY);
+ for(const p of r.p){const [cx,cy]=p.c;const o=ringFor(p.n,cx,cy,R);const frac=cl(h/p.T),done=h>=p.T;
+  ringLayer(o,frac,p.dir,'back',done,p.glow);marker(o,frac,p.dir,'back',1);globe(p.n,p.glow,cx,cy,R);ringLayer(o,frac,p.dir,'front',done,p.glow);marker(o,frac,p.dir,'front',1);
+  if(done){const k=tt-finT(r,p);const fl=Math.exp(-k/0.18);if(fl>0.02){x.save();x.globalAlpha=fl*.6;x.fillStyle='#fff3c4';x.beginPath();x.arc(cx,cy,R*1.05,0,7);x.fill();x.restore()}}}
+ const Tmin=Math.min(...r.p.map(q=>q.T));
+ for(const p of r.p){const [cx,cy]=p.c,nx=Math.max(150,Math.min(cx,800));txt(p.n,nx,cy-R+62,fit(p.n,40,230,'Mont'),'#fff',.95,'Mont');
+  if(h>=p.T){const k=tt-finT(r,p),al=ease(k/0.15),pop=1+0.3*Math.exp(-k/0.12);const last=p.T==r.Tm,first=p.T==Tmin;const sx=Math.min(nx,745);
+   x.save();x.globalAlpha=al*.6;x.font='74px Anton';const ww=x.measureText(p.st).width+44;x.fillStyle='#000';x.beginPath();x.roundRect(sx-ww/2,cy-44,ww,90,45);x.fill();x.restore();
+   txt(p.st,sx,cy+28,fit(p.st,74,300)*pop,last?'#ff8a6a':(first?'#9df0bf':'#ffd166'),al)}}
+ x.restore();
+ // shared clock between the four globes
+ const ca=ri==0?(t>25?1:1-ease((t-8.5)/.3)):ease((tt-(r.a-0.6))/.3)*(1-ease((t-19.7)/.3));
+ if(ca>0.01){x.save();x.globalAlpha=cl(ca);const s=fmt(h);x.font='84px Anton';const w=x.measureText(s).width+60;x.fillStyle='rgba(0,0,0,.55)';x.beginPath();x.roundRect(540+ox-w/2,CY-62,w,90,45);x.fill();x.restore();
+  txt(s,540+ox,CY+16,84,h>0&&h<r.Tm?'#ffd166':'#ffffff',ca)}}
+// finale: Venus up close, the marker goes once around the other way; 243 days vs a 225-day year
+const VF={a:20.2,b:22.4};
+function drawVenus(ox,t){const z=1+0.06*ease((t-19.8)/10);x.save();x.translate(540+ox,1180);x.scale(z,z);x.translate(-540,-1180);
+ const cx=540,cy=1180,r=520,o={cx,cy,rx:r*1.12,ry:r*0.27,tl:-0.12},glow=PL.VENUS[2];
+ const gl=x.createRadialGradient(cx,cy,r*.9,cx,cy,r*1.6);gl.addColorStop(0,'rgba(250,215,150,.45)');gl.addColorStop(.3,'rgba(250,200,130,.14)');gl.addColorStop(1,'rgba(250,200,130,0)');x.fillStyle=gl;x.fillRect(-200,0,W+400,H);
+ // marker: first lap during the count, then keeps turning slowly the other way
+ const frac=t<VF.b?cl(eio((t-VF.a)/(VF.b-VF.a))):1+(t-VF.b)*0.12;const done=t>=VF.b;const fr=Math.min(frac,1);
+ ringLayer(o,fr,-1,'back',done,glow,1.4);marker(o,frac,-1,'back',1.7);globe('VENUS',glow,cx,cy,r);ringLayer(o,fr,-1,'front',done,glow,1.4);marker(o,frac,-1,'front',1.7);
+ // direction arrows on the front of the ring while "it spins backwards"
+ const aa=ease((t-25.3)/.3)*(1-ease((t-28.2)/.3));if(aa>0.01){for(let i=0;i<3;i++){const th=Math.PI/2+0.55-(((t-25.3)*0.5+i*0.35)%1.05);const [px,py]=ept(o,th),[qx,qy]=ept(o,th-0.02);
+  x.save();x.globalAlpha=aa;x.translate(px,py);x.rotate(Math.atan2(qy-py,qx-px));x.fillStyle='#fff';x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=10;x.beginPath();x.moveTo(26,0);x.lineTo(-12,-18);x.lineTo(-4,0);x.lineTo(-12,18);x.fill();x.restore()}}
+ x.restore();
+ const days=Math.round(fr*243);const ca=ease((t-(VF.a-0.3))/.3)*(1-ease((t-30.9)/.3));
+ if(ca>0.01){const s=days+' DAYS';x.save();x.globalAlpha=ca*.55;x.font='150px Anton';const w=x.measureText(s).width+70;x.fillStyle='#000';x.beginPath();x.roundRect(540+ox-w/2,1080,w,170,85);x.fill();x.restore();
+  txt(s,540+ox,1222,done?150:136,done?'#ff8a6a':'#ffe2a0',ca)}}
+const CARDS=[[0,4.0,'ONE SPIN ON EVERY PLANET','WHICH IS SLOWEST?'],[4.0,8.5,'THE GIANTS',''],[9.6,19.7,'THE ROCKY PLANETS',''],
+ [19.9,22.9,'AND VENUS?',''],[22.9,25.3,'LONGER THAN','ITS WHOLE YEAR'],[25.3,28.3,'AND IT SPINS','BACKWARDS'],[28.3,30.4,'WHICH SURPRISED YOU?',''],[31.9,D+1,'ONE SPIN ON EVERY PLANET','WHICH IS SLOWEST?']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.22),b>D?1:ease((b-t)/.2));
+ const sz=Math.min(fit(l1,92,800),l2?fit(l2,92,800):99);const y1=l2?425:470;txt(l1,495,y1,sz,'#fff',al);if(l2)txt(l2,495,y1+sz*1.06,sz,'#ffd166',al)}}
+const WH=[[8.6,9.2,0,1],[19.7,20.3,1,2],[31.4,31.9,2,0]];
+function view(t){for(const [a,b,f,to] of WH){if(t>=a&&t<b){const k=eio((t-a)/(b-a));return [[f,-k*W],[to,(1-k)*W]]}}
+ if(t<8.6)return [[0,0]];if(t<19.7)return [[1,0]];if(t<31.4)return [[2,0]];return [[0,0]]}
+function scene(si,ox,t){if(si==2)drawVenus(ox,t);else drawRound(si,ox,t)}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ const Vw=view(t);stars(Vw.length>1?Vw[0][1]*0.3:0,t,1);
+ for(const [si,ox] of Vw){if(Vw.length>1){for(let s=0;s<3;s++){x.save();x.globalAlpha=s==0?1:0.4;scene(si,ox+(s-1)*16,t);x.restore()}}else scene(si,ox,t)}
+ x.globalAlpha=1;cards(t);
+ const fa=(t<4.0?1:0)*ease((4.0-t)/.3)+(t>31.9?1:0);txt('one full turn · sizes not to scale',495,572,32,'#d9dee6',fa*.95,'Mont');
+ const ya=ease((t-23.0)/.3)*(1-ease((t-25.2)/.3));if(ya>0.01){txt('one spin: 243 days · one year: 225 days',495,572,32,'#ffe2a0',ya,'Mont')}
+ if(t>=30.3&&t<31.4){const al=Math.min(ease((t-30.3)/.25),ease((31.4-t)/.2));txt('FOLLOW → MORE EVERY DAY',495,1400,50,'#fff',al)}
+ const g=x.createRadialGradient(540,1000,560,540,1000,1350);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.4)');x.fillStyle=g;x.fillRect(0,0,W,H);}
+</script>
