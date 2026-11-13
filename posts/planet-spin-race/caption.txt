@@ -8,12 +8,12 @@ The rocky planets: Earth 23.9 hours, Mars 24.6 hours (almost the same as Earth),
 
 And Venus: 243 days for one spin. That's longer than its whole year: one trip around the Sun takes Venus only 225 days. Venus also spins backward compared to Earth, so on Venus the Sun would rise in the west and set in the east.
 
-About the video: an original animation using real NASA images. Planet sizes are not to scale and the clocks are sped up (the second clock runs faster and faster). The times are rotation periods (one full turn measured against the stars). Sunrise to sunrise is different: about 117 days on Venus and about 176 days on Mercury. Uranus is tipped on its side (about 98°), so its ring is drawn upright.
+About the video: an original animation using real NASA images. Planet sizes are not to scale and the clocks are sped up (the second clock runs faster and faster). The times are rotation periods (one full turn measured against the stars). Sunrise to sunrise is different: about 117 days on Venus and about 176 days on Mercury. Uranus also spins backward, and it is tipped on its side (about 98°), so its ring is drawn upright.
 
 Sources:
-NASA NSSDC Planetary Fact Sheet (rotation periods in hours: Mercury 1407.6, Venus -5832.5, Earth 23.9, Mars 24.6, Jupiter 9.9, Saturn 10.7, Uranus -17.2, Neptune 16.1; length of day: Mercury 4222.6 h; Venus orbital period 224.7 days; Uranus obliquity 97.8°): https://nssdc.gsfc.nasa.gov/planetary/factsheet/
+NASA NSSDC Planetary Fact Sheet (rotation periods in hours: Mercury 1407.6, Venus -5832.5, Earth 23.9, Mars 24.6, Jupiter 9.9, Saturn 10.7, Uranus -17.2, Neptune 16.1; length of day, sunrise to sunrise: Mercury 4222.6 h, Venus 2802.0 h; Venus orbital period 224.7 days; Uranus obliquity 97.8°): https://nssdc.gsfc.nasa.gov/planetary/factsheet/
 NASA NSSDC Planetary Fact Sheet notes (rotation period is measured relative to the fixed stars; a negative sign means retrograde rotation): https://nssdc.gsfc.nasa.gov/planetary/factsheet/planetfact_notes.html
-NASA Science, Venus Facts (a 243-day "day", longer than the 225-day year; sunrise to sunset takes 117 days; Venus spins backward compared to Earth, so the Sun rises in the west): https://science.nasa.gov/venus/facts/
+NASA Science, Venus Facts (a 243-day "day", longer than the 225-day year; Venus spins backward compared to Earth, so the Sun rises in the west): https://science.nasa.gov/venus/facts/
 
 Footage (NASA public domain; NASA does not endorse this video):
 Mercury: "Mercury Globe: 0°N, 180°E" (PIA15162), NASA/Johns Hopkins University Applied Physics Laboratory/Carnegie Institution of Washington: https://images.nasa.gov/details/PIA15162

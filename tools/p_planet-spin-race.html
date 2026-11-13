@@ -4,7 +4,7 @@
 <!-- planet-spin-race (style A): one full spin (sidereal rotation period) of every planet, 2 rounds of 4, then Venus up close.
      Rotation periods from the NASA NSSDC Planetary Fact Sheet (hours): Me 1407.6, Ve -5832.5, Ea 23.9, Ma 24.6, Ju 9.9, Sa 10.7, Ur -17.2, Ne 16.1.
      Venus orbital period 224.7 days. Planet pictures: NASA public-domain images, cropped to pl/<id>.jpg (see posts/planet-spin-race/NEXT.md).
-     A glowing marker rides each equator ring once per spin (Venus and Uranus turn the other way). Sizes not to scale; time compressed. -->
+     A glowing marker rides each equator ring once per spin; prograde = left to right on the near side (north up), Venus and Uranus the other way. Sizes not to scale; time compressed. -->
 <script>
 const W=1080,H=1920,FPS=30,D=32.4;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
@@ -13,8 +13,8 @@ const R=225,CY=1070,CELLS=[[270,820],[770,820],[270,1320],[770,1320]];
 const PL={JUPITER:[9.9,'PIA04866','235,200,160','9.9 h'],SATURN:[10.7,'PIA21046','240,215,150','10.7 h'],NEPTUNE:[16.1,'PIA01492','110,150,255','16.1 h'],URANUS:[-17.2,'PIA18182','160,235,240','17.2 h'],
  EARTH:[23.9,'as17-148-22727','120,170,255','23.9 h'],MARS:[24.6,'PIA00407','255,150,110','24.6 h'],MERCURY:[1407.6,'PIA15162','200,200,200','58.6 DAYS'],VENUS:[-5832.5,'PIA23791','250,225,170','243 DAYS']};
 // rounds: clock start/end (scene s), k = clock acceleration (0 = linear), names in grid order
-const RD=[{a:0.35,b:8.0,k:0,names:['JUPITER','SATURN','NEPTUNE','URANUS']},{a:10.0,b:19.5,k:8,names:['EARTH','MARS','MERCURY','VENUS']}];
-for(const r of RD){r.p=r.names.map((n,i)=>({n,T:Math.abs(PL[n][0]),dir:Math.sign(PL[n][0]),img:PL[n][1],glow:PL[n][2],st:PL[n][3],c:CELLS[i]}));r.Tm=Math.max(...r.p.map(p=>p.T))}
+const RD=[{a:0.0,b:8.0,k:0,names:['JUPITER','SATURN','NEPTUNE','URANUS']},{a:10.0,b:19.5,k:8,names:['EARTH','MARS','MERCURY','VENUS']}];
+for(const r of RD){r.p=r.names.map((n,i)=>({n,T:Math.abs(PL[n][0]),dir:-Math.sign(PL[n][0]),img:PL[n][1],glow:PL[n][2],st:PL[n][3],c:CELLS[i]}));r.Tm=Math.max(...r.p.map(p=>p.T))}
 // clock mapping: u in [0,1] -> hours
 function hU(r,u){u=cl(u);return r.k?r.Tm*(Math.exp(r.k*u)-1)/(Math.exp(r.k)-1):r.Tm*u}
 function uH(r,h){return r.k?Math.log(1+h/r.Tm*(Math.exp(r.k)-1))/r.k:h/r.Tm}
@@ -68,9 +68,9 @@ function drawVenus(ox,t){const z=1+0.06*ease((t-19.8)/10);x.save();x.translate(5
  const gl=x.createRadialGradient(cx,cy,r*.9,cx,cy,r*1.6);gl.addColorStop(0,'rgba(250,215,150,.45)');gl.addColorStop(.3,'rgba(250,200,130,.14)');gl.addColorStop(1,'rgba(250,200,130,0)');x.fillStyle=gl;x.fillRect(-200,0,W+400,H);
  // marker: first lap during the count, then keeps turning slowly the other way
  const frac=t<VF.b?cl(eio((t-VF.a)/(VF.b-VF.a))):1+(t-VF.b)*0.12;const done=t>=VF.b;const fr=Math.min(frac,1);
- ringLayer(o,fr,-1,'back',done,glow,1.4);marker(o,frac,-1,'back',1.7);globe('VENUS',glow,cx,cy,r);ringLayer(o,fr,-1,'front',done,glow,1.4);marker(o,frac,-1,'front',1.7);
+ ringLayer(o,fr,1,'back',done,glow,1.4);marker(o,frac,1,'back',1.7);globe('VENUS',glow,cx,cy,r);ringLayer(o,fr,1,'front',done,glow,1.4);marker(o,frac,1,'front',1.7);
  // direction arrows on the front of the ring while "it spins backwards"
- const aa=ease((t-25.3)/.3)*(1-ease((t-28.2)/.3));if(aa>0.01){for(let i=0;i<3;i++){const th=Math.PI/2+0.55-(((t-25.3)*0.5+i*0.35)%1.05);const [px,py]=ept(o,th),[qx,qy]=ept(o,th-0.02);
+ const aa=ease((t-25.3)/.3)*(1-ease((t-28.2)/.3));if(aa>0.01){for(let i=0;i<3;i++){const th=Math.PI/2-0.55+(((t-25.3)*0.5+i*0.35)%1.05);const [px,py]=ept(o,th),[qx,qy]=ept(o,th+0.02);
   x.save();x.globalAlpha=aa;x.translate(px,py);x.rotate(Math.atan2(qy-py,qx-px));x.fillStyle='#fff';x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=10;x.beginPath();x.moveTo(26,0);x.lineTo(-12,-18);x.lineTo(-4,0);x.lineTo(-12,18);x.fill();x.restore()}}
  x.restore();
  const days=Math.round(fr*243);const ca=ease((t-(VF.a-0.3))/.3)*(1-ease((t-30.9)/.3));
@@ -89,7 +89,7 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
  for(const [si,ox] of Vw){if(Vw.length>1){for(let s=0;s<3;s++){x.save();x.globalAlpha=s==0?1:0.4;scene(si,ox+(s-1)*16,t);x.restore()}}else scene(si,ox,t)}
  x.globalAlpha=1;cards(t);
  const fa=(t<4.0?1:0)*ease((4.0-t)/.3)+(t>31.9?1:0);txt('one full turn · sizes not to scale',495,572,32,'#d9dee6',fa*.95,'Mont');
- const ya=ease((t-23.0)/.3)*(1-ease((t-25.2)/.3));if(ya>0.01){txt('one spin: 243 days · one year: 225 days',495,572,32,'#ffe2a0',ya,'Mont')}
+ const ya=ease((t-23.0)/.3)*(1-ease((t-25.2)/.3));if(ya>0.01){txt('one spin: 243 days · one year: 225 days',495,580,42,'#ffe2a0',ya,'Mont')}
  if(t>=30.3&&t<31.4){const al=Math.min(ease((t-30.3)/.25),ease((31.4-t)/.2));txt('FOLLOW → MORE EVERY DAY',495,1400,50,'#fff',al)}
  const g=x.createRadialGradient(540,1000,560,540,1000,1350);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.4)');x.fillStyle=g;x.fillRect(0,0,W,H);}
 </script>

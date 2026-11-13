@@ -4,7 +4,7 @@ from kokoro_onnx import Kokoro
 k = Kokoro('/tmp/claude-0/kokoro/kokoro-v1.0.onnx', '/tmp/claude-0/kokoro/voices-v1.0.bin')
 L = {
  'l1': "One full spin on every planet. Which one is the slowest?",
- 'l2': "Jupiter and Saturn, about ten hours.",
+ 'l2': "Jupiter and Saturn, ten and eleven hours.",
  'l3': "Neptune, sixteen. Uranus, seventeen.",
  'l4': "Now the rocky planets.",
  'l5': "Earth, one day. Mars? Almost the same.",

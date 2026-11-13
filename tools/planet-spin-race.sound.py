@@ -13,7 +13,7 @@ def add(sig, pan=0.0, i0=0):
     a = (pan + 1) * np.pi / 4; n = min(len(sig), N - i0)
     if n <= 0: return
     L[i0:i0 + n] += sig[:n] * np.cos(a); R[i0:i0 + n] += sig[:n] * np.sin(a)
-land1 = [4.75, 5.11, 7.51, 8.0]; land2 = [13.06, 13.10, 17.81, 19.5]; SUNT = 22.4
+land1 = [4.60, 4.98, 7.49, 8.0]; land2 = [13.06, 13.10, 17.81, 19.5]; SUNT = 22.4
 # 1. pad (filtered saws)
 def pad(freqs, t0, t1, amp, fc=750):
     n0, n1 = int(t0 * SR), int(min(t1, D) * SR); tt = np.arange(n1 - n0) / SR; s = np.zeros(n1 - n0)
@@ -35,7 +35,7 @@ def pluck(t0, f, amp, pan):
     n = int(.5 * SR); tt = np.arange(n) / SR
     s = np.sin(2 * np.pi * f * tt) * np.exp(-tt / .12) * (1 - np.exp(-tt / .006)); s += .3 * np.sin(4 * np.pi * f * tt) * np.exp(-tt / .06)
     add(lp(s, 900) * amp, pan, int(t0 * SR))
-for a, b, f in [(0.35, 8.0, 220.0), (10.0, 19.5, 196.0), (20.2, 22.4, 174.61)]:
+for a, b, f in [(0.0, 8.0, 220.0), (10.0, 19.5, 196.0), (20.2, 22.4, 174.61)]:
     tb = a; k = 0
     while tb < b - .05:
         pluck(tb, f if k % 2 == 0 else f * 0.75, .16, -.3 if k % 2 else .3); per = .42 - .2 * min(1, (tb - a) / (b - a)); tb += per; k += 1
