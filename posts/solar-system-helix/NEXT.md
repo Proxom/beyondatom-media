@@ -26,3 +26,5 @@ Facts: NASA Science Sun facts (450,000 mph / 720,000 km/h; ~230 million years pe
 v1 (reviewer round 1): facts OK (no errors), average 7.5, reference gate 6/10 (narrow white tangle, trails cross counter, loop counter jump).
 v2 fixes: saturated per-planet colours (Me grey, Ve yellow, Ea blue, Ma red, Ju orange, Sa lavender), thicker trails, F 1980->2450 (helix ~1.24x), Sun y 770, counter backdrop .78, counter hidden 30.6 s -> end (clean loop at 0 KM).
 Final media/solar-system-helix/solar-system-helix-v2.mp4: 1080x1920 30 fps CRF 18, AAC 48 kHz, 32.0 s, -15.6 LUFS, -2.3 dBTP, HP4k 19 dB below, first/last YAVG 42.8/44.0, text zones clean (check-text-zones {}).
+Reviewer round 2: average 8.1, reference gate 8/10, no fact errors. Remaining small notes (not fixed, max 2 rounds): Jupiter/Saturn rings touch the cards and frame edges in places; counter backdrop could be more opaque.
+SCHEDULED: 14 Nov 2026 17:00 Europe/London, Metricool 427735374 (PENDING), raw URL HTTP 200 checked.
