@@ -1,0 +1,98 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- solar-system-helix (1M+ list #4, style C): the Sun drags the planets around the galaxy, so their paths are spirals, not circles.
+     Facts: NASA Science Sun facts (solar system moves ~720,000 km/h = 200 km/s; one lap ~230 million years); NSSDC Earth fact sheet (Earth's mean orbital speed 29.78 km/s = ~107,000 km/h).
+     The live counter = 200 km per second of video. Pictures: Sun = NASA SDO (GSFC_20171208_Archive_e000790), galaxy = NASA/JPL-Caltech/R. Hurt artist's concept (PIA10748), files in hx/ (see posts/solar-system-helix/NEXT.md).
+     Not to scale: sizes, distances, orbit speeds and the Sun's speed are all compressed; the planets' orbits are drawn tilted to the Sun's path. Galaxy turns clockwise as seen from the north (trailing arms). -->
+<script>
+const W=1080,H=1920,FPS=30,D=32.0;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2},mix=(a,b,k)=>a+(b-a)*k;
+const IM={};let LOADED=0;const SRC={sun:'hx/sun.jpg',gal:'hx/galaxy.jpg'};
+for(const k in SRC){const im=new Image();im.onload=()=>{if(++LOADED==2)Promise.all([document.fonts.load('88px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true})};im.src=SRC[k];IM[k]=im}
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const STARS=[];{const r=rnd(7);for(let i=0;i<900;i++)STARS.push([r()*W,r()*H,Math.pow(r(),3)*2.0+.3,r(),r(),.25+r()*.75])}
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=22;x.fillText(s,px,py);x.shadowBlur=6;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+// ---------- 3D: Sun-centred coordinates, Y = direction of the Sun's travel (screen up in side view)
+const TL=30*Math.PI/180;const NRM=[0,Math.cos(TL),Math.sin(TL)],E1=[1,0,0],E2=[0,Math.sin(TL),-Math.cos(TL)];
+// planets: name, orbit radius, size px, colour (r,g,b), phase
+const PLN=[['MERCURY',62,6,'205,200,190',0.4],['VENUS',96,9,'245,215,160',2.1],['EARTH',134,10,'90,170,255',4.0],['MARS',176,8,'255,120,80',1.0],['JUPITER',245,18,'235,200,150',5.2],['SATURN',318,15,'240,220,155',3.0]];
+const TE=2.6;for(const p of PLN){p.w=2*Math.PI/(TE*Math.pow(p[1]/134,1.5))}
+const VS=95; // Sun speed (scene units per sim second)
+function ppos(p,s){const a=p.w*s+p[4],c=Math.cos(a)*p[1],d=Math.sin(a)*p[1];return [c*E1[0]+d*E2[0],c*E1[1]+d*E2[1],c*E1[2]+d*E2[2]]}
+const sub=(a,b)=>[a[0]-b[0],a[1]-b[1],a[2]-b[2]],dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2],crs=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]],nz=a=>{const l=Math.hypot(...a);return [a[0]/l,a[1]/l,a[2]/l]};
+let CAM;function setCam(az,el,dist,sx,sy,F){const C=[dist*Math.cos(el)*Math.sin(az),dist*Math.sin(el),dist*Math.cos(el)*Math.cos(az)];const f=nz(sub([0,0,0],C));const r=nz(crs(f,[0,1,0]));const u=crs(r,f);CAM={C,f,r,u,sx,sy,F}}
+function prj(p){const d=sub(p,CAM.C);const z=dot(d,CAM.f);return [CAM.sx+CAM.F*dot(d,CAM.r)/z,CAM.sy-CAM.F*dot(d,CAM.u)/z,z,CAM.F/z]}
+// ---------- timeline
+// beta: 1 = paths as seen from the galaxy (spirals), 0 = as seen from the Sun (circles)
+function beta(t){if(t<3.8)return 1;if(t<8.6)return 1-eio((t-3.8)/2.2);if(t<9.4)return 0;return eio((t-9.4)/3.4)}
+// sim clock (orbits keep turning at a steady rate)
+const simT=t=>t*1.0+2.0;
+function camAt(t){// [az, el, dist, sunX, sunY]
+ const side=[-0.10+0.05*Math.sin(t*0.3),0.16,1550,505,800],top=[0.05,0.95,1450,505,1010],swing=[0.42,0.10,1500,505,790];
+ let k1=eio((t-3.6)/2.6)*(1-eio((t-9.2)/3.0));let k2=eio((t-16.6)/3.2)*(1-eio((t-25.0)/3.0));
+ const a=[0,1,2,3,4].map(i=>mix(mix(side[i],top[i],k1),swing[i],k2));return a}
+// galaxy zoom: 0 = solar system, 1 = whole galaxy
+function gz(t){if(t<20.0||t>26.0)return 0;return t<23?eio((t-20.0)/1.6):1-eio((t-24.3)/1.6)}
+function stars(t,b,oy){for(const s of STARS){const tw=.6+.4*Math.sin(t*1.3+s[4]*20);const y=((s[1]+oy*s[5])%H+H)%H;x.globalAlpha=(.15+.6*s[3])*tw;x.fillStyle='#fff';x.beginPath();x.arc(s[0],y,s[2],0,7);x.fill()}x.globalAlpha=1}
+let STAR_OY=0,LAST_T=-1;
+function streaks(t,b){const r=rnd(99);x.save();x.globalCompositeOperation='lighter';for(let i=0;i<60;i++){const sx=r()*W,sp=600+r()*900,len=60+r()*160,y0=r()*H;const y=((y0+t*sp*b)%(H+400))-200;
+ const g=x.createLinearGradient(sx,y,sx,y+len);g.addColorStop(0,'rgba(170,200,255,0)');g.addColorStop(1,'rgba(170,200,255,'+(0.16*b*(.4+r()*.6))+')');x.strokeStyle=g;x.lineWidth=1.6;x.beginPath();x.moveTo(sx,y);x.lineTo(sx,y+len);x.stroke()}x.restore()}
+function sunDraw(sx,sy,R,al){x.save();x.globalAlpha=al;x.globalCompositeOperation='lighter';
+ const g=x.createRadialGradient(sx,sy,R*.6,sx,sy,R*4.2);g.addColorStop(0,'rgba(255,170,60,.55)');g.addColorStop(.25,'rgba(255,120,30,.20)');g.addColorStop(1,'rgba(255,90,20,0)');x.fillStyle=g;x.beginPath();x.arc(sx,sy,R*4.2,0,7);x.fill();x.restore();
+ x.save();x.globalAlpha=al;x.beginPath();x.arc(sx,sy,R,0,7);x.clip();x.drawImage(IM.sun,sx-R*1.04,sy-R*1.04,R*2.08,R*2.08);x.restore();
+ x.save();x.globalAlpha=al*.8;x.globalCompositeOperation='lighter';const g2=x.createRadialGradient(sx,sy,R*.85,sx,sy,R*1.25);g2.addColorStop(0,'rgba(255,200,120,.0)');g2.addColorStop(.25,'rgba(255,190,110,.45)');g2.addColorStop(1,'rgba(255,150,60,0)');x.fillStyle=g2;x.beginPath();x.arc(sx,sy,R*1.25,0,7);x.fill();x.restore()}
+const TW=11.0,TS=1/45; // trail length (sim s) and step
+function trails(t,b,front,al){const st=simT(t);x.save();x.globalCompositeOperation='lighter';x.lineCap='round';
+ for(const p of PLN){let prev=null;const N=Math.floor(TW/TS);
+  for(let i=N;i>=0;i--){const s=st-i*TS;const q=ppos(p,s);q[1]-=b*VS*(st-s);const P=prj(q);const fr=P[2]<dot(sub([0,0,0],CAM.C),CAM.f);
+   if(prev&&fr==front){const age=i/N;const a=Math.pow(1-age,1.4)*al;if(a>0.01){x.strokeStyle='rgba('+p[3]+','+(a*.22)+')';x.lineWidth=14*Math.min(1.6,P[3]);x.beginPath();x.moveTo(prev[0],prev[1]);x.lineTo(P[0],P[1]);x.stroke();
+     x.strokeStyle='rgba('+p[3]+','+(a*.95)+')';x.lineWidth=3.2*Math.min(1.6,P[3]);x.stroke()}}prev=P}}
+ x.restore()}
+function planets(t,front,al,lab){const st=simT(t);const sz=dot(sub([0,0,0],CAM.C),CAM.f);for(const p of PLN){const P=prj(ppos(p,st));if((P[2]<sz)!=front)continue;const r=p[2]*P[3];
+ x.save();x.globalCompositeOperation='lighter';x.globalAlpha=al;const g=x.createRadialGradient(P[0],P[1],0,P[0],P[1],r*3.2);g.addColorStop(0,'rgba('+p[3]+',.9)');g.addColorStop(1,'rgba('+p[3]+',0)');x.fillStyle=g;x.beginPath();x.arc(P[0],P[1],r*3.2,0,7);x.fill();x.restore();
+ x.save();x.globalAlpha=al;x.fillStyle='rgb('+p[3]+')';x.beginPath();x.arc(P[0],P[1],r,0,7);x.fill();x.fillStyle='rgba(255,255,255,.7)';x.beginPath();x.arc(P[0]-r*.3,P[1]-r*.3,r*.45,0,7);x.fill();x.restore();
+ if(p[0]=='EARTH'&&lab>0.01){txt('YOU',P[0]+26,P[1]-18,40,'#9fd0ff',lab*al,'Anton','left')}}}
+function solar(t,al,zoomK){const [az,el,dist,sx,sy]=camAt(t);const b=beta(t);setCam(az,el,dist,sx,sy,1980*zoomK);const S=prj([0,0,0]);
+ const lab=t<3.8?1:(t<9.4?1:1-ease((t-11)/1));
+ trails(t,b,false,al);planets(t,false,al,lab);sunDraw(S[0],S[1],62*S[3],al);trails(t,b,true,al);planets(t,true,al,lab)}
+// galaxy: image 1920 px, centre (960,960); Sun drawn at radius GR px below centre; clockwise rotation (as seen from the north)
+const GR=430;
+function galaxy(t,k){if(k<=0.01)return;const sc=mix(9.0,0.82,k);// screen px per image px
+ const ang=(t-20)*0.035;// slow clockwise turn
+ const sunImg=[960+GR*Math.sin(-ang)*0,960+GR];
+ // keep the Sun's image point at the screen sun spot while zoomed in, the galaxy centre at screen centre when zoomed out
+ const tx=mix(505,540,k),ty=mix(800,960,k);const cxs=mix(tx-(sunImg[0]-960)*sc,540,ease(k)),cys=mix(ty-(sunImg[1]-960)*sc,960,ease(k));
+ x.save();x.globalAlpha=cl(k*1.6);x.translate(cxs,cys);x.rotate(ang);x.scale(sc,sc);x.drawImage(IM.gal,-960,-960);
+ // Sun's orbit and position
+ const oa=cl((k-.7)/.3);if(oa>0){x.globalAlpha=oa*.8;x.strokeStyle='rgba(255,210,120,.85)';x.lineWidth=3/sc;x.setLineDash([14/sc,12/sc]);x.beginPath();x.arc(0,0,GR,0,7);x.stroke();x.setLineDash([])}
+ x.restore();
+ // sun marker (screen space): moves clockwise along the orbit
+ const th=Math.PI/2+ang+ (t-20)*0.06; const mx=cxs+GR*sc*Math.cos(th),my=cys+GR*sc*Math.sin(th);
+ if(k>0.6){const a=cl((k-.6)/.3);x.save();x.globalCompositeOperation='lighter';x.globalAlpha=a;const g=x.createRadialGradient(mx,my,0,mx,my,46);g.addColorStop(0,'rgba(255,230,160,1)');g.addColorStop(.3,'rgba(255,190,90,.7)');g.addColorStop(1,'rgba(255,150,60,0)');x.fillStyle=g;x.beginPath();x.arc(mx,my,46,0,7);x.fill();x.restore();
+  txt('YOU ARE HERE',mx,my+78,46,'#ffe2a0',a*cl((1420-(my+78))/60));
+  // direction arrow (clockwise = moving left at the bottom of the orbit)
+  for(let i=0;i<3;i++){const ph=th+0.10+i*0.09+((t*0.25)%0.09);const px=cxs+GR*sc*Math.cos(ph),py=cys+GR*sc*Math.sin(ph);x.save();x.globalAlpha=a*(0.9-i*.25);x.translate(px,py);x.rotate(ph+Math.PI/2);x.fillStyle='#ffd166';x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=8;x.beginPath();x.moveTo(18,0);x.lineTo(-9,-13);x.lineTo(-3,0);x.lineTo(-9,13);x.fill();x.restore()}}}
+const CARDS=[[0,3.8,'HOW FAST ARE','YOU MOVING?'],[3.9,8.9,'EARTH AROUND THE SUN','107,000 KM/H'],[9.0,10.8,'BUT THE SUN','ISN\'T STANDING STILL'],
+ [10.9,17.0,'AROUND THE GALAXY','720,000 KM/H'],[17.1,20.3,'NOT CIRCLES.','SPIRALS.'],[20.5,25.0,'ONE LAP AROUND THE GALAXY','230 MILLION YEARS'],[29.4,30.7,'DID YOU FEEL IT?',''],[31.6,D+1,'HOW FAST ARE','YOU MOVING?']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.22),b>D?1:ease((b-t)/.2));
+ const sz=Math.min(fit(l1,96,800),l2?fit(l2,96,800):99);const y1=l2?440:490;txt(l1,495,y1,sz,'#fff',al);if(l2)txt(l2,495,y1+sz*1.08,sz,'#ffd166',al)}}
+function counter(t){const km=Math.round(t*200);const s=km.toLocaleString('en-US')+' KM';const big=ease((t-25.2)/.5)*(1-ease((t-29.3)/.4));
+ const al=(1-ease((t-30.6)/.2)+ease((t-31.6)/.2))*(1-gz(t));if(al<=0.01)return;const y=mix(1345,1240,big),sz=mix(80,140,big),ls=mix(30,40,big);
+ x.save();x.globalAlpha=cl(al)*.5;x.font=sz+'px Anton';const w=Math.max(x.measureText(s).width,mix(470,620,big))+70;x.fillStyle='#000';x.beginPath();x.roundRect(495-w/2,y-sz*0.98-ls-14,w,sz*1.22+ls+20,40);x.fill();x.restore();
+ txt('SINCE YOU STARTED WATCHING',495,y-sz*0.92,ls,'#d9dee6',al,'Mont');txt(s,495,y,sz,big>0.5?'#ffd166':'#fff',al)}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.globalCompositeOperation='source-over';x.fillStyle='#000';x.fillRect(0,0,W,H);
+ const b=beta(t),k=gz(t);
+ // background: stars drift down while the Sun moves (parallax), fast streaks only in the spiral views
+ stars(t,b,ease(b)*t*22+(t>9.4?0:0));streaks(t,b*(1-k)*0.9);
+ if(k<0.98){const zs=mix(1,0.04,eio(cl(k*1.25)));solar(t,1-cl((k-.55)/.35),zs)}
+ galaxy(t,k);
+ cards(t);counter(t);
+ const na=(1-k)*(t<20.2||t>25.5?1:0);txt('illustration · not to scale',495,615,30,'#c9ced6',na*.9*(t<3.8||t>31.6?1:(t>3.9&&t<8.9||t>10.9&&t<20.3?1:0)),'Mont');
+ if(k>0.6)txt("artist's concept of the Milky Way",495,615,30,'#c9ced6',cl((k-.6)/.3)*.9,'Mont');
+ if(t>=30.7&&t<31.6){const al=Math.min(ease((t-30.7)/.25),ease((31.6-t)/.2));txt('FOLLOW → MORE EVERY DAY',495,520,52,'#fff',al)}
+ const g=x.createRadialGradient(540,960,600,540,960,1350);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.45)');x.fillStyle=g;x.fillRect(0,0,W,H)}
+</script>
