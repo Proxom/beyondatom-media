@@ -22,3 +22,7 @@ Render: serve tools/ (`python3 -m http.server 8765`), BASE=http://127.0.0.1:8765
 Sound tools/solar-system-helix.sound.py; VO tools/solar-system-helix.vo.py (Kokoro am_michael 1.08).
 VO starts: l1 .15, l2 3.9, l3 9.0, l4 10.9, l5 17.1, l6 20.6, l7 25.3, l8 29.5. Mix: tools/mix-vo.py, then highshelf 4.5 kHz -2.5 dB + loudnorm -15.5 -> -15.5 LUFS, -2.5 dBTP, HP4k 19.1 dB below the mix.
 Facts: NASA Science Sun facts (450,000 mph / 720,000 km/h; ~230 million years per lap); NSSDC Earth fact sheet (29.78 km/s = 107,208 km/h).
+
+v1 (reviewer round 1): facts OK (no errors), average 7.5, reference gate 6/10 (narrow white tangle, trails cross counter, loop counter jump).
+v2 fixes: saturated per-planet colours (Me grey, Ve yellow, Ea blue, Ma red, Ju orange, Sa lavender), thicker trails, F 1980->2450 (helix ~1.24x), Sun y 770, counter backdrop .78, counter hidden 30.6 s -> end (clean loop at 0 KM).
+Final media/solar-system-helix/solar-system-helix-v2.mp4: 1080x1920 30 fps CRF 18, AAC 48 kHz, 32.0 s, -15.6 LUFS, -2.3 dBTP, HP4k 19 dB below, first/last YAVG 42.8/44.0, text zones clean (check-text-zones {}).
