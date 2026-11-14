@@ -3,6 +3,17 @@
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
 
+## TOP OVERRIDE (Erkan, 14 Nov 2026 20:25): 1 Short A DAY AT 17:00 ONLY + NEW QUEUE RULE — overrides every other slot, schedule and queue rule in this file
+- From now on: exactly 1 Short a day, at 17:00 Europe/London (Metricool brand 7675089). The 01:00 slot is CLOSED (as 21:00 already is): never schedule anything new at 01:00 or 21:00. This overrides "2 a day", "01:00 and 17:00", the 01:00 style/family rotation and every other mention of 01:00 below.
+- Shorts already scheduled for 01:00 stay as they are (already made, do not delete or move them). They count in QUEUE.
+- The daily 17:00 Short keeps its current rule: the next item on the 1M+ list, in order, with the same hard gate and quality standard. Rotation/family/series rules now apply across days instead of across slots.
+- QUEUE = future non-draft posts in Metricool + finished, gate-passed Shorts not yet scheduled.
+  - QUEUE 3 or more: do NOT make a new Short. Short check only (max 15 min: next 17:00 slots filled, last posts PUBLISHED, metrics note), then end.
+  - QUEUE 1 or 2 (or 0): make Shorts in this run until QUEUE is 3, one after another, each to the full hard gate, each scheduled at the next empty 17:00. Stop early if the run's time cap is reached; the next run continues. Never lower the gate to reach 3.
+  - The next 17:00 slot is always filled first.
+- Daily report: note posts per day changed to 1 on 15 Nov; compare views per Short and followers per day, 2 a day vs 1 a day.
+- Keep runs short and lean.
+
 ## TOP OVERRIDE (Erkan, 12 Nov 2026 18:30): 2 SHORTS A DAY, 01:00 AND 17:00 ONLY – to save weekly Claude credits
 - From now on: exactly 2 Shorts a day, at 01:00 and 17:00 Europe/London. The 21:00 slot is CLOSED: never schedule anything new at 21:00. This overrides the 3-a-day rule/sprint below and any other mention of 21:00.
 - Posts already scheduled for 21:00 stay as they are (already made); do not make new ones for 21:00.
