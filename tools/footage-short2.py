@@ -62,7 +62,7 @@ def wrap(d, text, f, maxw):
 
 def ease(x): x = min(max(x, 0), 1); return x * x * (3 - 2 * x)
 
-def draw_text_block(img, text, y, size, color, alpha, anchor='top', pop=1.0):
+def draw_text_block(img, text, y, size, color, alpha, anchor='top', pop=1.0, plate=True):
     ov = Image.new('RGBA', (W, H), (0, 0, 0, 0)); d = ImageDraw.Draw(ov)
     f = font(int(size * pop)); cx = (SAFE_L + SAFE_R) / 2; maxw = SAFE_R - SAFE_L - 20
     lines = wrap(d, text, f, maxw); lh = int(f.size * 1.12); hgt = lh * len(lines)
@@ -76,7 +76,8 @@ def draw_text_block(img, text, y, size, color, alpha, anchor='top', pop=1.0):
     for i, l in enumerate(lines):
         d.text((cx, y0 + i * lh), l, font=f, fill=color + (int(255 * alpha),), anchor='ma',
                stroke_width=sw, stroke_fill=(0, 0, 0, int(230 * alpha)))
-    img.alpha_composite(pl); img.alpha_composite(ov)
+    if plate: img.alpha_composite(pl)
+    img.alpha_composite(ov)
     return y0, y0 + hgt
 
 def hexrgb(h): h = h.lstrip('#'); return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
@@ -121,7 +122,7 @@ def main():
             if c['t0'] <= t < c['t1']:
                 a = min(1, (t - c['t0']) / 0.12 if c['t0'] > 0 else 1, (c['t1'] - t) / 0.12 if c.get('fadeout', True) else 1)
                 pop = 1 + 0.06 * (1 - ease((t - c['t0']) / 0.18)) if c['t0'] > 0 else 1
-                draw_text_block(img, c['text'], c['y'], c['size'], hexrgb(c.get('color', '#ffffff')), a, c.get('anchor', 'top'), pop)
+                draw_text_block(img, c['text'], c['y'], c['size'], hexrgb(c.get('color', '#ffffff')), a, c.get('anchor', 'top'), pop, c.get('plate', True))
         if C and C['t0'] - 0.3 <= t < C.get('hold', 1e9):
             k = ease((t - C['t0']) / (C['t1'] - C['t0'])); val = C['to'] * k
             done = t >= C['t1']; txt = fmt(round(val / 10) * 10 if not done else C['to']) + (C.get('suffix', '') if done else '')
