@@ -5,12 +5,12 @@ k = Kokoro('/tmp/claude-0/kokoro/kokoro-v1.0.onnx', '/tmp/claude-0/kokoro/voices
 L = {
  'l1': "Guess how fast this room is moving.",
  'l2': "In here, nobody walks. You push off, and float.",
- 'l3': "Bedrooms? Six of them.",
+ 'l3': "Six sleeping quarters.",
  'l4': "A gym. Two hours of workouts, every day.",
  'l5': "And it's bigger inside than a six-bedroom house.",
  'l6': "But look out the window.",
- 'l7': "This room is flying eight kilometers every second.",
- 'l8': "All the way around Earth in ninety minutes.",
+ 'l7': "This room is flying almost eight kilometers every second.",
+ 'l8': "Around the whole Earth in about ninety minutes.",
  'l9': "Would you live here?",
 }
 for n, s in L.items():
