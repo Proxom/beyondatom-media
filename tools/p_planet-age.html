@@ -12,9 +12,9 @@ const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2
 const R=225,CY=1070,CELLS=[[270,820],[770,820],[270,1320],[770,1320]];
 // name: [orbit period days, image, glow, decimals]
 const PL={MERCURY:[87.969,'PIA15162','200,200,200',1],VENUS:[224.701,'PIA23791','250,225,170',1],EARTH:[365.256,'as17-148-22727','120,170,255',1],MARS:[686.980,'PIA00407','255,150,110',1],
- JUPITER:[4332.589,'PIA04866','235,200,160',2],SATURN:[10755.699,'PIA21046','240,215,150',2],URANUS:[30685.4,'PIA18182','160,235,240',2],NEPTUNE:[60189.018,'PIA01492','110,150,255',2]};
+ JUPITER:[4332.589,'PIA02873','235,200,160',2],SATURN:[10755.699,'PIA21046','240,215,150',2],URANUS:[30685.4,'PIA18182','160,235,240',2],NEPTUNE:[60189.018,'PIA01492','110,150,255',2]};
 // rounds: Earth clock runs 0 -> AGE years between a and b; hl = time each stamp pops (VO sync)
-const RD=[{a:0.0,b:5.0,names:['MERCURY','VENUS','EARTH','MARS'],hl:[5.2,6.3,99,7.5]},{a:9.6,b:15.0,names:['JUPITER','SATURN','URANUS','NEPTUNE'],hl:[15.4,17.2,17.9,18.6]}];
+const RD=[{a:0.0,b:5.0,names:['MERCURY','VENUS','EARTH','MARS'],hl:[5.2,6.5,99,8.2]},{a:9.6,b:15.0,names:['JUPITER','SATURN','URANUS','NEPTUNE'],hl:[15.4,17.2,17.9,18.6]}];
 for(const r of RD){r.p=r.names.map((n,i)=>({n,P:PL[n][0],img:PL[n][1],glow:PL[n][2],dec:PL[n][3],c:CELLS[i],hl:r.hl[i]}))}
 function yrs(r,t){return AGE*cl((t-r.a)/(r.b-r.a))}
 const IM={};let LOADED=0;const SRC=Object.assign({},...Object.keys(PL).map(n=>({[n]:'pl/'+PL[n][1]+'.jpg'})),{NEPBIG:'pl/PIA01492_big.jpg'});const NIM=Object.keys(SRC).length;
@@ -28,7 +28,7 @@ function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measu
 function pill(s,px,py,size,al){x.save();x.globalAlpha=cl(al)*.55;x.font=size+'px Anton';const w=x.measureText(s).width+size*.6;x.fillStyle='#000';x.beginPath();x.roundRect(px-w/2,py-size*.86,w,size*1.12,size*.56);x.fill();x.restore()}
 function globe(n,glow,cx,cy,r,img){const im=IM[img||n];
  const rg=x.createRadialGradient(cx,cy,r*.95,cx,cy,r*1.25);rg.addColorStop(0,'rgba('+glow+',.35)');rg.addColorStop(1,'rgba('+glow+',0)');x.fillStyle=rg;x.beginPath();x.arc(cx,cy,r*1.3,0,7);x.fill();
- if(n=='SATURN'){const S=r*2.5;x.save();x.globalCompositeOperation='screen';x.drawImage(im,cx-S/2,cy-S/2,S,S);x.restore();return}
+ if(n=='SATURN'){const S=r*2.0;x.save();x.beginPath();x.ellipse(cx,cy,S*0.5,S*0.25,0,0,7);x.clip();x.globalCompositeOperation='screen';x.drawImage(im,cx-S/2,cy-S/2,S,S);x.restore();return}
  x.save();x.beginPath();x.arc(cx,cy,r,0,7);x.clip();x.drawImage(im,cx-r*1.005,cy-r*1.005,r*2.01,r*2.01);x.restore();
  const sh=x.createRadialGradient(cx-r*.3,cy-r*.3,r*.2,cx,cy,r*1.01);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(.8,'rgba(0,0,0,.08)');sh.addColorStop(1,'rgba(0,0,0,.5)');x.fillStyle=sh;x.beginPath();x.arc(cx,cy,r,0,7);x.fill()}
 // progress ring: fraction of ONE planet year, clockwise from the top; a glowing dot at the head
@@ -44,7 +44,9 @@ function drawRound(ri,ox,t){const r=RD[ri];const tt=(ri==0&&t>25)?0:t;const y=yr
   globe(p.n,p.glow,cx,cy,R);ring(cx,cy,R*1.1,frac,p.glow,1,done);
   if(done){const k=tt-(r.a+(r.b-r.a)*(p.P/EY)/AGE);const fl=Math.exp(-k/0.18);if(fl>0.02&&k>=0){x.save();x.globalAlpha=fl*.55;x.fillStyle='#fff3c4';x.beginPath();x.arc(cx,cy,R*1.05,0,7);x.fill();x.restore()}}}
  for(const p of r.p){const [cx,cy]=p.c,nx=Math.max(150,Math.min(cx,800));txt(p.n,nx,cy-R+62,fit(p.n,40,230,'Mont'),'#fff',.95,'Mont');
-  const age=y*EY/p.P;const s=age.toFixed(p.dec);const fin=tt>=r.b;const k=tt-p.hl,pop=k>=0?1+0.28*Math.exp(-k/0.14):1;const sx=Math.min(nx,760);
+  const age=y*EY/p.P;const endq=ri==0&&t>31.4&&t<34.5?ease((t-31.4)/.3)*(1-ease((t-34.2)/.25)):0;
+  if(endq>0.01){const sx=Math.min(nx,760);if(p.n=='MARS'){const q=1+0.12*Math.sin((t-31.4)*6);pill('?',sx,cy+62,110,1);txt('?',sx,cy+62,110*q,'#ffd166',1)}else{x.save();x.globalAlpha=1-0.7*endq;pill(age.toFixed(p.dec),sx,cy+62,80,1);txt(age.toFixed(p.dec),sx,cy+62,80,'#fff',1);x.restore()}continue}
+  const s=age.toFixed(p.dec);const fin=tt>=r.b;const k=tt-p.hl,pop=k>=0?1+0.28*Math.exp(-k/0.14):1;const sx=Math.min(nx,760);
   const col=!fin?'#ffffff':(p.n=='EARTH'?'#ffffff':(k>=0?(age<1?'#ff8a6a':(age>AGE?'#9df0bf':'#ffd166')):'#ffffff'));
   pill(s,sx,cy+62,80,1);txt(s,sx,cy+62,80*pop,col,1);txt('YEARS OLD',sx,cy+112,28,'#d9dee6',.9,'Mont')}
  x.restore();
@@ -59,7 +61,8 @@ function drawNeptune(ox,t){const z=1+0.06*ease((t-20.3)/12);const cx=540,cy=1180
  if(done){const k=t-NF.b;const fl=Math.exp(-k/0.25);if(fl>0.02){x.save();x.globalAlpha=fl*.5;x.fillStyle='#e8f0ff';x.beginPath();x.arc(cx,cy,r*1.05,0,7);x.fill();x.restore()}}
  x.restore();
  const yr=Math.round(1846+165*fr);const ca=ease((t-20.9)/.3)*(1-ease((t-30.9)/.2));
- if(ca>0.01){const s=t>=27.5?'AGE 165':String(yr);const big=done?150:136;pill(s,540+ox,1240,150,ca);txt(s,540+ox,1240,big,done?(t>=27.5?'#ff8a6a':'#9df0bf'):'#ffe2a0',ca)}}
+ if(ca>0.01){const s=t>=27.5?'YOU TURN 1':String(yr);const big=t>=27.5?130:(done?150:136);pill(s,540+ox,1240,big,ca);txt(s,540+ox,1240,big,done?(t>=27.5?'#ff8a6a':'#9df0bf'):'#ffe2a0',ca);
+  if(t>=27.5){const a2=ca*ease((t-27.8)/.3);pill('AT 165 EARTH YEARS',540+ox,1370,60,a2);txt('AT 165 EARTH YEARS',540+ox,1370,60,'#ffffff',a2)}}}
 const CARDS=[[0,4.6,"YOU'RE 20 ON EARTH",'HOW OLD ON EACH PLANET?'],[4.6,8.9,'IN PLANET YEARS',''],[9.3,15.2,'THE GIANTS',''],[15.2,20.3,'NOT EVEN ONE',''],
  [20.9,23.8,'FOUND IN 1846',''],[23.8,27.5,'ONE LAP AROUND THE SUN',''],[27.5,31.1,'1ST BIRTHDAY',''],[31.5,34.3,'HOW OLD ARE YOU','ON MARS?'],[34.4,D+1,"YOU'RE 20 ON EARTH",'HOW OLD ON EACH PLANET?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.22),b>D?1:ease((b-t)/.2));
@@ -74,7 +77,7 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
  x.globalAlpha=1;cards(t);
  const fa=(t<4.6?1:0)*ease((4.6-t)/.3)+(t>34.4?1:0);txt('ring = one planet year · sizes not to scale',495,572,32,'#d9dee6',fa*.95,'Mont');
  const ya=ease((t-24.0)/.3)*(1-ease((t-27.4)/.3));if(ya>0.01)txt('one Neptune year: about 165 Earth years',495,560,40,'#cfe0ff',ya,'Mont');
- const ba=ease((t-27.6)/.3)*(1-ease((t-30.9)/.2));if(ba>0.01)txt('on Neptune you turn 1 at age 165',495,560,40,'#ffe2a0',ba,'Mont');
- if(t>=32.9&&t<33.9){const al=Math.min(ease((t-32.9)/.2),ease((33.9-t)/.15));txt('FOLLOW → MORE EVERY DAY',495,606,44,'#fff',al)}
+ const ba=ease((t-31.6)/.3)*(1-ease((t-34.3)/.2));if(ba>0.01)txt('Mars age = your age ÷ 1.88',495,600,38,'#ffe2a0',ba,'Mont');
+ if(t>=32.3&&t<34.25){const al=Math.min(ease((t-32.3)/.2),ease((34.25-t)/.15));pill('FOLLOW → MORE EVERY DAY',540,CY+26,48,al);txt('FOLLOW → MORE EVERY DAY',540,CY+26,48,'#fff',al)}
  const g=x.createRadialGradient(540,1000,560,540,1000,1350);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.4)');x.fillStyle=g;x.fillRect(0,0,W,H);}
 </script>

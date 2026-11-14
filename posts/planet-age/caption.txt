@@ -21,7 +21,7 @@ Mercury: "Mercury Globe: 0°N, 180°E" (PIA15162), NASA/Johns Hopkins University
 Venus: "Venus from Mariner 10" (PIA23791), NASA/JPL-Caltech (processing: Kevin M. Gill): https://images.nasa.gov/details/PIA23791
 Earth: "View of the Earth seen by the Apollo 17 crew" (AS17-148-22727), NASA: https://images.nasa.gov/details/as17-148-22727
 Mars: "Global Color Views of Mars" (PIA00407), NASA/JPL/USGS: https://images.nasa.gov/details/PIA00407
-Jupiter: "Cassini Jupiter Portrait" (PIA04866), NASA/JPL/Space Science Institute: https://images.nasa.gov/details/PIA04866
+Jupiter: "High Resolution Globe of Jupiter" (PIA02873), NASA/JPL/University of Arizona: https://images.nasa.gov/details/PIA02873
 Saturn: "Saturn, Approaching Northern Summer" (PIA21046), NASA/JPL-Caltech/Space Science Institute: https://images.nasa.gov/details/PIA21046
 Uranus: "Uranus as seen by NASA Voyager 2" (PIA18182), NASA/JPL-Caltech: https://images.nasa.gov/details/PIA18182
 Neptune: Voyager 2 (PIA01492), NASA/JPL: https://images.nasa.gov/details/PIA01492
