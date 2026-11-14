@@ -1,0 +1,23 @@
+{"fps": 30, "srcw": 1920, "srch": 1080, "audio": "/tmp/claude-0/-home-user-beyondatom-media/762c7fcc-7801-5beb-96a5-da6b5182d408/scratchpad/iss/mix.wav",
+ "shots": [
+  {"src": "/tmp/claude-0/-home-user-beyondatom-media/762c7fcc-7801-5beb-96a5-da6b5182d408/scratchpad/iss/c5.mp4", "in": 5.5, "out": 14.0, "dur": 3.2, "cx": 0.52, "push": 1.06},
+  {"src": "/tmp/claude-0/-home-user-beyondatom-media/762c7fcc-7801-5beb-96a5-da6b5182d408/scratchpad/iss/c2.mp4", "in": 2.0, "out": 14.0, "dur": 3.8, "cx": 0.5, "push": 1.08},
+  {"src": "/tmp/claude-0/-home-user-beyondatom-media/762c7fcc-7801-5beb-96a5-da6b5182d408/scratchpad/iss/c3.mp4", "in": 3.0, "out": 7.5, "dur": 2.4, "cx": 0.66, "push": 1.06},
+  {"src": "/tmp/claude-0/-home-user-beyondatom-media/762c7fcc-7801-5beb-96a5-da6b5182d408/scratchpad/iss/c4.mp4", "in": 4.0, "out": 12.0, "dur": 3.2, "cx": 0.46, "push": 1.06},
+  {"src": "/tmp/claude-0/-home-user-beyondatom-media/762c7fcc-7801-5beb-96a5-da6b5182d408/scratchpad/iss/c1.mp4", "in": 1.5, "out": 9.0, "dur": 4.2, "cx": 0.56, "push": 1.06},
+  {"src": "/tmp/claude-0/-home-user-beyondatom-media/762c7fcc-7801-5beb-96a5-da6b5182d408/scratchpad/iss/c6.mp4", "in": 2.0, "out": 14.0, "dur": 2.8, "cx": 0.3, "push": 1.05},
+  {"src": "/tmp/claude-0/-home-user-beyondatom-media/762c7fcc-7801-5beb-96a5-da6b5182d408/scratchpad/iss/c6.mp4", "in": 15.0, "out": 26.0, "dur": 8.4, "cx": 0.26, "push": 1.15, "px": 0.45, "py": 0.5},
+  {"src": "/tmp/claude-0/-home-user-beyondatom-media/762c7fcc-7801-5beb-96a5-da6b5182d408/scratchpad/iss/c5.mp4", "in": 0.2, "out": 5.5, "dur": 2.0, "cx": 0.52}
+ ],
+ "cards": [
+  {"t0": 0, "t1": 3.2, "text": "HOW FAST IS THIS ROOM MOVING?", "y": 1420, "size": 108, "anchor": "bottom"},
+  {"t0": 3.3, "t1": 7.0, "text": "NO WALKING. JUST FLOAT.", "y": 360, "size": 96},
+  {"t0": 7.1, "t1": 9.4, "text": "6 BEDROOMS", "y": 360, "size": 110},
+  {"t0": 9.5, "t1": 12.6, "text": "GYM: 2 HOURS A DAY", "y": 360, "size": 104},
+  {"t0": 12.8, "t1": 16.8, "text": "BIGGER THAN A 6-BEDROOM HOUSE", "y": 1420, "size": 96, "anchor": "bottom"},
+  {"t0": 16.9, "t1": 19.6, "text": "NOW LOOK OUTSIDE", "y": 360, "size": 104},
+  {"t0": 19.9, "t1": 23.5, "text": "8 KM\nEVERY SECOND", "y": 360, "size": 150, "color": "#ffd54a"},
+  {"t0": 23.6, "t1": 28.0, "text": "AROUND EARTH IN 90 MINUTES", "y": 360, "size": 104},
+  {"t0": 28.0, "t1": 30.0, "text": "WOULD YOU LIVE HERE?", "y": 1330, "size": 104, "anchor": "bottom", "fadeout": false},
+  {"t0": 28.7, "t1": 30.0, "text": "Follow: new space Short every day", "y": 1435, "size": 44, "anchor": "bottom", "fadeout": false}
+ ]}
