@@ -1,4 +1,4 @@
-# iss-float-tour — 15 Nov 2026 17:00 Europe/London, 1M+ list #5 (style B, human / what it's like), run yt-2007-rubin-qc962z
+# iss-float-tour — DONE, scheduled (Metricool 428332889). 15 Nov 2026 17:00 Europe/London, 1M+ list #5 (style B, human / what it's like), run yt-2007-rubin-qc962z
 outlier: Astronaut flying through the ISS (NASA, ~4.3M views) — topic only, nothing copied. Our twist: guess hook "How fast is this room moving?", house-tour cards, payoff at the Dragon window (8 km every second, 90-minute lap).
 
 ## Reference gate: what made the original work (3-5 points)
