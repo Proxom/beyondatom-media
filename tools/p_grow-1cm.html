@@ -17,7 +17,7 @@ const EARTH=new Image();EARTH.src='g1-earth.jpg';
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('40px Mont'),new Promise(r=>{EARTH.onload=r})]).then(()=>{window.TEXREADY=true});
 const R=6378137; // equatorial radius, m (NSSDC)
 // ---------- growth clock: u = log10(T+1) through keyframes (monotone cubic) ----------
-const K=[[0,0],[2.8,1.0414],[4.0,1.7853],[7.0,3.5564],[10.0,4.9365],[12.6,5.08],[16.0,5.55],[17.3,5.9468],[19.0,6.3],[20.3,7.6042],[23.4,7.70],
+const K=[[0,0],[2.8,1.0414],[4.0,1.7853],[7.0,3.5564],[8.0,3.62],[10.0,4.9365],[12.6,5.08],[16.0,5.55],[17.3,5.9468],[18.4,5.962],[20.3,7.6042],[23.4,7.70],
  [26.4,9.4022],[D,9.4022]];
 const MS=(()=>{const n=K.length,d=[],m=[];for(let i=0;i<n-1;i++)d.push((K[i+1][1]-K[i][1])/(K[i+1][0]-K[i][0]));
  m[0]=d[0];m[n-1]=d[n-2];for(let i=1;i<n-1;i++)m[i]=(d[i-1]*d[i]<=0)?0:(d[i-1]+d[i])/2;
@@ -45,7 +45,7 @@ const SURF=[];{const r=rnd(55);for(let i=0;i<220;i++){SURF.push({a:(r()-.5)*1.6,
 // ---------- text helpers ----------
 function T(s,X,Y,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';
  x.lineJoin='round';x.shadowColor='rgba(0,0,0,.75)';x.shadowBlur=size*.22;x.shadowOffsetY=size*.05;x.fillStyle=col||'#fff';x.fillText(s,X,Y);x.restore()}
-const fmtH=h=>h<10?h.toFixed(2)+' m':h<10000?Math.floor(h).toLocaleString('en-US')+' m':Math.floor(h/1000).toLocaleString('en-US')+' km';
+const fmtH=h=>h<10?(Math.floor(h*100+1e-6)/100).toFixed(2)+' m':h<10000?Math.floor(h).toLocaleString('en-US')+' m':Math.floor(h/1000).toLocaleString('en-US')+' km';
 function fmtT(T){const pl=(n,w)=>n+' '+w+(n==1?'':'S');
  if(T<60)return pl(Math.floor(T),'SECOND');if(T<3600)return pl(Math.floor(T/60),'MINUTE');if(T<86400)return pl(Math.floor(T/3600),'HOUR');
  if(T<86400*120)return pl(Math.floor(T/86400),'DAY');if(T<31557600*2)return pl(Math.floor(T/2629800),'MONTH');return pl(Math.floor(T/31557600),'YEAR')}
@@ -113,11 +113,11 @@ function draw(t){
   const ag=x.createRadialGradient(cx,cy,RS*.995,cx,cy,RS*(1+ 90e3/R)+30);ag.addColorStop(0,'rgba(120,180,255,.9)');ag.addColorStop(.35,'rgba(70,140,255,.35)');ag.addColorStop(1,'rgba(40,90,255,0)');
   x.fillStyle=ag;x.beginPath();x.arc(cx,cy,RS*(1+90e3/R)+30,0,6.283);x.fill();
   // surface: procedural first, NASA Apollo 17 photo when the ball becomes visible
-  const ph=1-ss(25000,80000,RS),lh=Math.log10(h),oc=ss(4.0,5.0,lh);
+  const ph=1-ss(3000,9000,RS),lh=Math.log10(h),oc=ss(4.0,5.0,lh);
   x.save();x.beginPath();x.arc(cx,cy,RS,0,6.283);x.clip();
   if(ph<1){const sg=x.createLinearGradient(0,fy,0,Math.min(H,cy));sg.addColorStop(0,`rgb(${lerp(92,63,oc)|0},${lerp(112,127,oc)|0},${lerp(70,191,oc)|0})`);sg.addColorStop(1,`rgb(${lerp(36,18,oc)|0},${lerp(48,58,oc)|0},${lerp(30,107,oc)|0})`);x.fillStyle=sg;x.fillRect(0,0,W,H);
-   for(const c of SURF){const an=-Math.PI/2+c.a*Math.min(1,2.4e6/ (h+1e5));const px=cx+Math.cos(an)*RS,py=cy+Math.sin(an)*RS;const w=c.w*s;if(w<2||w>900||py>H+w)continue;
-    x.globalAlpha=c.al*(1-ph)*ss(4.3,5.0,lh);x.fillStyle=c.land?'#6f7a4a':'#f2f5fa';x.beginPath();x.ellipse(px,py+w*c.h*.6,w,w*c.h,an+Math.PI/2,0,6.283);x.fill()}
+   for(const c of SURF){const an=-Math.PI/2+c.a*Math.min(1,2.4e6/ (h+1e5));const px=cx+Math.cos(an)*RS,py=cy+Math.sin(an)*RS;const w=c.w*s;if(w<2||w>300||py>H+w)continue;
+    x.globalAlpha=.35*c.al*(1-ph)*ss(4.3,5.0,lh);x.fillStyle=c.land?'#6f7a4a':'#f2f5fa';x.beginPath();x.ellipse(px,py+w*c.h*.6,w,w*c.h,an+Math.PI/2,0,6.283);x.fill()}
    x.globalAlpha=1}
   if(ph>0){x.globalAlpha=ph;const ir=642,icx=965,icy=977;const k=RS/ir;x.drawImage(EARTH,cx-icx*k,cy-icy*k,1920*k,1920*k);x.globalAlpha=1}
   // night-side shading (sun from the right)
@@ -180,18 +180,18 @@ function draw(t){
  // ----- text -----
  // hook
  const hk=1-ss(2.5,3.0,t);
- if(hk>0){T('WHAT IF YOU GREW',540,414,88,'#fff',hk);T('1 CM EVERY SECOND?',540,510,96,'#ffd98a',hk)}
+ if(hk>0){T('WHAT IF YOU GREW',540,395,72,'#fff',hk);T('1 CM EVERY SECOND?',540,470,80,'#ffd98a',hk)}
  // counter group (height big, time small) top right of the head
  const ca=1;
  const cxp=CXT,cyp=lerp(lerp(670,455,ss(2.5,3.1,t)),430,ss(23.4,26.4,t));
  if(ca>0){let pop=0;for(const m of [4.0,7.0,10.0,17.3,20.3,26.4])pop=Math.max(pop,Math.exp(-Math.pow((t-m)/.18,2)));
   T(fmtH(h),cxp,cyp,Math.round(104*(1+.05*pop)),'#fff',ca);T('AFTER '+fmtT(Tn),cxp,cyp+58,40,'#ffd98a',ca,'Mont')}
  // one label at a time, next to its landmark
- const lab=(s1,a,b,X0,Y0,s2)=>{const al=ss(a,a+.35,t)*(1-ss(b-.3,b,t));if(al>0){const xx=cl(X0,250,760),yy=cl(Y0,680,1380);T(s1,xx,yy,42,'#fff',al,'Mont');if(s2)T(s2,xx,yy+50,42,'#ffd98a',al,'Mont')}};
+ const lab=(s1,a,b,X0,Y0,s2)=>{const al=ss(a,a+.35,t)*(1-ss(b-.3,b,t));if(al>0){const xx=cl(X0,250,760),yy=cl(Y0,600,1380);T(s1,xx,yy,42,'#fff',al,'Mont');if(s2)T(s2,xx,yy+50,42,'#ffd98a',al,'Mont')}};
  lab('DOOR',3.4,6.0,(window.__door||[800,0])[0],(window.__door||[0,900])[1]-20);
- lab('BURJ KHALIFA',10.0,13.0,CXT,cl((window.__burj||[0,800])[1]-30,760,1300),'828 m');
- lab('EVEREST',17.0,19.4,CXT,650,'8,849 m');
- lab('SPACE STATION',20.3,23.8,CXT,cl((window.__iss||[0,900])[1]+70,700,1300),'ORBIT ~400 km');
+ lab('BURJ KHALIFA',10.0,13.0,655,cl((window.__burj||[0,800])[1]-30,760,1300),'828 m');
+ lab('EVEREST · 8,849 m',17.0,19.0,716,1010,'PASSED ON DAY 10');
+ lab('SPACE STATION',20.3,23.8,CXT,Math.max(600,fy-400e3*s+70),'ORBIT ~400 km');
  lab('EARTH',26.4,29.8,PX,fy+R*s+20);
  if(t>26.8&&t<29.8){const al=ss(26.8,27.2,t)*(1-ss(29.5,29.8,t));T('ALMOST',CXT,580,46,'#fff',al,'Mont');T('2 EARTHS TALL',CXT,632,46,'#fff',al,'Mont')}
  // guess card
@@ -199,8 +199,8 @@ function draw(t){
  if(ga>0){const sc=x.createRadialGradient(CXT,700,20,CXT,700,330);sc.addColorStop(0,`rgba(10,20,40,${.55*ga})`);sc.addColorStop(1,'rgba(10,20,40,0)');x.fillStyle=sc;x.fillRect(CXT-340,420,680,560);T('WHEN DO YOU',CXT,640,60,'#fff',ga);T('PASS EVEREST?',CXT,710,68,'#ffd98a',ga);T('GUESS NOW',CXT,772,44,'#fff',ga,'Mont')}
  
  // payoff + loop
- const pa=ss(29.8,30.1,t)*(1-ss(31.0,31.2,t));if(pa>0){T('DID YOU',CXT,620,84,'#fff',pa);T('GUESS RIGHT?',CXT,710,88,'#ffd98a',pa)}
- const fa=ss(31.1,31.35,t)*(1-ss(32.25,32.45,t));if(fa>0){T('Follow →',700,1250,40,'#fff',fa*.95,'Mont');T('a new one every day',700,1298,40,'#fff',fa*.95,'Mont')}
+ const pa=ss(29.8,30.1,t)*(1-ss(31.0,31.2,t));if(pa>0){T('DID YOU',CXT,620,84,'#fff',pa);T('GUESS RIGHT?',CXT,710,88,'#ffd98a',pa);T('EVEREST: DAY 10',CXT,790,46,'#fff',pa,'Mont')}
+ const fa=ss(31.1,31.35,t)*(1-ss(32.25,32.45,t));if(fa>0){T('Follow →',700,880,40,'#fff',fa*.95,'Mont');T('a new one every day',700,928,40,'#fff',fa*.95,'Mont')}
 }
 window.draw=draw;
 </script>
