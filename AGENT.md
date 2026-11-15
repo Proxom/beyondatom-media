@@ -3,6 +3,22 @@
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
 
+## TOP OVERRIDE (Erkan, 15 Nov 2026 14:55): OWN SIMULATIONS FIRST, PROVEN SERIES, SATURDAY LONG VIDEO — overrides older format, length and review rules it contradicts
+
+DATA (YouTube Studio, 15 Nov): most Shorts stop at 1,000-1,500 views (YouTube's first test audience swipes away). Winners: "Same Jump on 4 Moons: Who Lands Last?" 5,901 (our own simulation/race), "What If You Fell Into Jupiter?" 2,901, "How Much Gravity Can a Human Survive?" 2,043, "Why Do Astronauts Get Taller in Space?" 1,877, "What If a Black Hole Replaced the Sun?" 1,645. Dry fact Shorts stay at 1,000-1,350. Comments are almost zero. The 12 long videos (Nov-Dec 2024, 6-135 views) were never distributed and half carry "Potential earning limitation" = YouTube treats them as reused content (NASA footage with little added). A channel made mostly of others' footage risks YouTube Partner Program rejection.
+
+1. MAIN FORMAT = OUR OWN SIMULATIONS AND COMPARISONS (code-made animation, real physics/real numbers with sources). NASA footage only as a short support clip (max ~20 % of a video), never the core. Every video must be clearly original work.
+2. SERIES (each video belongs to one; label it on screen and in the title pattern):
+   - "Who Lands / Wins First?" (same experiment on several worlds, race, viewer guesses) — at least 2 per week.
+   - "Your Body on Every Planet" / "What happens to a human…".
+   - "What If…?" (black hole replaces the Sun, fall into Jupiter…).
+   Drop dry-fact topics (spin rates, orbit trivia) unless turned into a race or a human-body question. Re-rank topics weekly from the Studio numbers.
+3. SHORTS: first second = the race already moving or the most striking moment + a big guess question on screen; 20-35 s; the answer at 80-90 % then loop. ONE review round (automatic gate + one visual review; fix once, no loops). About 20 min work per Short.
+4. SATURDAY LONG VIDEO (from Sat 28 Nov 2026, every Saturday 17:00 Europe/London, Metricool brand 7675089, YouTube normal video): 8-10 min compilation of the best-performing series, e.g. "Every Planet Compared: 10 Experiments" — our own simulations, chapters, strong title + thumbnail (big contrast, one object, 3-4 words max), first 30 s promises the payoff. Build it in parts during the week ONLY when the Shorts QUEUE is 3. It must pass the same HARD GATE (sources, sound, captions, no reused-content look). The Saturday Short that day points to it (related video link).
+5. OLD 12 LONG VIDEOS: do not touch; list them in reports/long-video-audit.md with views and the "earning limitation" flag. Erkan decides later about making some private.
+6. Shorts stay 1 a day at 17:00, queue 3. Saturday has both the Short and the long video.
+7. Daily report: per series table (posts, median views at 72 h, best/worst); every Monday re-rank. Saturday report: long video impressions, CTR, average view duration once Studio data is shared by Erkan.
+
 ## TOP OVERRIDE (Erkan, 14 Nov 2026 20:25): 1 Short A DAY AT 17:00 ONLY + NEW QUEUE RULE — overrides every other slot, schedule and queue rule in this file
 - From now on: exactly 1 Short a day, at 17:00 Europe/London (Metricool brand 7675089). The 01:00 slot is CLOSED (as 21:00 already is): never schedule anything new at 01:00 or 21:00. This overrides "2 a day", "01:00 and 17:00", the 01:00 style/family rotation and every other mention of 01:00 below.
 - Shorts already scheduled for 01:00 stay as they are (already made, do not delete or move them). They count in QUEUE.
