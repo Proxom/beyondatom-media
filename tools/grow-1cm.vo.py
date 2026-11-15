@@ -10,7 +10,7 @@ L = {
  'l3': "After one hour, thirty-eight meters.",
  'l4': "After one day, you're taller than the tallest building on Earth.",
  'l5': "So when do you pass Mount Everest? Guess now.",
- 'l6': "Just ten days.",
+ 'l6': "Just over ten days.",
  'l7': "After about fifteen months, your head reaches the space station's orbit.",
  'l8': "And after eighty years, you'd be almost twice as tall as Earth is wide.",
  'l9': "Did you guess right?",

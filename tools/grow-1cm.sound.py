@@ -1,6 +1,6 @@
 # Original bed for "What If You Grew 1 cm Every Second?" (grow-1cm, 32.5 s). Warm pad that climbs (C -> F -> Am -> G -> F -> C) as the
 # person grows, a slow rising filter sweep, sub swell when we reach space, soft low whooshes and felt thumps on each milestone
-# (1 min 5.0 s, 1 h 7.8 s, 1 day 11.5 s, Everest 17.4 s, ISS 22.0 s, 80 years 27.2 s). Nothing bright: sources < ~1.2 kHz before the low-pass.
+# (1 min 4.0 s, 1 h 7.0 s, 1 day 10.0 s, Everest 17.3 s, ISS 20.3 s, 80 years 26.4 s). Nothing bright: sources < ~1.2 kHz before the low-pass.
 # usage: python3 grow-1cm.sound.py bed.wav
 import numpy as np, wave, sys
 SR = 48000; D = 32.5; N = int(SR * D); t = np.arange(N) / SR
@@ -35,20 +35,20 @@ for i, tb in enumerate(np.arange(3.0, 29.6, beat)):
     s = np.sin(2 * np.pi * f * tt) * np.exp(-tt / .12) * (.06 + .03 * (tb / 30))
     add(lp(s, 500), 0, int(tb * SR))
 # 3. sub swell into space
-da = env([(0, .25), (17.0, .25), (22.0, .6), (27.2, .75), (29.6, .4), (D, .25)])
+da = env([(0, .25), (17.0, .25), (20.3, .6), (26.4, .75), (29.6, .4), (D, .25)])
 for m, a in [(1, .22), (2, .14)]:
     add(da * a * np.sin(2 * np.pi * 32.70 * m * t + m), 0)
 # 4. soft low whooshes into milestones (band-limited noise 70-900 Hz)
 def whoosh(tc, dur, amp, pan):
     n = int(dur * SR); tt = np.arange(n) / SR; s = bp(rng.standard_normal(n), 70, 900)
     e = (np.clip(tt / dur, 0, 1) ** 2) * np.exp(-np.clip(tt - dur * .85, 0, None) / .08); add(s * e * amp, pan, int(max(0, tc - dur * .85) * SR))
-for tc, p in [(5.0, -.3), (7.8, .3), (11.5, -.2), (17.4, .2), (22.0, -.3), (27.2, .3)]:
+for tc, p in [(4.0, -.3), (7.0, .3), (10.0, -.2), (17.3, .2), (20.3, -.3), (26.4, .3)]:
     whoosh(tc, 1.4, .06, p)
 # 5. felt thumps (sine drop 90->40 Hz) on milestones
 def thump(t0, amp):
     n = int(.8 * SR); tt = np.arange(n) / SR; f = 40 + 50 * np.exp(-tt / .06)
     s = np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-tt / .25); add(lp(s, 400) * amp, 0, int(t0 * SR))
-for t0 in (5.0, 7.8, 11.5, 17.4, 22.0, 27.2): thump(t0, .3)
+for t0 in (4.0, 7.0, 10.0, 17.3, 20.3, 26.4): thump(t0, .3)
 m = np.stack([L, R], 1); m /= np.max(np.abs(m)) / .5
 with wave.open(sys.argv[1], 'w') as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes((m * 32767).astype(np.int16).tobytes())
