@@ -71,8 +71,8 @@ def draw_text_block(img, text, y, size, color, alpha, anchor='top', pop=1.0, pla
     # soft dark plate behind the text for legibility on busy footage
     pl = Image.new('RGBA', (W, H), (0, 0, 0, 0)); pd = ImageDraw.Draw(pl)
     wmax = max(d.textlength(l, font=f) for l in lines)
-    pd.rounded_rectangle([cx - wmax / 2 - 34, y0 - 22, cx + wmax / 2 + 34, y0 + hgt + 18], 34, fill=(5, 8, 20, int(120 * alpha)))
-    pl = pl.filter(ImageFilter.GaussianBlur(14))
+    pd.rounded_rectangle([cx - wmax / 2 - 34, y0 - 22, cx + wmax / 2 + 34, y0 + hgt + 18], 34, fill=(5, 8, 20, int(105 * alpha)))
+    pl = pl.filter(ImageFilter.GaussianBlur(30))  # wide feather: no hard plate edges
     for i, l in enumerate(lines):
         d.text((cx, y0 + i * lh), l, font=f, fill=color + (int(255 * alpha),), anchor='ma',
                stroke_width=sw, stroke_fill=(0, 0, 0, int(230 * alpha)))

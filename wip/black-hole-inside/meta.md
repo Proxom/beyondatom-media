@@ -19,7 +19,7 @@ We've even seen one. In April 2019 the Event Horizon Telescope released the firs
 
 What we don't know: what matter looks like inside. Einstein's general relativity predicts that the very center is a point where matter is crushed to infinite density, a singularity. But that prediction may mark the limit of the theory, where quantum effects it leaves out become important. And because nothing can escape, nothing about what happens inside can ever reach us.
 
-About the video: the glowing disk shots are a NASA simulation (sped up and cropped). The ring image is the real 2019 Event Horizon Telescope image of M87*. The dark, warped sky is from a NASA simulation of a camera plunging into a black hole.
+About the video: the glowing disk shots are a NASA simulation of a black hole and its disk (cropped, one part sped up). The ring image is the real 2019 Event Horizon Telescope image of M87*.
 
 Sources:
 NASA Science, Black Hole Basics (nothing, not even light, can escape the event horizon; there is much we don't know, like what matter looks like inside): https://science.nasa.gov/universe/black-holes/
@@ -28,7 +28,6 @@ ESO, eso1907 "Astronomers Capture First Image of a Black Hole" (10 April 2019; M
 
 Footage:
 "Black Hole Accretion Disk Visualization" (SVS 13326), NASA's Goddard Space Flight Center/Jeremy Schnittman (NASA public domain; NASA does not endorse this video): https://svs.gsfc.nasa.gov/13326
-"NASA Black Hole Visualization Takes Viewers Beyond the Brink" (SVS 14576), NASA's Goddard Space Flight Center/J. Schnittman and B. Powell (NASA public domain): https://svs.gsfc.nasa.gov/14576
 "First Image of a Black Hole" (eso1907a), Credit: EHT Collaboration, licensed under CC BY 4.0: https://www.eso.org/public/images/eso1907a/
 Narration: AI voice (Kokoro). Music and sound: original.
 

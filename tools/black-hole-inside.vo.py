@@ -11,7 +11,7 @@ L = {
  'l4': "It has six and a half billion times the mass of our Sun.",
  'l5': "Its edge is called the event horizon. Cross it, and nothing gets back out. Not even light.",
  'l6': "Now, what we don't know.",
- 'l7': "Einstein's theory says everything inside is crushed into one point, of infinite density.",
+ 'l7': "Einstein's theory says the center may be a point where matter is crushed to infinite density.",
  'l8': "But that may just be where his theory stops working.",
  'l9': "And nothing from inside can ever reach us to tell.",
  'l10': "So what do you think is in there?",
