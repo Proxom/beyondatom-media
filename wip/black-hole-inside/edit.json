@@ -65,7 +65,7 @@
   {
    "t0": 0,
    "t1": 2.25,
-   "text": "WHAT'S INSIDE A BLACK HOLE?",
+   "text": "WHAT'S INSIDE\nA BLACK HOLE?",
    "y": 360,
    "size": 118
   },
@@ -88,7 +88,7 @@
   {
    "t0": 6.4,
    "t1": 10.7,
-   "text": "FIRST REAL IMAGE, 2019",
+   "text": "FIRST REAL\nIMAGE, 2019",
    "y": 1420,
    "size": 104,
    "anchor": "bottom"
@@ -96,21 +96,21 @@
   {
    "t0": 14.6,
    "t1": 17.5,
-   "text": "EDGE: THE EVENT HORIZON",
+   "text": "THE EDGE:\nEVENT HORIZON",
    "y": 360,
    "size": 108
   },
   {
    "t0": 17.6,
    "t1": 20.4,
-   "text": "NOT EVEN LIGHT ESCAPES",
+   "text": "NOT EVEN\nLIGHT ESCAPES",
    "y": 360,
    "size": 112
   },
   {
    "t0": 20.6,
    "t1": 22.6,
-   "text": "WHAT WE DON'T KNOW",
+   "text": "WHAT WE\nDON'T KNOW",
    "y": 380,
    "size": 116,
    "color": "#ffd54a"
@@ -118,7 +118,7 @@
   {
    "t0": 22.6,
    "t1": 25.5,
-   "text": "CRUSHED TO ONE POINT?",
+   "text": "CRUSHED TO\nONE POINT?",
    "y": 360,
    "size": 108
   },
@@ -132,7 +132,7 @@
   {
    "t0": 28.5,
    "t1": 31.2,
-   "text": "WHERE EINSTEIN'S THEORY ENDS?",
+   "text": "WHERE EINSTEIN'S\nTHEORY ENDS?",
    "y": 360,
    "size": 104
   },
