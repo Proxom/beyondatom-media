@@ -1,4 +1,4 @@
-# Footage Short compositor v2 (per-shot 'src', Anton font, smooth sub-pixel 'push' zoom per shot; otherwise as footage-short.py)
+# Footage Short compositor v2 (streams shot by shot; per-shot 'src', Anton font, smooth sub-pixel 'push' zoom per shot; otherwise as footage-short.py)
 # Footage Short compositor (real NASA/ESA footage + text cards + counter + optional particles).
 # usage: python3 footage-short.py <edit.json> <out.mp4> [--preview] [--stills dir]
 # edit.json: {"src": "path.mp4", "fps": 30, "audio": "music.wav",
@@ -100,8 +100,12 @@ def grains_layer(t, g):
 def fmt(n): return f"{int(n):,}"
 
 def main():
-    frames = np.concatenate([shot_frames(s) for s in E['shots']])
-    N = len(frames); print('frames', N, 'dur', N / FPS)
+    # stream shot by shot (holding every full-res frame at once ran out of memory on a 37 s Short)
+    N = sum(int(round(s['dur'] * FPS)) for s in E['shots']); print('frames', N, 'dur', N / FPS)
+    def frame_iter():
+        for s in E['shots']:
+            for f in shot_frames(s): yield f
+    frames = frame_iter()
     ow, oh = (540, 960) if PREVIEW else (W, H)
     enc = ['ffmpeg', '-loglevel', 'error', '-y', '-f', 'rawvideo', '-pix_fmt', 'rgb24', '-s', f'{ow}x{oh}', '-r', str(FPS), '-i', '-']
     if E.get('audio'): enc += ['-i', E['audio'], '-c:a', 'aac', '-b:a', '192k', '-shortest']
@@ -113,7 +117,7 @@ def main():
         want = {min(N - 1, int(N * q)) for q in (0, .2, .4, .6, .8, 1.0)} | {int(0.5 * FPS)}
     C = E.get('counter'); G = E.get('grains')
     for i in range(N):
-        t = i / FPS; img = Image.fromarray(frames[i]).convert('RGBA')
+        t = i / FPS; img = Image.fromarray(next(frames)).convert('RGBA')
         # gentle vignette top/bottom so text plates read well
         if G:
             gl = grains_layer(t, G)
