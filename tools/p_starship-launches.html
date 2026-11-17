@@ -1,0 +1,187 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- starship-launches (1M+ list #8, style A): "How many launches to land Starship on the Moon?"
+     Facts: Apollo = one Saturn V launch per landing (NASA). Starship plan (NASA OIG IG-26-004, Mar 2026): a storage depot launches first,
+     then more than 10 Starship tankers fill it (SpaceX targets one tanker every 6 days), then the uncrewed lander launches, refuels at the
+     depot and flies on to lunar orbit. Depot 1 + 11 tankers + lander 1 = 13 launches (minimum consistent with "more than 10 tankers").
+     Lander height 171 ft = 52 m (OIG); Apollo LM 22 ft 11 in = 7.0 m (NASA). Scene 4 draws LM, Starship lander and astronaut to scale
+     with each other. Earth/Moon distances and sizes in scenes 2/3/5 are NOT to scale (said in the description).
+     Images: Earth = NASA AS17-148-22727; Moon = NASA GSFC/LRO "Full Moon" GSFC_20171208_Archive_e000868 (both public domain). -->
+<script>
+const W=1080,H=1920,D=35.5;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ss=(a,b,v)=>{const t=cl((v-a)/(b-a));return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
+const eo=k=>1-Math.pow(1-cl(k),3), ei=k=>Math.pow(cl(k),2.2);
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+const EARTH=new Image();EARTH.src='sl-earth.jpg';const MOON=new Image();MOON.src='sl-moon.jpg';
+Promise.all([document.fonts.load('80px Anton'),document.fonts.load('40px Mont'),new Promise(r=>{EARTH.onload=r}),new Promise(r=>{MOON.onload=r})]).then(()=>{window.TEXREADY=true});
+// stars
+const ST=(()=>{const r=rnd(5),a=[];for(let i=0;i<420;i++)a.push([r()*W*1.6-W*.3,r()*H*1.4-H*.2,r()*1.6+.3,r()*.8+.2,r()]);return a})();
+function stars(ox,oy,al,streak){x.save();for(const s of ST){const px=((s[0]+ox*s[4])%(W*1.6)+W*1.6)%(W*1.6)-W*.3,py=((s[1]+oy*s[4])%(H*1.4)+H*1.4)%(H*1.4)-H*.2;
+ x.globalAlpha=al*s[3];x.fillStyle='#dfe8ff';if(streak){x.fillRect(px,py,s[2],s[2]+streak*s[4])}else{x.beginPath();x.arc(px,py,s[2],0,7);x.fill()}}x.restore()}
+// text: Anton, white with soft shadow, max one block at a time
+function T(s,X,Y,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';
+ x.textBaseline='middle';x.shadowColor='rgba(0,0,0,.85)';x.shadowBlur=size*.35;x.shadowOffsetY=size*.06;x.fillStyle=col||'#fff';x.fillText(s,X,Y);x.restore()}
+function pop(t,a,b){return ss(a,a+.25,t)*(1-ss(b-.25,b,t))}
+// ---------- vehicles (drawn pointing up, origin at engine base centre, height hp px) ----------
+function plume(X,Y,len,wid,t,ang){x.save();x.translate(X,Y);x.rotate(ang||0);x.globalCompositeOperation='lighter';
+ for(let i=0;i<3;i++){const L=len*(1-i*.25)*(1+.05*Math.sin(t*40+i)),w=wid*(1-i*.28);const g=x.createLinearGradient(0,0,0,L);
+  g.addColorStop(0,i==2?'rgba(255,255,240,.95)':'rgba(255,190,90,.85)');g.addColorStop(.35,'rgba(255,120,40,.5)');g.addColorStop(1,'rgba(255,80,20,0)');
+  x.fillStyle=g;x.beginPath();x.moveTo(-w/2,0);x.quadraticCurveTo(-w*.9,L*.4,0,L);x.quadraticCurveTo(w*.9,L*.4,w/2,0);x.fill()}
+ const gg=x.createRadialGradient(0,0,0,0,0,wid*1.6);gg.addColorStop(0,'rgba(255,220,160,.7)');gg.addColorStop(1,'rgba(255,140,60,0)');x.fillStyle=gg;
+ x.beginPath();x.arc(0,0,wid*1.6,0,7);x.fill();x.restore()}
+function steel(w,dark){const g=x.createLinearGradient(-w/2,0,w/2,0);const c=dark?['#4a4f57','#9aa1aa','#d8dde3','#8c939c','#3c4148']:['#6d737c','#c4cad1','#f2f4f7','#b3b9c1','#5b6068'];
+ c.forEach((v,i)=>g.addColorStop(i/(c.length-1),v));return g}
+function saturnV(X,Y,hp){const w=hp*.0909;x.save();x.translate(X,Y); // 111 m tall, 10.1 m wide
+ const s=hp/111;const seg=(y0,y1,w0,w1,fill)=>{x.fillStyle=fill;x.beginPath();x.moveTo(-w0/2*s,-y0*s);x.lineTo(w0/2*s,-y0*s);x.lineTo(w1/2*s,-y1*s);x.lineTo(-w1/2*s,-y1*s);x.fill()};
+ const wg=g=>{const q=x.createLinearGradient(-5*s,0,5*s,0);q.addColorStop(0,'#8d9196');q.addColorStop(.45,'#ffffff');q.addColorStop(1,'#7c8085');return q};
+ // fins + engines
+ x.fillStyle='#2b2d31';for(const sx of[-1,1]){x.beginPath();x.moveTo(sx*5*s,-2*s);x.lineTo(sx*7.6*s,0);x.lineTo(sx*5*s,-9*s);x.fill()}
+ seg(0,42,10.1,10.1,wg());x.fillStyle='#16181b';for(const[y0,y1]of[[2,9],[30,42]])x.fillRect(0,-y1*s,5.05*s,(y1-y0)*s);x.fillRect(-5.05*s,-30*s,5.05*s,8*s);
+ seg(42,46,10.1,10.1,'#c9ccd0');seg(46,71,10.1,10.1,wg());x.fillStyle='#16181b';x.fillRect(-5.05*s,-71*s,10.1*s,1.4*s);
+ seg(71,75,10.1,6.6,wg());seg(75,93,6.6,6.6,wg());x.fillStyle='#16181b';x.fillRect(0,-93*s,3.3*s,6*s);
+ seg(93,96,6.6,3.9,'#e6e8ea');seg(96,100,3.9,1,'#c8cbcf');x.strokeStyle='#d7d9dc';x.lineWidth=Math.max(1,.5*s);x.beginPath();x.moveTo(0,-100*s);x.lineTo(0,-111*s);x.stroke();
+ x.fillStyle='#b53b2d';x.fillRect(-.6*s,-111*s,1.2*s,2.5*s);x.restore()}
+function starshipStack(X,Y,hp,withBooster,kind){// kind: 'ship' steel, 'hls' white top band, booster 71 m + ship 50 m (drawing proportions, unlabelled)
+ x.save();x.translate(X,Y);const s=hp/(withBooster?121:52),w=9*s;
+ const body=(y0,y1,fill)=>{x.fillStyle=fill;x.fillRect(-w/2,-y1*s,w,(y1-y0)*s)};
+ let y=0;if(withBooster){body(0,71,steel(w,true));x.fillStyle='rgba(0,0,0,.25)';for(let i=1;i<9;i++)x.fillRect(-w/2,-i*8*s,w,.25*s);
+  x.fillStyle='#2a2d33';for(const sx of[-1,1])x.fillRect(sx>0?w/2:-w/2-2.2*s,-67*s,2.2*s,3.2*s);body(71,73,'#30343a');y=73}
+ const top=y+(kind=='hls'?52:50);body(y,top-9,steel(w));x.fillStyle='rgba(0,0,0,.18)';for(let i=1;i<5;i++)x.fillRect(-w/2,-(y+i*8)*s,w,.25*s);
+ // nose
+ x.fillStyle=steel(w);x.beginPath();x.moveTo(-w/2,-(top-9)*s);x.bezierCurveTo(-w/2,-(top-2)*s,-w*.2,-top*s,0,-top*s);x.bezierCurveTo(w*.2,-top*s,w/2,-(top-2)*s,w/2,-(top-9)*s);x.fill();
+ if(kind=='hls'){x.fillStyle='#f4f4f2';x.fillRect(-w/2,-(top-9)*s,w,6*s);x.fillStyle='#f4f4f2';x.beginPath();x.moveTo(-w/2,-(top-9)*s);x.bezierCurveTo(-w/2,-(top-2)*s,-w*.2,-top*s,0,-top*s);
+  x.bezierCurveTo(w*.2,-top*s,w/2,-(top-2)*s,w/2,-(top-9)*s);x.fill();x.fillStyle='#22262c';for(let i=-1;i<=1;i++)x.fillRect(i*2.4*s-.6*s,-(top-6.5)*s,1.2*s,1.6*s);
+  x.fillStyle='#2c3036';x.fillRect(-w/2,-(top-15)*s,w,1.2*s);
+  // legs
+  x.strokeStyle='#8b9098';x.lineWidth=Math.max(1.5,.8*s);for(const sx of[-1,1]){x.beginPath();x.moveTo(sx*w/2,-(y+6)*s);x.lineTo(sx*(w/2+3.2*s),0);x.stroke()}}
+ else{// flaps (ships/tankers/depot)
+  x.fillStyle='#3a3e45';for(const sx of[-1,1]){x.beginPath();x.moveTo(sx*w/2,-(y+1)*s);x.lineTo(sx*(w/2+2.6*s),-(y+2)*s);x.lineTo(sx*(w/2+2.6*s),-(y+9)*s);x.lineTo(sx*w/2,-(y+11)*s);x.fill();
+   x.beginPath();x.moveTo(sx*w/2,-(top-13)*s);x.lineTo(sx*(w/2+1.6*s),-(top-12)*s);x.lineTo(sx*(w/2+1.4*s),-(top-7)*s);x.lineTo(sx*w/2*.8,-(top-5)*s);x.fill()}}
+ x.restore()}
+// a ship lying horizontally in orbit (nose to the right), centre at X,Y, length Lp px
+function shipH(X,Y,Lp,kind,ang){x.save();x.translate(X,Y);x.rotate(ang||0);x.rotate(Math.PI/2);x.translate(0,Lp/2);starshipStack(0,0,Lp,false,kind);x.restore()}
+function img(im,cx,cy,r,al){if(al<=0)return;x.save();x.globalAlpha=al;x.beginPath();x.arc(cx,cy,r,0,7);x.clip();x.drawImage(im,cx-r*1.0,cy-r*1.0,r*2,r*2);x.restore()}
+function earthDisc(cx,cy,r,al){// AS17 image: disc ~ fills frame; crop slightly so the limb is clean
+ if(al<=0)return;x.save();x.globalAlpha=al;x.beginPath();x.arc(cx,cy,r,0,7);x.clip();const k=r/0.662;x.drawImage(EARTH,cx-k*1.003,cy-k*0.981,2*k,2*k);
+ const g=x.createRadialGradient(cx-r*.3,cy-r*.3,r*.2,cx,cy,r);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.85,'rgba(0,0,0,.05)');g.addColorStop(1,'rgba(0,0,20,.45)');x.fillStyle=g;x.fillRect(cx-r,cy-r,2*r,2*r);x.restore();
+ x.save();x.globalAlpha=al*.8;x.globalCompositeOperation='lighter';const a=x.createRadialGradient(cx,cy,r*.97,cx,cy,r*1.06);a.addColorStop(0,'rgba(90,160,255,.55)');a.addColorStop(1,'rgba(90,160,255,0)');
+ x.fillStyle=a;x.beginPath();x.arc(cx,cy,r*1.06,0,7);x.fill();x.restore()}
+function moonDisc(cx,cy,r,al){if(al<=0)return;x.save();x.globalAlpha=al;x.beginPath();x.arc(cx,cy,r,0,7);x.clip();const k=r/0.845;x.drawImage(MOON,cx-k*1.0,cy-k*1.005,2*k,2*k);x.restore()}
+// ---------- counter (top), one at a time ----------
+function counter(n,sub,al,big){if(al<=0)return;T(String(n),540,525,190,'#ffd27a',al);if(sub)T(sub,540,675,58,'#fff',al)}
+// ---------- SCENE 1: side-by-side liftoff (0 - 6.0) ----------
+function s1(t){const sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#05070f');sky.addColorStop(.55,'#1b2440');sky.addColorStop(.8,'#5a4a5c');sky.addColorStop(1,'#d08a58');
+ x.fillStyle=sky;x.fillRect(0,0,W,H);stars(0,0,.55,0);
+ const rise=t=>18*t+16*t*t; // px climb
+ const cam=rise(t)*.86; // camera follows: ground drops away
+ const gy=1560+cam; // ground line
+ // ground + pads
+ x.fillStyle='#120f12';x.fillRect(0,gy,W,H-gy+10);
+ for(const px of[330,640]){x.fillStyle='#25212a';x.fillRect(px-120,gy-30,240,30)}
+ // smoke clouds
+ const r=rnd(11);x.save();for(let i=0;i<46;i++){const px=(i%2?640:330)+(r()-.5)*(260+t*90),py=gy-20-r()*90-t*10*r(),rr=60+r()*90+t*14;
+  const g=x.createRadialGradient(px,py,0,px,py,rr);g.addColorStop(0,'rgba(235,215,200,.55)');g.addColorStop(1,'rgba(200,180,170,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,rr,0,7);x.fill()}x.restore();
+ const hpS=760,hpX=830; const ySV=gy-40-rise(t),yST=gy-40-rise(t)*1.05;
+ plume(330,ySV,420+t*60,70,t);saturnV(330,ySV,hpS);
+ plume(640,yST,460+t*60,82,t);starshipStack(640,yST,hpX,true,'ship');
+ // labels near the bottom of the text-safe area
+ const la=1-ss(5.6,6.0,t);
+ T('APOLLO',165,1040,58,'#fff',la);T('STARSHIP',815,1040,58,'#fff',la);
+ T('1',165,1150,130,'#ffd27a',la);T('?',815,1150,130,'#ffd27a',la);
+ // hook question
+ const qa=1-ss(5.6,6.0,t);T('HOW MANY LAUNCHES',540,422,96,'#fff',qa);T('TO THE MOON?',540,527,96,'#fff',qa)}
+// ---------- SCENE 2: Apollo, one launch straight to the Moon (6.0 - 10.0) ----------
+function s2(t){const k=(t-6)/4;x.fillStyle='#000';x.fillRect(0,0,W,H);stars(-k*120,k*60,.9,0);
+ const z=lerp(1,1.12,ss(0,1,k));x.save();x.translate(540,960);x.scale(z,z);x.translate(-540,-960);
+ earthDisc(250,1420,430,1);moonDisc(800,700,230,1);
+ // trajectory arc from Earth to the Moon
+ const P=u=>{const a=[560,1180],b=[1010,780],c=[660,560];const m=1-u;return[m*m*a[0]+2*m*u*b[0]+u*u*c[0],m*m*a[1]+2*m*u*b[1]+u*u*c[1]]};
+ const u=eo(ss(.08,.85,k));x.save();x.strokeStyle='rgba(255,210,120,.9)';x.lineWidth=7;x.setLineDash([22,16]);x.beginPath();for(let i=0;i<=40;i++){const q=P(u*i/40);i?x.lineTo(q[0],q[1]):x.moveTo(q[0],q[1])}x.stroke();x.restore();
+ const q=P(u),q2=P(Math.max(0,u-.02));const ang=Math.atan2(q[1]-q2[1],q[0]-q2[0]);
+ if(u<.99){x.save();x.translate(q[0],q[1]);x.rotate(ang);x.globalCompositeOperation='lighter';const g=x.createRadialGradient(0,0,0,0,0,40);g.addColorStop(0,'rgba(255,240,200,1)');g.addColorStop(1,'rgba(255,170,60,0)');x.fillStyle=g;x.beginPath();x.arc(0,0,40,0,7);x.fill();x.restore();
+  x.save();x.translate(q[0],q[1]);x.rotate(ang+Math.PI/2);x.fillStyle='#e9ecef';x.beginPath();x.moveTo(0,-26);x.lineTo(10,8);x.lineTo(-10,8);x.fill();x.restore()}
+ x.restore();
+ T('APOLLO: 1 LAUNCH',540,430,104,'#fff',pop(t,6.15,10.0));T('STRAIGHT TO THE MOON',540,535,52,'#ffd27a',pop(t,6.9,10.0),'Mont')}
+// ---------- orbit backdrop for scenes 3 and 5 ----------
+function orbitBg(t,drift){x.fillStyle='#000';x.fillRect(0,0,W,H);stars(-drift,0,.9,0);
+ // Earth limb filling the lower part
+ earthDisc(540+Math.sin(t*.05)*20,H+1500,2350,1)}
+const DEP={x:540,y:1010,L:820};
+function fuelBar(f,al){if(al<=0)return;x.save();x.globalAlpha=al;const X0=200,Y0=1330,Wd=680,Hh=34;x.fillStyle='rgba(0,0,0,.55)';x.fillRect(X0-6,Y0-6,Wd+12,Hh+12);
+ const g=x.createLinearGradient(X0,0,X0+Wd,0);g.addColorStop(0,'#3aa0ff');g.addColorStop(1,'#8fd4ff');x.fillStyle=g;x.fillRect(X0,Y0,Wd*cl(f),Hh);
+ x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=3;x.strokeRect(X0,Y0,Wd,Hh);x.restore();T('DEPOT FUEL',540,1405,40,'#cfe8ff',al,'Mont')}
+// tanker schedule: 11 tankers, launch index 2..12
+const TK=(()=>{const a=[];let s=12.6;const gaps=[2.0,1.4,1.0,.75,.6,.5,.45,.42,.4,.4,.4];for(let i=0;i<11;i++){a.push(s);s+=gaps[i]}return a})(); // arrival times
+function tanker(t,ta){// approaches from lower-left, docks under the depot, transfers, then leaves to the right/down
+ const a0=ta-1.1,d0=ta,d1=ta+.55,l1=ta+1.3;if(t<a0||t>l1)return 0;
+ let X,Y,ang=0;if(t<d0){const u=eo((t-a0)/1.1);X=lerp(-300,540,u);Y=lerp(1700,1185,u);ang=lerp(-.5,0,u)}
+ else if(t<d1){X=540;Y=1185}else{const u=ei((t-d1)/.75);X=lerp(540,1500,u);Y=lerp(1185,1550,u);ang=lerp(0,.3,u)}
+ if(t<d0)plume(X-DEP.L*.42*Math.cos(ang),Y-DEP.L*.42*Math.sin(ang),110,34,t,ang+Math.PI/2);
+ shipH(X,Y,DEP.L*.86,'ship',ang);
+ if(t>=d0&&t<d1){x.save();x.globalCompositeOperation='lighter';x.globalAlpha=.8*Math.sin((t-d0)/.55*Math.PI);const g=x.createLinearGradient(0,1115,0,1065);g.addColorStop(0,'rgba(120,200,255,0)');g.addColorStop(1,'rgba(120,200,255,1)');x.fillStyle=g;x.fillRect(470,1065,140,50);x.restore()}
+ return (t>=d0&&t<d1)?1:0}
+function s3(t){orbitBg(t,(t-10)*30);
+ // depot arrives first
+ const da=ss(10.0,11.6,t);const dx=lerp(1500,DEP.x,eo(da)),dy=lerp(760,DEP.y,eo(da));
+ if(da<1)plume(dx-DEP.L*.5,dy,140,40,t,Math.PI/2);shipH(dx,dy,DEP.L,'ship',0);
+ let n=1,f=0;for(let i=0;i<11;i++){tanker(t,TK[i]);if(t>=TK[i])n=2+i;f+=cl((t-TK[i])/.55)/11}
+ fuelBar(f,ss(12.2,12.6,t)*(1-ss(20.9,21.2,t)));
+ const ca=ss(10.15,10.45,t)*(1-ss(20.9,21.2,t));
+ counter(n,n==1?'LAUNCH 1: FUEL DEPOT':(n-1)+(n==2?' TANKER':' TANKERS'),ca)}
+// ---------- SCENE 4: lunar surface, to scale: astronaut 1.8 m, Apollo LM 7.0 m, Starship lander 52 m (21.2 - 27.8) ----------
+function lm(X,Y,s){x.save();x.translate(X,Y);// 7.0 m tall, ~9.4 m across legs
+ x.strokeStyle='#c9c9c9';x.lineWidth=Math.max(1.5,.18*s);for(const sx of[-1,1]){x.beginPath();x.moveTo(sx*2*s,-2.6*s);x.lineTo(sx*4.4*s,0);x.stroke();x.fillStyle='#bbb';x.beginPath();x.ellipse(sx*4.4*s,0,.5*s,.15*s,0,0,7);x.fill()}
+ x.fillStyle='#c9a227';x.fillRect(-2.1*s,-4.0*s,4.2*s,2.2*s);x.fillStyle='#8e7a3a';x.fillRect(-2.1*s,-4.0*s,4.2*s,.4*s);
+ x.fillStyle='#b9bcc0';x.beginPath();x.moveTo(-1.9*s,-4.0*s);x.lineTo(1.9*s,-4.0*s);x.lineTo(1.5*s,-6.4*s);x.lineTo(-.4*s,-7.0*s);x.lineTo(-1.8*s,-6.0*s);x.fill();
+ x.fillStyle='#2d3036';x.beginPath();x.moveTo(-1.4*s,-5.6*s);x.lineTo(-.6*s,-5.0*s);x.lineTo(-.6*s,-5.9*s);x.fill();x.restore()}
+function astro(X,Y,s){x.save();x.translate(X,Y);x.fillStyle='#f2f2f2';x.fillRect(-.25*s,-.85*s,.2*s,.85*s);x.fillRect(.05*s,-.85*s,.2*s,.85*s);
+ x.beginPath();x.ellipse(0,-1.15*s,.33*s,.42*s,0,0,7);x.fill();x.beginPath();x.arc(0,-1.62*s,.18*s,0,7);x.fill();x.fillStyle='#c48a2a';x.beginPath();x.arc(.05*s,-1.62*s,.11*s,0,7);x.fill();x.restore()}
+function s4(t){const k=(t-21.2)/6.6;x.fillStyle='#000';x.fillRect(0,0,W,H);stars(k*40,0,.8,0);
+ // camera: start close on LM + astronaut, pull back + tilt up to reveal the 52 m lander
+ const pxm=lerp(70,19,eo(ss(.12,.62,k))); // px per metre
+ const gy=lerp(1250,1420,eo(ss(.12,.62,k)));
+ earthDisc(200,470,64,ss(.4,.7,k));
+ // ground
+ const g=x.createLinearGradient(0,gy,0,H);g.addColorStop(0,'#8a8781');g.addColorStop(1,'#3c3a37');x.fillStyle=g;x.fillRect(0,gy,W,H-gy);
+ const r=rnd(3);x.fillStyle='rgba(0,0,0,.18)';for(let i=0;i<30;i++){const cx=r()*W,cy=gy+r()*(H-gy),rr=6+r()*30;x.beginPath();x.ellipse(cx,cy,rr*2,rr*.5,0,0,7);x.fill()}
+ const lx=lerp(330,230,eo(ss(.12,.62,k))),hx=lerp(1100,740,eo(ss(.12,.62,k)));
+ // lander shadow + lander
+ x.save();x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.ellipse(hx,gy+6,9*pxm,1.2*pxm,0,0,7);x.fill();x.restore();
+ starshipStack(hx,gy,52*pxm,false,'hls');lm(lx,gy,pxm);astro(lx+6.2*pxm,gy,pxm);
+ // brackets
+ const ba=ss(.55,.68,k);if(ba>0){x.save();x.globalAlpha=ba;x.strokeStyle='#ffd27a';x.lineWidth=5;const bx=hx+7.8*pxm;x.beginPath();x.moveTo(bx-14,gy-52*pxm);x.lineTo(bx,gy-52*pxm);x.lineTo(bx,gy);x.lineTo(bx-14,gy);x.stroke();
+  const ax=lx-5.4*pxm;x.beginPath();x.moveTo(ax+14,gy-7*pxm);x.lineTo(ax,gy-7*pxm);x.lineTo(ax,gy);x.lineTo(ax+14,gy);x.stroke();x.restore()}
+ T('52 m',hx+7.8*pxm-8,gy-26*pxm,64,'#ffd27a',ba,'Anton','right');
+ T('APOLLO LANDER',Math.max(lx,300),gy-7*pxm-80,44,'#fff',ss(.05,.15,k)*(1-ss(.5,.56,k)),'Mont');
+ T('7 m',lx,gy-7*pxm-45,56,'#ffd27a',ba);
+ T('WHY?',540,450,120,'#fff',pop(t,21.3,23.4));
+ T('THE LANDER IS A',330,700,76,'#fff',pop(t,23.5,27.8));T('WHOLE STARSHIP',330,790,76,'#ffd27a',pop(t,23.5,27.8))}
+// ---------- SCENE 5: lander launch 13 docks, fills, leaves for the Moon (27.8 - 31.6) ----------
+function s5(t){const k=(t-27.8)/3.8;orbitBg(t,(t-27.8)*30+300);
+ // depot stays; lander approaches from left, docks under, then fires to the right
+ shipH(DEP.x,DEP.y,DEP.L,'ship',0);
+ let X,Y,ang=0;if(k<.32){const u=eo(k/.32);X=lerp(-400,540,u);Y=lerp(1750,1185,u);ang=lerp(-.5,0,u)}else if(k<.62){X=540;Y=1185}
+ else{const u=ei((k-.62)/.38);X=lerp(540,1900,u);Y=lerp(1185,760,u);ang=lerp(0,-.32,u)}
+ if(k<.32||k>.62)plume(X-DEP.L*.45*Math.cos(ang),Y-DEP.L*.45*Math.sin(ang),k>.62?240:110,k>.62?60:34,t,ang+Math.PI/2);
+ shipH(X,Y,DEP.L*.9,'hls',ang);
+ if(k>=.32&&k<.62){x.save();x.globalCompositeOperation='lighter';x.globalAlpha=.85*Math.sin((k-.32)/.3*Math.PI);x.fillStyle='rgba(120,200,255,.9)';x.fillRect(470,1065,140,50);x.restore()}
+ fuelBar(1-ss(.32,.62,k)*.9,ss(0,.08,k)*(1-ss(.9,1,k)));
+ counter(13,'LAUNCH 13: THE LANDER',ss(0,.08,k)*(1-ss(.94,1,k)))}
+// ---------- SCENE 6: payoff + follow line + loop (31.6 - D) ----------
+function s6(t){const k=(t-31.6)/(D-31.6);x.fillStyle='#000';x.fillRect(0,0,W,H);stars(-k*200,0,.9,0);
+ moonDisc(540,1000,lerp(300,420,eo(k)),1);
+ // the lander streaks toward the Moon
+ const u=eo(ss(0,.6,k));const X=lerp(-200,420,u),Y=lerp(1500,1180,u);if(u<.99){plume(X-60*Math.cos(-.5),Y+60*Math.sin(.5),120,30,t,-.5+Math.PI/2);shipH(X,Y,160,'hls',-.5)}
+ T('13+ LAUNCHES',540,475,140,'#ffd27a',pop(t,31.7,D-1.15));T('DID YOU GUESS RIGHT?',540,610,58,'#fff',pop(t,32.1,D-1.15),'Mont');
+ T('Follow → a new one tomorrow',540,1390,46,'#fff',pop(t,D-1.15,D-.25),'Mont')}
+function draw(t){x.save();x.globalAlpha=1;x.clearRect(0,0,W,H);
+ if(t<6.0)s1(t);else if(t<10.0)s2(t);else if(t<21.2)s3(t);else if(t<27.8)s4(t);else if(t<31.6)s5(t);else s6(t);
+ // whip transitions: short dark blur flash at cuts
+ for(const c of[6.0,10.0,21.2,27.8,31.6]){const d=Math.abs(t-c);if(d<.18){x.fillStyle='rgba(0,0,0,'+(.55*(1-d/.18))+')';x.fillRect(0,0,W,H)}}
+ // loop: last 0.25 s crossfade into the first frame
+ if(t>D-.25){x.globalAlpha=ss(D-.25,D,t);s1(0)}
+ x.restore()}
+window.draw=draw;
+</script>
