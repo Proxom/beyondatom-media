@@ -3,7 +3,12 @@
 // Sources: NASA NSSDC Earth (9.82) and Moon (1.62 m/s^2) fact sheets; g = G M / R^2 from NSSDC satellite fact sheets:
 //   Europa 480.0e20 kg, 1560.8 km -> 1.315; Triton 214e20 kg, 1353.4 km -> 0.780; Titania 34.2e20 kg, 788.9 km -> 0.367 m/s^2.
 //   Planet spin ignored.
-const D=22.9,LOOP=22.45,FPS=30,W=1080,H=1920;
+// LS (landscape 1920x1080, for the Saturday long video): set window.LS=true before loading, or ?ls=1. Portrait output is unchanged.
+const LS=typeof window!=='undefined'&&(window.LS===true||/[?&]ls=1/.test(window.location.search));
+const D=22.9,LOOP=22.45,FPS=30,W=LS?1920:1080,H=LS?1080:1920;
+// screen layout (y positions of text rows etc.)
+const LY=LS?{CX:960,card:118,cardMax:1500,cardSz:74,foot:250,name:292,timer:338,height:376,chip:440,rulerTop:470,beamTop:455,band:[0,500],follow:560,plDy:-370,rulerX:30}
+ :{CX:495,card:412,cardMax:860,cardSz:68,foot:548,name:612,timer:660,height:702,chip:780,rulerTop:830,beamTop:800,band:[250,760],follow:962,plDy:0,rulerX:66};
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},eio=t=>{t=cl(t);return t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2};
 const lerp=(a,b,k)=>a+(b-a)*k;
 const GE=9.82,HE=0.5,V0=Math.sqrt(2*GE*HE),TL=0.55;
@@ -14,8 +19,9 @@ const WORLDS=[
  {name:'EUROPA',g:gm(480.0e20,1560.8e3),x0:408,x1:582,cx:495},
  {name:'TRITON',g:gm(214e20,1353.4e3),x0:582,x1:756,cx:669},
  {name:'TITANIA',g:gm(34.2e20,788.9e3),x0:756,x1:1080,cx:843}];
+if(LS)WORLDS.forEach((w,i)=>{w.x0=i*384;w.x1=(i+1)*384;w.cx=i*384+192;});
 for(const w of WORLDS){w.T=2*V0/w.g;w.h=V0*V0/(2*w.g);w.tA=TL+w.T/2;w.tD=TL+w.T;}
-const GY=1400,TOPY=745,S0=170;
+const GY=LS?960:1400,TOPY=LS?500:745,S0=LS?150:170;
 // body (m)
 const B={thigh:.45,shin:.45,ank:.07,torso:.56,neck:.08,head:.125,ua:.30,fa:.28,foot:.2};
 const HIPEXT=B.thigh+B.shin+B.ank; // hip height with straight legs
@@ -84,4 +90,4 @@ function fmtH(h){return '↑ '+h.toFixed(1)+' m'}
 function hud(w,t){const fin=1-ease((t-(LOOP-0.65))/0.6);  // reset at the loop seam
  const el=cl(t-TL,0,w.T);const run=t>=TL&&t<w.tD;const done=t>=w.tD;
  return {timer:fmtT(fin<1&&t>LOOP-0.65?el*fin:el),timerOn:run?1:(done?0.75:0.45),hAl:(t>=w.tA?ease((t-w.tA)/0.3):0)*fin,hTxt:fmtH(w.h)};}
-if(typeof module!=='undefined')module.exports={LOOP,FOLLOW,HMAX,beamK,zk,S1,CHIP_T0,CHIP_DT,CHIP_OUT,D,FPS,WORLDS,V0,TL,GY,TOPY,S0,CARDS,jumper,joints,scale,HEADTOP,hud,B};
+if(typeof module!=='undefined')module.exports={LS,LY,W,H,LOOP,FOLLOW,HMAX,beamK,zk,S1,CHIP_T0,CHIP_DT,CHIP_OUT,D,FPS,WORLDS,V0,TL,GY,TOPY,S0,CARDS,jumper,joints,scale,HEADTOP,hud,B};
