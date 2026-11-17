@@ -4,7 +4,7 @@ outlier: "Why does Starship need 12+ launches to reach the Moon?" (Everyday Astr
 style: A (side-by-side comparison + live launch counter) · series "Who Lands / Wins First?" (Apollo vs Starship) · family Q · 1M+ list #8 · slot 18 Nov 2026 17:00 Europe/London
 topic key: starship refueling — not in registry
 tags: starship, spacex, saturn v, apollo, moon landing, artemis, orbital refueling, space
-alt: Original animation with real NASA photos of Earth and the Moon, with narration. Under the question How many launches to the Moon?, a Saturn V and a Starship lift off side by side, labelled Apollo 1 and Starship question mark. Apollo: 1 launch, a dashed path from Earth straight to the Moon. In orbit above Earth, a Starship fuel depot arrives as launch 1, then tanker Starships dock under it one after another while a counter climbs to 12 and a depot fuel bar fills. Why? On the Moon, the 7 m Apollo lunar module and an astronaut stand next to the 52 m Starship lander: the lander is a whole Starship. Launch 13, the lander, docks, refuels and fires toward the Moon. 13+ launches. Did you guess right? A follow line, then it loops.
+alt: Original animation with real NASA photos of Earth and the Moon, with narration. Under the question How many launches to the Moon?, a Saturn V and a Starship lift off side by side, labelled Saturn V 1 and Starship question mark. Apollo: 1 launch, a dashed path from Earth straight to the Moon. In orbit above Earth, a Starship fuel depot arrives as launch 1, then tanker Starships dock under it one after another (tanker 1 to tanker 11) while a launch counter climbs to 12 and a depot fuel bar fills. Why? On the Moon, the 7 m Apollo lunar module and an astronaut stand next to the 52 m Starship lander: the lander is a whole Starship, and it must refill its tanks in orbit before it can land and climb back up. Launch 13, the lander, docks, refuels and fires toward the Moon. 13+ Starship launches. Did you guess right? A follow line, then it loops.
 
 ## Description
 How many did you guess? 👇
@@ -15,7 +15,7 @@ Apollo landed on the Moon with one Saturn V launch. NASA's plan for Starship nee
 3. The uncrewed Starship lander launches last, docks with the depot, refuels, and flies on to lunar orbit to wait for the astronauts.
 Depot + more than 10 tankers + lander = at least 13 launches. The astronauts launch separately on NASA's SLS rocket and Orion spacecraft.
 
-Why so many? The lander is a whole Starship, about 52 m (171 ft) tall. Apollo's lunar module was 7 m (22 ft 11 in).
+Why so many? The lander is a whole Starship, about 52 m (171 ft) tall (Apollo's lunar module was 7 m, 22 ft 11 in), and it must refuel in orbit before it can fly to the Moon, land and climb back up to lunar orbit.
 The final count is still open: in October 2026 a member of NASA's Aerospace Safety Advisory Panel said the latest estimate was around 22 flights, while SpaceX's CEO said 6 to 8. The first big ship-to-ship propellant transfer test will help settle it.
 
 About the video: an original animation. The lunar module, astronaut and Starship lander are drawn to scale with each other; sizes and distances in the Earth, orbit and Moon scenes are not to scale. Earth and the Moon are real NASA images.

@@ -5,11 +5,11 @@
      Facts: Apollo = one Saturn V launch per landing (NASA). Starship plan (NASA OIG IG-26-004, Mar 2026): a storage depot launches first,
      then more than 10 Starship tankers fill it (SpaceX targets one tanker every 6 days), then the uncrewed lander launches, refuels at the
      depot and flies on to lunar orbit. Depot 1 + 11 tankers + lander 1 = 13 launches (minimum consistent with "more than 10 tankers").
-     Lander height 171 ft = 52 m (OIG); Apollo LM 22 ft 11 in = 7.0 m (NASA). Scene 4 draws LM, Starship lander and astronaut to scale
+     Lander height 171 ft = 52 m (OIG); Apollo LM 22 ft 11 in = 7.0 m (NASA). Scene 4 (21.2-28.4) draws LM, Starship lander and astronaut to scale
      with each other. Earth/Moon distances and sizes in scenes 2/3/5 are NOT to scale (said in the description).
      Images: Earth = NASA AS17-148-22727; Moon = NASA GSFC/LRO "Full Moon" GSFC_20171208_Archive_e000868 (both public domain). -->
 <script>
-const W=1080,H=1920,D=35.5;
+const W=1080,H=1920,D=36.5;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ss=(a,b,v)=>{const t=cl((v-a)/(b-a));return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
 const eo=k=>1-Math.pow(1-cl(k),3), ei=k=>Math.pow(cl(k),2.2);
 function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
@@ -70,11 +70,11 @@ function earthDisc(cx,cy,r,al){// AS17 image: disc ~ fills frame; crop slightly 
  x.fillStyle=a;x.beginPath();x.arc(cx,cy,r*1.06,0,7);x.fill();x.restore()}
 function moonDisc(cx,cy,r,al){if(al<=0)return;x.save();x.globalAlpha=al;x.beginPath();x.arc(cx,cy,r,0,7);x.clip();const k=r/0.845;x.drawImage(MOON,cx-k*1.0,cy-k*1.005,2*k,2*k);x.restore()}
 // ---------- counter (top), one at a time ----------
-function counter(n,sub,al,big){if(al<=0)return;T(String(n),540,525,190,'#ffd27a',al);if(sub)T(sub,540,675,58,'#fff',al)}
+function counter(n,sub,al,pu){if(al<=0)return;T(String(n),540,545,Math.round(190*(1+.12*(pu||0))),'#ffd27a',al);if(sub)T(sub,540,675,58,'#fff',al)}
 // ---------- SCENE 1: side-by-side liftoff (0 - 6.0) ----------
 function s1(t){const sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#05070f');sky.addColorStop(.55,'#1b2440');sky.addColorStop(.8,'#5a4a5c');sky.addColorStop(1,'#d08a58');
  x.fillStyle=sky;x.fillRect(0,0,W,H);stars(0,0,.55,0);
- const rise=t=>18*t+16*t*t; // px climb
+ const rise=t=>40+18*t+16*t*t; // px climb
  const cam=rise(t)*.86; // camera follows: ground drops away
  const gy=1560+cam; // ground line
  // ground + pads
@@ -88,8 +88,8 @@ function s1(t){const sky=x.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#05
  plume(640,yST,460+t*60,82,t);starshipStack(640,yST,hpX,true,'ship');
  // labels near the bottom of the text-safe area
  const la=1-ss(5.6,6.0,t);
- T('APOLLO',165,1040,58,'#fff',la);T('STARSHIP',815,1040,58,'#fff',la);
- T('1',165,1150,130,'#ffd27a',la);T('?',815,1150,130,'#ffd27a',la);
+ T('SATURN V',170,1040,50,'#fff',la);T('STARSHIP',815,1040,58,'#fff',la);
+ T('1',170,1150,130,'#ffd27a',la);T('?',815,1150,130,'#ffd27a',la);
  // hook question
  const qa=1-ss(5.6,6.0,t);T('HOW MANY LAUNCHES',540,422,96,'#fff',qa);T('TO THE MOON?',540,527,96,'#fff',qa)}
 // ---------- SCENE 2: Apollo, one launch straight to the Moon (6.0 - 10.0) ----------
@@ -109,9 +109,9 @@ function orbitBg(t,drift){x.fillStyle='#000';x.fillRect(0,0,W,H);stars(-drift,0,
  // Earth limb filling the lower part
  earthDisc(540+Math.sin(t*.05)*20,H+1500,2350,1)}
 const DEP={x:540,y:1010,L:820};
-function fuelBar(f,al){if(al<=0)return;x.save();x.globalAlpha=al;const X0=200,Y0=1330,Wd=680,Hh=34;x.fillStyle='rgba(0,0,0,.55)';x.fillRect(X0-6,Y0-6,Wd+12,Hh+12);
+function fuelBar(f,al){if(al<=0)return;x.save();x.globalAlpha=al;const X0=200,Y0=790,Wd=680,Hh=34;x.fillStyle='rgba(0,0,0,.55)';x.fillRect(X0-6,Y0-6,Wd+12,Hh+12);
  const g=x.createLinearGradient(X0,0,X0+Wd,0);g.addColorStop(0,'#3aa0ff');g.addColorStop(1,'#8fd4ff');x.fillStyle=g;x.fillRect(X0,Y0,Wd*cl(f),Hh);
- x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=3;x.strokeRect(X0,Y0,Wd,Hh);x.restore();T('DEPOT FUEL',540,1405,40,'#cfe8ff',al,'Mont')}
+ x.strokeStyle='rgba(255,255,255,.8)';x.lineWidth=3;x.strokeRect(X0,Y0,Wd,Hh);x.restore();T('DEPOT FUEL',540,865,40,'#cfe8ff',al,'Mont')}
 // tanker schedule: 11 tankers, launch index 2..12
 const TK=(()=>{const a=[];let s=12.6;const gaps=[2.0,1.4,1.0,.75,.6,.5,.45,.42,.4,.4,.4];for(let i=0;i<11;i++){a.push(s);s+=gaps[i]}return a})(); // arrival times
 function tanker(t,ta){// approaches from lower-left, docks under the depot, transfers, then leaves to the right/down
@@ -126,10 +126,10 @@ function s3(t){orbitBg(t,(t-10)*30);
  // depot arrives first
  const da=ss(10.0,11.6,t);const dx=lerp(1500,DEP.x,eo(da)),dy=lerp(760,DEP.y,eo(da));
  if(da<1)plume(dx-DEP.L*.5,dy,140,40,t,Math.PI/2);shipH(dx,dy,DEP.L,'ship',0);
- let n=1,f=0;for(let i=0;i<11;i++){tanker(t,TK[i]);if(t>=TK[i])n=2+i;f+=cl((t-TK[i])/.55)/11}
+ let n=1,f=0,pu=0;for(let i=0;i<11;i++){tanker(t,TK[i]);if(t>=TK[i])n=2+i;f+=cl((t-TK[i])/.55)/11;const d=t-TK[i];if(d>=0&&d<.3)pu=Math.max(pu,Math.sin(d/.3*Math.PI))}
  fuelBar(f,ss(12.2,12.6,t)*(1-ss(20.9,21.2,t)));
  const ca=ss(10.15,10.45,t)*(1-ss(20.9,21.2,t));
- counter(n,n==1?'LAUNCH 1: FUEL DEPOT':(n-1)+(n==2?' TANKER':' TANKERS'),ca)}
+ counter(n,n==1?'FUEL DEPOT':'TANKER '+(n-1),ca,pu)}
 // ---------- SCENE 4: lunar surface, to scale: astronaut 1.8 m, Apollo LM 7.0 m, Starship lander 52 m (21.2 - 27.8) ----------
 function lm(X,Y,s){x.save();x.translate(X,Y);// 7.0 m tall, ~9.4 m across legs
  x.strokeStyle='#c9c9c9';x.lineWidth=Math.max(1.5,.18*s);for(const sx of[-1,1]){x.beginPath();x.moveTo(sx*2*s,-2.6*s);x.lineTo(sx*4.4*s,0);x.stroke();x.fillStyle='#bbb';x.beginPath();x.ellipse(sx*4.4*s,0,.5*s,.15*s,0,0,7);x.fill()}
@@ -138,7 +138,7 @@ function lm(X,Y,s){x.save();x.translate(X,Y);// 7.0 m tall, ~9.4 m across legs
  x.fillStyle='#2d3036';x.beginPath();x.moveTo(-1.4*s,-5.6*s);x.lineTo(-.6*s,-5.0*s);x.lineTo(-.6*s,-5.9*s);x.fill();x.restore()}
 function astro(X,Y,s){x.save();x.translate(X,Y);x.fillStyle='#f2f2f2';x.fillRect(-.25*s,-.85*s,.2*s,.85*s);x.fillRect(.05*s,-.85*s,.2*s,.85*s);
  x.beginPath();x.ellipse(0,-1.15*s,.33*s,.42*s,0,0,7);x.fill();x.beginPath();x.arc(0,-1.62*s,.18*s,0,7);x.fill();x.fillStyle='#c48a2a';x.beginPath();x.arc(.05*s,-1.62*s,.11*s,0,7);x.fill();x.restore()}
-function s4(t){const k=(t-21.2)/6.6;x.fillStyle='#000';x.fillRect(0,0,W,H);stars(k*40,0,.8,0);
+function s4(t){const k=(t-21.2)/7.2;x.fillStyle='#000';x.fillRect(0,0,W,H);stars(k*40,0,.8,0);
  // camera: start close on LM + astronaut, pull back + tilt up to reveal the 52 m lander
  const pxm=lerp(70,19,eo(ss(.12,.62,k))); // px per metre
  const gy=lerp(1250,1420,eo(ss(.12,.62,k)));
@@ -146,7 +146,7 @@ function s4(t){const k=(t-21.2)/6.6;x.fillStyle='#000';x.fillRect(0,0,W,H);stars
  // ground
  const g=x.createLinearGradient(0,gy,0,H);g.addColorStop(0,'#8a8781');g.addColorStop(1,'#3c3a37');x.fillStyle=g;x.fillRect(0,gy,W,H-gy);
  const r=rnd(3);x.fillStyle='rgba(0,0,0,.18)';for(let i=0;i<30;i++){const cx=r()*W,cy=gy+r()*(H-gy),rr=6+r()*30;x.beginPath();x.ellipse(cx,cy,rr*2,rr*.5,0,0,7);x.fill()}
- const lx=lerp(330,230,eo(ss(.12,.62,k))),hx=lerp(1100,740,eo(ss(.12,.62,k)));
+ const lx=lerp(330,230,eo(ss(.12,.62,k))),hx=lerp(1250,740,eo(ss(.12,.62,k)));
  // lander shadow + lander
  x.save();x.fillStyle='rgba(0,0,0,.35)';x.beginPath();x.ellipse(hx,gy+6,9*pxm,1.2*pxm,0,0,7);x.fill();x.restore();
  starshipStack(hx,gy,52*pxm,false,'hls');lm(lx,gy,pxm);astro(lx+6.2*pxm,gy,pxm);
@@ -157,9 +157,9 @@ function s4(t){const k=(t-21.2)/6.6;x.fillStyle='#000';x.fillRect(0,0,W,H);stars
  T('APOLLO LANDER',Math.max(lx,300),gy-7*pxm-80,44,'#fff',ss(.05,.15,k)*(1-ss(.5,.56,k)),'Mont');
  T('7 m',lx,gy-7*pxm-45,56,'#ffd27a',ba);
  T('WHY?',540,450,120,'#fff',pop(t,21.3,23.4));
- T('THE LANDER IS A',330,700,76,'#fff',pop(t,23.5,27.8));T('WHOLE STARSHIP',330,790,76,'#ffd27a',pop(t,23.5,27.8))}
+ T('THE LANDER IS A',330,700,76,'#fff',pop(t,23.5,28.4));T('WHOLE STARSHIP',330,790,76,'#ffd27a',pop(t,23.5,28.4))}
 // ---------- SCENE 5: lander launch 13 docks, fills, leaves for the Moon (27.8 - 31.6) ----------
-function s5(t){const k=(t-27.8)/3.8;orbitBg(t,(t-27.8)*30+300);
+function s5(t){const k=(t-28.4)/3.8;orbitBg(t,(t-28.4)*30+300);
  // depot stays; lander approaches from left, docks under, then fires to the right
  shipH(DEP.x,DEP.y,DEP.L,'ship',0);
  let X,Y,ang=0;if(k<.32){const u=eo(k/.32);X=lerp(-400,540,u);Y=lerp(1750,1185,u);ang=lerp(-.5,0,u)}else if(k<.62){X=540;Y=1185}
@@ -168,18 +168,18 @@ function s5(t){const k=(t-27.8)/3.8;orbitBg(t,(t-27.8)*30+300);
  shipH(X,Y,DEP.L*.9,'hls',ang);
  if(k>=.32&&k<.62){x.save();x.globalCompositeOperation='lighter';x.globalAlpha=.85*Math.sin((k-.32)/.3*Math.PI);x.fillStyle='rgba(120,200,255,.9)';x.fillRect(470,1065,140,50);x.restore()}
  fuelBar(1-ss(.32,.62,k)*.9,ss(0,.08,k)*(1-ss(.9,1,k)));
- counter(13,'LAUNCH 13: THE LANDER',ss(0,.08,k)*(1-ss(.94,1,k)))}
+ counter(13,'THE LANDER',ss(0,.08,k)*(1-ss(.94,1,k)))}
 // ---------- SCENE 6: payoff + follow line + loop (31.6 - D) ----------
-function s6(t){const k=(t-31.6)/(D-31.6);x.fillStyle='#000';x.fillRect(0,0,W,H);stars(-k*200,0,.9,0);
+function s6(t){const k=(t-32.2)/(D-32.2);x.fillStyle='#000';x.fillRect(0,0,W,H);stars(-k*200,0,.9,0);
  moonDisc(540,1000,lerp(300,420,eo(k)),1);
  // the lander streaks toward the Moon
  const u=eo(ss(0,.6,k));const X=lerp(-200,420,u),Y=lerp(1500,1180,u);if(u<.99){plume(X-60*Math.cos(-.5),Y+60*Math.sin(.5),120,30,t,-.5+Math.PI/2);shipH(X,Y,160,'hls',-.5)}
- T('13+ LAUNCHES',540,475,140,'#ffd27a',pop(t,31.7,D-1.15));T('DID YOU GUESS RIGHT?',540,610,58,'#fff',pop(t,32.1,D-1.15),'Mont');
+ T('13+ STARSHIP',540,440,120,'#ffd27a',pop(t,32.3,D-1.15));T('LAUNCHES',540,560,120,'#ffd27a',pop(t,32.3,D-1.15));T('DID YOU GUESS RIGHT?',540,680,58,'#fff',pop(t,32.7,D-1.15),'Mont');
  T('Follow → a new one tomorrow',540,1390,46,'#fff',pop(t,D-1.15,D-.25),'Mont')}
 function draw(t){x.save();x.globalAlpha=1;x.clearRect(0,0,W,H);
- if(t<6.0)s1(t);else if(t<10.0)s2(t);else if(t<21.2)s3(t);else if(t<27.8)s4(t);else if(t<31.6)s5(t);else s6(t);
+ if(t<6.0)s1(t);else if(t<10.0)s2(t);else if(t<21.2)s3(t);else if(t<28.4)s4(t);else if(t<32.2)s5(t);else s6(t);
  // whip transitions: short dark blur flash at cuts
- for(const c of[6.0,10.0,21.2,27.8,31.6]){const d=Math.abs(t-c);if(d<.18){x.fillStyle='rgba(0,0,0,'+(.55*(1-d/.18))+')';x.fillRect(0,0,W,H)}}
+ for(const c of[6.0,10.0,21.2,28.4,32.2]){const d=Math.abs(t-c);if(d<.18){x.fillStyle='rgba(0,0,0,'+(.55*(1-d/.18))+')';x.fillRect(0,0,W,H)}}
  // loop: last 0.25 s crossfade into the first frame
  if(t>D-.25){x.globalAlpha=ss(D-.25,D,t);s1(0)}
  x.restore()}

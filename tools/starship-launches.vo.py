@@ -10,9 +10,9 @@ L = {
  'l3': "Apollo: one rocket, straight to the Moon.",
  'l4': "Starship starts with a fuel depot in orbit.",
  'l5': "Then more than ten tanker launches fill it up. SpaceX aims for one every six days.",
- 'l6': "Why? Because its Moon lander is a whole Starship, more than seven times taller than Apollo's lander.",
+ 'l6': "Why? The lander is a whole Starship. It has to refill its tanks in orbit before it can land and climb back up.",
  'l7': "It launches last, fills up at the depot, and heads for the Moon.",
- 'l8': "Thirteen launches, at least. Did you guess right?",
+ 'l8': "Thirteen Starship launches, at least. Did you guess right?",
 }
 for n, s in L.items():
     a, sr = k.create(s, voice='am_michael', speed=1.08, lang='en-us')
