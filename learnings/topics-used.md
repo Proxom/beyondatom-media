@@ -66,6 +66,7 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 49 | 15 Kas 17:00 | How Fast Is This Room Moving? 🚀 | iss interior tour | yayında |
 | 50 | 16 Kas 17:00 | What's Really Inside a Black Hole? 🕳️ | black hole interior | planlı (Metricool 428599926) |
 | 51 | 17 Kas 17:00 | What If You Grew 1 cm Every Second? 📏 | grow 1 cm per second | planlı (Metricool 428856294) |
+| 52 | 18 Kas 17:00 | How Many Launches to Land Starship on the Moon? 🚀 | starship refueling | planlı (Metricool 430989202) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
