@@ -88,9 +88,9 @@ function lane(i,w,u,s,t){const top=LT[i],LH=LHS[i],gy=top+LH-GOFF;x.save();x.beg
  txt(w.n,72,top+48,44,'#fff',1,'Anton','left');x.font='44px Anton';const nw=x.measureText(w.n).width;txt('g = '+w.g.toFixed(2)+' m/s²',72+nw+14,top+46,24,'rgba(240,244,250,.92)',1,'Mont','left');
  const dist=b?b[0]:0;const win=done&&i==3;txt(dist.toFixed(1)+' m',920,top+56,50*pop,win?'#9df0bf':(done?'#ffffff':'#ffd166'),u>-0.1?1:ease((u+0.4)/.3),'Anton','right');
  if(done){txt(w.T.toFixed(1)+' s in the air',920,top+88,22,'rgba(240,244,250,.92)',ease(k/.3),'Mont','right')}}
-const CARDS=[[0,3.0,'SAME THROW, 4 WORLDS','WHO THROWS FARTHEST?'],[3.0,6.0,'SAME SPEED: 36 km/h','SAME ANGLE: 45°'],[6.0,10.3,'THE MOON:','9 SECONDS IN THE AIR'],
- [10.3,13.4,'PLUTO:','STILL IN THE AIR…'],[13.4,17.4,'GUESS: HOW FAR?','COMMENT BEFORE IT LANDS'],[17.4,22.75,'PLUTO PULLS','16× WEAKER THAN EARTH'],
- [22.8,26.4,'163 m!','14× FARTHER THAN EARTH'],[26.4,28.2,'WHICH WORLD WOULD','YOU THROW ON?'],[28.2,29.2,'FOLLOW →','NEW RACE TOMORROW'],[29.2,D+1,'SAME THROW, 4 WORLDS','WHO THROWS FARTHEST?']];
+const CARDS=[[0,3.0,'SAME THROW, 4 WORLDS','WHO THROWS FARTHEST?'],[3.0,6.0,'EARTH: 11.5 m','MARS: 28.2 m'],[6.0,10.3,'THE MOON:','9 SECONDS IN THE AIR'],
+ [10.3,13.4,'PLUTO: STILL IN THE AIR…','SAME SPEED, MORE AIR TIME'],[13.4,17.4,'GUESS: HOW FAR?','COMMENT BEFORE IT LANDS'],[17.4,22.75,'PLUTO PULLS','16 TIMES WEAKER THAN EARTH'],
+ [22.8,26.4,'163 m!','14 TIMES FARTHER THAN EARTH'],[26.4,27.75,'WHICH WORLD WOULD','YOU THROW ON?'],[27.75,29.2,'FOLLOW →','MORE EVERY DAY'],[29.2,D+1,'SAME THROW, 4 WORLDS','WHO THROWS FARTHEST?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,78,820),l2?fit(l2,80,820):99);const pop=(l1=='163 m!')?1+0.1*Math.exp(-(t-a)/.15):1;txt(l1,495,404,sz*pop,'#fff',al);if(l2)txt(l2,495,404+sz*1.08,sz,'#ffd166',al)}}
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
@@ -104,7 +104,7 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
  // winner glow on Pluto after landing
  const kp=u-R0-WD[3].T;if(kp>0&&t<29.2){x.save();x.globalAlpha=.5*ease(kp/.4);x.strokeStyle='#9df0bf';x.lineWidth=4;x.strokeRect(6,LT[3]+6,W-12,LHS[3]-12);x.restore()}
  cards(t);
- const fa=(t<3.0?ease((3.0-t)/.3):0)+(t>29.2?ease((t-29.2)/.3):0);txt('released 1.5 m up · no air drag',495,521,24,'#eef2f8',fa,'Mont');
+ const fa=(t<3.0?ease((3.0-t)/.3):0)+(t>29.2?ease((t-29.2)/.3):0);txt('36 km/h at 45° · released 1.5 m up · no air drag',495,521,24,'#eef2f8',fa,'Mont');
  g=x.createRadialGradient(540,980,560,540,980,1300);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=g;x.fillRect(0,0,W,H);}
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true});
 </script>

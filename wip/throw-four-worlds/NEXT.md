@@ -9,3 +9,8 @@ Mix: tools/mix-vo.py vo bed.wav mix0.wav 30.0 l1=0.1 l2=3.25 l3=5.25 l4=6.6 l5=9
 Encode: libx264 CRF 18, preset slow, 30 fps, AAC 192k.
 ## Gate (v1)
 1080x1920, 30 fps, CRF 18, AAC, 30.0 s; -15.2 LUFS, -2.4 dBTP; HF (>4 kHz) 24.4 dB below; first/last frame YAVG 101; text zones {}; spelling clean (only proper nouns).
+## Review
+r1 (v1): FACTS PASS (reviewer recomputed every number, checked NSSDC). Avg 7.0 (hook 6, visual 7, clarity 7, payoff 8).
+Fixes applied once (v2): 3-6 s card = "EARTH: 11.5 m / MARS: 28.2 m" (matches VO); hook subline "36 km/h at 45° · released 1.5 m up · no air drag";
+Pluto card gets "SAME SPEED, MORE AIR TIME" (explains equal Moon/Pluto counters); "×" -> "TIMES" (Anton renders × small); follow card 1.45 s, "FOLLOW → MORE EVERY DAY" (no race promise).
+Gate v2: same audio; 30.0 s, -15.2 LUFS, -2.4 dBTP; text zones {}; first/last frame YAVG ~101.
