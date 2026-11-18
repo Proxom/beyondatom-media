@@ -1,0 +1,92 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- bird-legs (series "Your Body in Space"): the fluid shift in weightlessness. NASA NTRS 19750006319 (Thornton, Hoffler & Rummel, Skylab 4, 1974):
+     by the earliest in-flight measurement on mission day 3, every crewman had lost more than 2 liters of fluid from the calf and thigh;
+     puffy face and "bird legs" were photographed; after landing a sharp reversal happened, mostly completed within a few hours.
+     The day-by-day course between day 0 and day 3 is NOT shown as numbers (only the day-3 measurement is known); the drawing exaggerates the shapes.
+     Earth photo: NASA AS17-148-22727 (public domain). -->
+<script>
+const W=1080,H=1920,FPS=30,D=28.0;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)};
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const R=rnd(21),STARS=[];for(let i=0;i<320;i++)STARS.push([R()*W,R()*H,R()*1.3+.3,R()]);
+const P=[];for(let i=0;i<110;i++)P.push([R(),R(),R()*2+2,R()]);
+const img=new Image();img.src='pl/as17-148-22727.jpg';
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=22;x.fillText(s,px,py);x.shadowBlur=6;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+// state over time: shift 0..1 (how far the fluid has moved up), earth 0..1 (back on Earth)
+function shiftAt(t){if(t<20.2)return ease((t-0.0)/12.3)*0.25+ease((t-6.5)/5.8)*0.75;return 1-ease((t-20.6)/3.2)}
+function earthAt(t){return t<20.0?0:(t<27.3?ease((t-20.0)/0.8):1-ease((t-27.3)/0.5))}
+const CX=470;
+function limbFluid(path,al){x.save();path();x.clip();const g=x.createLinearGradient(0,600,0,1420);g.addColorStop(0,'rgba(80,200,255,'+al[0]+')');g.addColorStop(1,'rgba(80,200,255,'+al[1]+')');x.fillStyle=g;x.fillRect(0,0,W,H);x.restore()}
+function person(sh,t,eg){const puff=sh,thin=sh,float=1-eg;const bob=Math.sin(t*0.9)*10*float;x.save();x.translate(0,bob);
+ const legW=64*(1-0.28*thin),legGap=24;
+ // legs
+ const lx=[CX-legGap/2-legW/2-6,CX+legGap/2+legW/2+6];
+ const legPath=(i)=>()=>{x.beginPath();x.roundRect(lx[i]-legW/2,1120,legW,280,legW*0.45)};
+ for(let i=0;i<2;i++){x.fillStyle='#e7b48f';legPath(i)();x.fill();x.fillStyle='#f2f2f2';x.fillRect(lx[i]-legW/2,1360,legW,40);
+  x.fillStyle='#2b2f36';x.beginPath();x.roundRect(lx[i]-legW/2-10,1392,legW+30,34,14);x.fill()}
+ // shorts
+ x.fillStyle='#b99a6b';x.beginPath();x.roundRect(CX-125,1010,250,150,22);x.fill();x.fillStyle='rgba(0,0,0,.15)';x.fillRect(CX-3,1060,6,100);
+ // arms (float up a little in space)
+ for(const s of [-1,1]){x.save();x.translate(CX+s*120,745);x.rotate(s*(0.12+0.5*float*ease(t/1.5)+0.05*Math.sin(t*1.2+s)));
+  x.fillStyle='#1f3c73';x.beginPath();x.roundRect(-30,-10,60,95,24);x.fill();x.fillStyle='#e7b48f';x.beginPath();x.roundRect(-24,70,48,230,22);x.fill();x.beginPath();x.arc(0,305,27,0,7);x.fill();x.restore()}
+ // torso (navy polo)
+ x.fillStyle='#24467f';x.beginPath();x.roundRect(CX-125,720,250,310,40);x.fill();x.fillStyle='#1a3563';x.beginPath();x.moveTo(CX-40,722);x.lineTo(CX,790);x.lineTo(CX+40,722);x.fill();
+ x.fillStyle='#ffd166';x.beginPath();x.arc(CX+60,800,16,0,7);x.fill();
+ // neck + head
+ x.fillStyle='#e0a982';x.fillRect(CX-28,660,56,70);
+ const hx=CX,hy=590,rx=78*(1+0.16*puff),ry=92*(1+0.07*puff);
+ x.fillStyle='#e7b48f';x.beginPath();x.ellipse(hx,hy,rx,ry,0,0,7);x.fill();
+ // hair (floats up in space)
+ x.fillStyle='#4a2f1f';x.beginPath();x.ellipse(hx,hy-ry*0.55-8*float,rx*1.02,ry*0.55+6*float,0,Math.PI,0);x.fill();
+ for(let i=-3;i<=3;i++){x.beginPath();x.ellipse(hx+i*rx*0.28,hy-ry*1.02-10*float*(1+Math.sin(t*2+i)*.3),14,22+16*float,i*0.12,0,7);x.fill()}
+ // face
+ x.fillStyle='#2b2f36';for(const s of [-1,1]){x.beginPath();x.ellipse(hx+s*rx*0.36,hy-6,9,11*(1-0.25*puff),0,0,7);x.fill()}
+ x.fillStyle='rgba(235,110,110,'+(0.18+0.35*puff)+')';for(const s of [-1,1]){x.beginPath();x.arc(hx+s*rx*0.55,hy+26,18+12*puff,0,7);x.fill()}
+ x.strokeStyle='#8a4b3a';x.lineWidth=5;x.beginPath();x.arc(hx,hy+34,22,0.2*Math.PI,0.8*Math.PI);x.stroke();
+ // fluid overlay: legs lose it, head and chest gain it
+ const legA=0.55*(1-0.85*sh),upA=0.10+0.42*sh;
+ for(let i=0;i<2;i++)limbFluid(legPath(i),[legA*0.8,legA]);
+ limbFluid(()=>{x.beginPath();x.ellipse(hx,hy,rx,ry,0,0,7)},[upA,upA*0.9]);
+ limbFluid(()=>{x.beginPath();x.roundRect(CX-125,720,250,310,40)},[upA*0.8,upA*0.35]);
+ // flowing particles (up in space, down when back on Earth)
+ const rate=t<20.2?(0.35+0.65*(1-cl((t-12.3)/4))*cl(t/0.5)):-(1-ease((t-24)/2));
+ for(const p of P){const lane=p[3]<.5?0:1,colx=p[3]<.34?lx[0]:(p[3]<.67?CX:lx[1]);let ph=(p[0]+t*0.18*rate*(1+p[1]))%1;if(ph<0)ph+=1;const y=1390-ph*780;
+  const xx=colx+(p[1]-.5)*(colx==CX?150:legW*0.6);const a=Math.sin(ph*Math.PI)*Math.abs(rate)*0.9;
+  x.fillStyle='rgba(170,235,255,'+a+')';x.beginPath();x.arc(xx,y,p[2],0,7);x.fill();if(Math.abs(rate)>.3){x.strokeStyle='rgba(170,235,255,'+a*.5+')';x.lineWidth=p[2];x.beginPath();x.moveTo(xx,y);x.lineTo(xx,y+(rate>0?24:-24));x.stroke()}}
+ x.restore();return {lx,legW,hy,rx}}
+function bottle(cxb,cyb,fill,al){if(al<=0.01)return;x.save();x.globalAlpha=al;x.translate(cxb,cyb);const w=120,h=330;
+ x.beginPath();x.moveTo(-18,-h/2);x.lineTo(18,-h/2);x.lineTo(18,-h/2+40);x.quadraticCurveTo(w/2,-h/2+80,w/2,-h/2+130);x.lineTo(w/2,h/2-16);x.quadraticCurveTo(w/2,h/2,w/2-16,h/2);x.lineTo(-w/2+16,h/2);x.quadraticCurveTo(-w/2,h/2,-w/2,h/2-16);x.lineTo(-w/2,-h/2+130);x.quadraticCurveTo(-w/2,-h/2+80,-18,-h/2+40);x.closePath();
+ x.save();x.clip();x.fillStyle='rgba(255,255,255,.12)';x.fillRect(-w,-h,2*w,2*h);x.fillStyle='rgba(80,200,255,.85)';const fy=h/2-(h-60)*fill;x.fillRect(-w,fy,2*w,h);x.restore();
+ x.strokeStyle='rgba(255,255,255,.9)';x.lineWidth=5;x.stroke();x.fillStyle='#fff';x.fillRect(-22,-h/2-22,44,24);x.restore();
+ txt('2 L',cxb,cyb+30,72,'#ffffff',al)}
+const CARDS=[[0,3.0,'IN SPACE, YOUR FLUIDS','MOVE UP'],[3.0,6.9,'GUESS: HOW MUCH LEAVES','YOUR LEGS IN 3 DAYS?'],[6.9,9.6,'ON EARTH, GRAVITY','PULLS FLUID DOWN'],[9.6,12.3,'IN SPACE, NOTHING','PULLS IT BACK DOWN'],
+ [12.3,15.6,'MORE THAN 2 LITERS','GONE FROM THE LEGS BY DAY 3'],[15.6,20.2,'PUFFY FACE +','SKINNY "BIRD LEGS"'],[20.2,24.2,'BACK ON EARTH:','MOST FLOWS BACK IN HOURS'],[24.2,26.0,'DID YOU','GUESS RIGHT?'],[26.0,27.3,'FOLLOW →','MORE EVERY DAY'],[27.3,D+1,'IN SPACE, YOUR FLUIDS','MOVE UP']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
+ const sz=Math.min(fit(l1,76,840),fit(l2,76,840));const pop=l1=='MORE THAN 2 LITERS'?1+.1*Math.exp(-(t-a)/.15):1;txt(l1,495,402,sz*pop,'#fff',al);txt(l2,495,402+sz*1.06,sz,'#ffd166',al)}}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ const u=t>=27.3?t-D:t;const tt=u<0?0:u;const sh=u<0?0:shiftAt(tt),eg=t>=27.3?0:earthAt(t);
+ // space background
+ const bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#04060d');bg.addColorStop(1,'#0a1426');x.fillStyle=bg;x.fillRect(0,0,W,H);
+ for(const st of STARS){x.globalAlpha=(.3+.5*st[3])*(1-eg);x.fillStyle='#fff';x.beginPath();x.arc((st[0]-t*4+W)%W,st[1],st[2],0,7);x.fill()}x.globalAlpha=1;
+ if(img.complete&&img.naturalWidth){x.save();x.globalAlpha=1-eg;x.translate(820,1640);x.rotate(t*0.01);x.drawImage(img,-520,-520,1040,1040);x.restore();
+  const ag=x.createRadialGradient(820,1640,500,820,1640,600);ag.addColorStop(0,'rgba(120,180,255,.5)');ag.addColorStop(1,'rgba(120,180,255,0)');x.globalAlpha=1-eg;x.fillStyle=ag;x.fillRect(200,1000,880,920);x.globalAlpha=1}
+ // Earth surface background (back on Earth)
+ if(eg>0){x.globalAlpha=eg;const sg=x.createLinearGradient(0,0,0,1430);sg.addColorStop(0,'#2a64b5');sg.addColorStop(1,'#a9d3f2');x.fillStyle=sg;x.fillRect(0,0,W,1430);x.fillStyle='#5f8f45';x.fillRect(0,1430,W,H-1430);x.globalAlpha=1}
+ person(sh,t,eg);
+ // labels on the body
+ const la=(t>=15.6&&t<20.2)?Math.min(ease((t-15.6)/.3),ease((20.2-t)/.3)):0;if(la>0){txt('PUFFY FACE',CX+250,600,46,'#9fe3ff',la,'Anton','left');txt('BIRD LEGS',CX+150,1290,46,'#9fe3ff',la,'Anton','left');
+  x.save();x.globalAlpha=la;x.strokeStyle='#9fe3ff';x.lineWidth=4;x.beginPath();x.moveTo(CX+245,588);x.lineTo(CX+120,592);x.moveTo(CX+145,1278);x.lineTo(CX+70,1270);x.stroke();x.restore()}
+ // day counter (top right of the figure)
+ const day=t<6.5?0:(t<12.3?3*ease((t-6.5)/5.8):3);const da=(t<20.2&&t<27.3)?1:0;if(da&&u>=0){txt('DAY '+Math.floor(day+1e-6),915,640,92,'#fff',1,'Anton','right');txt(t<6.5?'GRAVITY: OFF':(t<12.3?'IN ORBIT':'FIRST MEASUREMENT'),915,686,26,'#ffd9a0',1,'Mont','right')}
+ if(eg>0.3&&t<27.3){txt('GRAVITY: ON',915,686,26,'#ffd9a0',eg,'Mont','right')}
+ // 2-liter bottle at the answer
+ const ba=(t>=12.3&&t<15.8)?Math.min(ease((t-12.3)/.25),ease((15.8-t)/.3)):0;bottle(830,1040,ease((t-12.4)/1.2),ba);
+ const g=x.createLinearGradient(0,250,0,560);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.35,'rgba(0,0,0,.45)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,250,W,310);
+ cards(t);}
+Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont'),new Promise(r=>{if(img.complete)r();img.onload=r;img.onerror=r})]).then(()=>{window.TEXREADY=true});
+</script>
