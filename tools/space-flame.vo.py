@@ -7,7 +7,7 @@ L = {
  'l3': "On Earth, hot air rises and pulls fresh air in. That stretches the flame.",
  'l4': "In orbit, there is no up. Fresh air only drifts in slowly.",
  'l5': "So the flame is round, small, and dim blue.",
- 'l6': "On the Mir space station, some burned for up to forty-five minutes!",
+ 'l6': "On the Shuttle, under a minute. But on Mir, up to forty-five minutes!",
  'l7': "Before it goes out, it pulses about once a second.",
  'l8': "Did you guess right?",
 }

@@ -8,7 +8,7 @@
      NASA image article "Candle Flame – 1g vs Microgravity": on Earth buoyant convection makes the flame teardrop-shaped and yellow (soot); in microgravity it is round, soot-free and blue.
      Drawing: flames are scaled up together (same scale for both); air-flow particles are illustrative. -->
 <script>
-const W=1080,H=1920,FPS=30,D=28.0;
+const W=1080,H=1920,FPS=30,D=28.5;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)};
 const cv=document.getElementById('c'),x=cv.getContext('2d');
 function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
@@ -26,11 +26,11 @@ function earthFlame(cx,t){const fl=1+0.06*Math.sin(t*13)+0.04*Math.sin(t*7.3),sw
  x.save();x.beginPath();x.moveTo(cx,by+8);x.bezierCurveTo(cx-w*0.75,by-h*0.15,cx-w*0.5+sway,by-h*0.75,cx+sway*1.6,by-h);x.bezierCurveTo(cx+w*0.5+sway,by-h*0.75,cx+w*0.75,by-h*0.15,cx,by+8);
  const fg=x.createLinearGradient(0,by,0,by-h);fg.addColorStop(0,'#3d6bff');fg.addColorStop(.12,'#ffb347');fg.addColorStop(.45,'#ffe27a');fg.addColorStop(1,'#fff6d0');x.fillStyle=fg;x.fill();
  x.globalCompositeOperation='screen';x.fillStyle='rgba(255,255,240,.35)';x.beginPath();x.ellipse(cx,by-h*0.35,w*0.22,h*0.28,0,0,7);x.fill();x.restore()}
-function orbitFlame(cx,t,life){if(life<=0)return;const puls=t>22.0&&t<24.8?1+0.3*Math.sin(2*Math.PI*(t-22.0))*ease((t-22.0)/1.2):1;const r=7.5*S*puls*Math.min(1,life),by=TOPY+4;
- const gl=x.createRadialGradient(cx,by,r*0.3,cx,by,r*3);gl.addColorStop(0,'rgba(80,140,255,'+(0.35*life)+')');gl.addColorStop(1,'rgba(80,140,255,0)');x.fillStyle=gl;x.fillRect(cx-r*3,by-r*3,r*6,r*6);
+function orbitFlame(cx,t,life){if(life<=0)return;const puls=(t>22.5&&t<25.3?1+0.3*Math.sin(2*Math.PI*(t-22.5))*ease((t-22.5)/1.2):1)*(1+0.015*Math.sin(t*9));const r=7.5*S*puls*Math.min(1,life),by=TOPY+4;
+ const gl=x.createRadialGradient(cx,by,r*0.3,cx,by,r*3);gl.addColorStop(0,'rgba(80,140,255,'+(0.17*life)+')');gl.addColorStop(1,'rgba(80,140,255,0)');x.fillStyle=gl;x.fillRect(cx-r*3,by-r*3,r*6,r*6);
  x.save();x.globalAlpha=0.9*life;x.beginPath();x.arc(cx,by,r,Math.PI,0);x.ellipse(cx,by,r,r*0.35,0,0,Math.PI);
- const fg=x.createRadialGradient(cx,by,0,cx,by,r*1.05);fg.addColorStop(0,'rgba(70,110,230,.55)');fg.addColorStop(.6,'rgba(90,150,255,.75)');fg.addColorStop(.88,'rgba(150,200,255,.95)');fg.addColorStop(1,'rgba(150,200,255,0)');x.fillStyle=fg;x.fill();
- x.globalCompositeOperation='screen';const ig=x.createRadialGradient(cx,by-r*0.3,0,cx,by-r*0.3,r*0.7);ig.addColorStop(0,'rgba(180,210,255,.35)');ig.addColorStop(1,'rgba(180,210,255,0)');x.fillStyle=ig;x.beginPath();x.arc(cx,by-r*0.3,r*0.7,0,7);x.fill();x.restore()}
+ const fg=x.createRadialGradient(cx,by,0,cx,by,r*1.05);fg.addColorStop(0,'rgba(70,110,230,.05)');fg.addColorStop(.6,'rgba(90,150,255,.18)');fg.addColorStop(.9,'rgba(140,190,255,.6)');fg.addColorStop(1,'rgba(150,200,255,0)');x.fillStyle=fg;x.fill();
+ x.globalCompositeOperation='screen';const ig=x.createRadialGradient(cx,by-r*0.3,0,cx,by-r*0.3,r*0.7);ig.addColorStop(0,'rgba(180,210,255,.08)');ig.addColorStop(1,'rgba(180,210,255,0)');x.fillStyle=ig;x.beginPath();x.arc(cx,by-r*0.3,r*0.7,0,7);x.fill();x.restore()}
 function air(t){// left: rising convection streams; right: slow diffusion inward from all sides
  const la=t>=6.4&&t<11.3?ease((t-6.4)/.4)*ease((11.3-t)/.4)*1.0+0.3:0.3;
  for(const p of PL){const ph=(p[0]+t*(0.25+0.2*p[2]))%1,xx=LX+(p[1]-.5)*260*(1-ph*0.6),yy=TOPY+380-ph*1100;x.fillStyle='rgba(255,220,170,'+(la*Math.sin(ph*Math.PI)*0.8)+')';x.beginPath();x.arc(xx,yy,3,0,7);x.fill();
@@ -38,12 +38,12 @@ function air(t){// left: rising convection streams; right: slow diffusion inward
  const ra=t>=11.3&&t<15.2?ease((t-11.3)/.4)*ease((15.2-t)/.4)*1.0+0.3:0.3;
  for(const p of PR){const ph=(p[1]+t*0.05*(0.5+p[2]))%1,d=300*(1-ph)+70;const xx=RX+Math.cos(p[0])*d,yy=TOPY+Math.sin(p[0])*d;x.fillStyle='rgba(170,210,255,'+(ra*Math.sin(ph*Math.PI)*0.8)+')';x.beginPath();x.arc(xx,yy,3,0,7);x.fill()}}
 const CARDS=[[0,2.8,'WHAT DOES FIRE','LOOK LIKE IN SPACE?'],[2.8,6.4,'GUESS: HOW LONG','CAN IT BURN IN ORBIT?'],[6.4,11.3,'ON EARTH, HOT AIR RISES','AND PULLS FRESH AIR IN'],
- [11.3,15.2,'IN ORBIT THERE IS NO "UP"','AIR ONLY DRIFTS IN SLOWLY'],[15.2,18.0,'SO THE FLAME IS ROUND,','SMALL AND DIM BLUE'],[18.0,22.0,'UP TO 45 MINUTES','ON THE MIR SPACE STATION'],
- [22.0,25.2,'BEFORE IT GOES OUT,','IT PULSES ABOUT ONCE A SECOND'],[25.2,26.4,'DID YOU','GUESS RIGHT?'],[26.4,27.3,'FOLLOW →','MORE EVERY DAY'],[27.3,D+1,'WHAT DOES FIRE','LOOK LIKE IN SPACE?']];
+ [11.3,15.2,'IN ORBIT THERE IS NO "UP"','AIR ONLY DRIFTS IN SLOWLY'],[15.2,18.0,'SO THE FLAME IS ROUND,','SMALL AND DIM BLUE'],[18.0,19.9,'ON THE SHUTTLE:','UNDER 1 MINUTE (BOXED IN)'],[19.9,22.5,'ON MIR: UP TO 45 MINUTES!','IN SOME TESTS'],
+ [22.5,25.7,'BEFORE IT GOES OUT,','IT PULSES ABOUT ONCE A SECOND'],[25.7,26.9,'DID YOU','GUESS RIGHT?'],[26.9,27.8,'FOLLOW →','MORE EVERY DAY'],[27.8,D+1,'WHAT DOES FIRE','LOOK LIKE IN SPACE?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
- const sz=Math.min(fit(l1,76,840),fit(l2,76,840));const pop=l1=='UP TO 45 MINUTES'?1+.1*Math.exp(-(t-a)/.15):1;txt(l1,495,402,sz*pop,'#fff',al);txt(l2,495,402+sz*1.06,sz,'#ffd166',al)}}
+ const sz=Math.min(fit(l1,76,840),fit(l2,76,840));const pop=l1=='ON MIR: UP TO 45 MINUTES!'?1+.1*Math.exp(-(t-a)/.15):1;txt(l1,495,402,sz*pop,'#fff',al);txt(l2,495,402+sz*1.06,sz,'#ffd166',al)}}
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
- const u=t>=27.3?t-D:t;
+ const u=t>=27.8?t-D:t;
  // left: room on Earth; right: inside a station in orbit
  let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#1a0f08');g.addColorStop(1,'#2b1a10');x.fillStyle=g;x.fillRect(0,0,540,H);
  g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#030712');g.addColorStop(1,'#0a1630');x.fillStyle=g;x.fillRect(540,0,540,H);
@@ -51,13 +51,16 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
  x.fillStyle='rgba(255,255,255,.12)';x.fillRect(538,0,4,H);
  txt('ON EARTH',LX,640,54,'#ffd9a0',1,'Anton');txt('IN ORBIT',RX,640,54,'#b9d8ff',1,'Anton');
  air(t);candle(LX);candle(RX);earthFlame(LX,t);
- // orbit flame life: on from the start, out at 24.3 s, relit for the loop at 27.3
- const life=t<24.8?1:(t<25.1?1-(t-24.8)/0.3:(t>=27.3?ease((t-27.3)/.3):0));orbitFlame(RX,t,life);
- if(t>24.8&&t<27.3){const k=t-24.8,rr=40+k*70,sg=x.createRadialGradient(RX,TOPY,rr*0.3,RX,TOPY,rr);sg.addColorStop(0,'rgba(200,210,230,'+(0.35*(1-k/3))+')');sg.addColorStop(1,'rgba(200,210,230,0)');x.fillStyle=sg;x.beginPath();x.arc(RX,TOPY,rr,0,7);x.fill()}
+ // orbit flame life: on from the start, out at 25.3 s, relit for the loop at 27.8
+ const life=t<25.3?1:(t<25.6?1-(t-25.3)/0.3:(t>=27.8?ease((t-27.8)/.3):0));orbitFlame(RX,t,life);
+ if(t>25.3&&t<27.8){const k=t-25.3,rr=40+k*70,sg=x.createRadialGradient(RX,TOPY,rr*0.3,RX,TOPY,rr);sg.addColorStop(0,'rgba(200,210,230,'+(0.35*(1-k/3))+')');sg.addColorStop(1,'rgba(200,210,230,0)');x.fillStyle=sg;x.beginPath();x.arc(RX,TOPY,rr,0,7);x.fill()}
  // size note
- if(t>=15.2&&t<18.0){const a=Math.min(ease((t-15.2)/.3),ease((18.0-t)/.3));txt('~1.5 cm',RX,TOPY-110,40,'#cfe8ff',a,'Anton');txt('~4 cm',LX+130,TOPY-170,40,'#ffe3a6',a,'Anton','left')}
+ if(t>=15.2&&t<18.0){const a=Math.min(ease((t-15.2)/.3),ease((18.0-t)/.3));txt('~1.5 cm wide',RX,TOPY-120,40,'#cfe8ff',a,'Anton');txt('~4 cm tall',LX+110,TOPY-150,40,'#ffe3a6',a,'Anton','left');
+  x.save();x.globalAlpha=a;x.strokeStyle='#cfe8ff';x.lineWidth=3;x.beginPath();x.moveTo(RX-56,TOPY-80);x.lineTo(RX+56,TOPY-80);x.moveTo(RX-56,TOPY-92);x.lineTo(RX-56,TOPY-68);x.moveTo(RX+56,TOPY-92);x.lineTo(RX+56,TOPY-68);x.stroke();
+  x.strokeStyle='#ffe3a6';x.beginPath();x.moveTo(LX+80,TOPY+6);x.lineTo(LX+80,TOPY-294);x.moveTo(LX+68,TOPY+6);x.lineTo(LX+92,TOPY+6);x.moveTo(LX+68,TOPY-294);x.lineTo(LX+92,TOPY-294);x.stroke();x.restore()}
  // 45-minute clock
- if(t>=18.0&&t<22.0){const k=t-18.0,m=Math.min(45,Math.floor(45*ease(k/2.6)));txt(m+':00',RX,TOPY-120,72,'#ffffff',ease(k/.3)*ease((22.0-t)/.3),'Anton')}
+ if(t>=18.0&&t<19.9){txt('< 1:00',RX,TOPY-120,72,'#ffffff',ease((t-18.0)/.3)*ease((19.9-t)/.2),'Anton')}
+ if(t>=19.9&&t<22.5){const k=t-19.9,m=Math.min(45,Math.floor(45*ease(k/1.8)));txt(m+':00',RX,TOPY-120,72,'#9df0bf',ease(k/.2)*ease((22.5-t)/.3),'Anton')}
  g=x.createLinearGradient(0,250,0,560);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.35,'rgba(0,0,0,.45)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,250,W,310);
  cards(t);}
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true});
