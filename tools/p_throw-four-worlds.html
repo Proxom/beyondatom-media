@@ -1,0 +1,110 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- throw-four-worlds (series "Who Lands / Wins First?"): the same throw (10 m/s = 36 km/h, 45 degrees, released 1.5 m up) on Earth, Mars,
+     the Moon and Pluto, in real time, one shared metre scale for all four lanes (the camera zooms out). No air drag.
+     Surface gravity from the NASA NSSDC fact sheets: Earth 9.82, Mars 3.73, Moon 1.62, Pluto 0.62 m/s^2.
+     Landscapes are illustrative. Astronaut and ball are drawn bigger than scale once the camera zooms out. -->
+<script>
+const W=1080,H=1920,FPS=30,D=30.0,V0=10,ANG=Math.PI/4,H0=1.5,VX=V0*Math.cos(ANG),VY=V0*Math.sin(ANG),R0=-0.25,X0=128;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)};
+const LHS=[165,185,235,325],LT=[530,695,880,1115],GOFF=46;   // lane heights grow with the height each throw needs; lane tops; ground strip height
+const WD=[
+ {n:'EARTH',g:9.82,sky:['#1d5eb0','#5d9be0','#b6dcf6'],hill:['#6e9a5c','#557f46'],gr:['#5e8f3a','#3b2a1a'],stars:0,tick:'rgba(255,255,255,.75)'},
+ {n:'MARS',g:3.73,sky:['#9c6a45','#c99368','#e9c49a'],hill:['#b06a42','#93512f'],gr:['#b4552d','#5a2412'],stars:0,tick:'rgba(255,240,225,.8)'},
+ {n:'MOON',g:1.62,sky:['#000','#030305','#0b0b10'],hill:['#7e7d7a','#666562'],gr:['#a3a19c','#3a3937'],stars:1,tick:'rgba(255,255,255,.7)',disc:{x:1012,y:42,r:22,c:['#d6ecff','#3f7fcf','#11366a']}},
+ {n:'PLUTO',g:0.62,sky:['#000','#02030a','#0d1020'],hill:['#c9ab8f','#a88466'],gr:['#dcc6aa','#5b4434'],stars:1,tick:'rgba(255,250,240,.75)',disc:{x:1005,y:56,r:30,c:['#d9d6d2','#8f8b86','#3c3a37']},tholin:1}];
+for(const w of WD){w.T=(VY+Math.sqrt(VY*VY+2*w.g*H0))/w.g;w.R=VX*w.T;w.Hm=H0+VY*VY/2/w.g}
+function ball(w,u){const tau=u-R0;if(tau<0)return null;const tt=Math.min(tau,w.T);return [VX*tt,Math.max(0,H0+VY*tt-0.5*w.g*tt*tt),tau>=w.T]}
+// camera scale (px per metre): shrinks so every ball (0.8 s ahead) stays inside its lane; never zooms back in during the race
+const S0=60,SK=[];{let m=S0;const raw=u=>{let s=S0;for(const w of WD){const tau=cl(u-R0,0,w.T);const xx=VX*tau,yy=H0+VY*tau-.5*w.g*tau*tau;s=Math.min(s,(LHS[WD.indexOf(w)]-GOFF-26)/(yy+0.6),770/(xx+3))}return s};
+ let sm=raw(0.5);for(let i=0;i<=D*FPS+2;i++){const u=i/FPS;m=Math.min(m,raw(u+0.5));sm+=(m-sm)*0.2;sm=Math.min(sm,raw(u+0.15));SK.push(sm)}}
+function scaleAt(u){if(u<0)return SK[0];const f=u*FPS,i=Math.floor(f),k=f-i;return SK[Math.min(i,SK.length-2)]*(1-k)+SK[Math.min(i+1,SK.length-1)]*k}
+window.MODEL=WD.map(w=>[w.n,w.T.toFixed(2),w.R.toFixed(1),w.Hm.toFixed(1)]).concat([['sEnd',scaleAt(D-1).toFixed(2)]]);
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+for(const [i,w] of WD.entries()){const r=rnd(91+i*57);w.st=[];for(let k=0;k<90;k++)w.st.push([r()*W,r()*(LHS[i]-GOFF),r()*1.4+.3,r()]);w.hp=[r()*9,r()*9,r()*9];
+ w.rk=[];for(let k=0;k<70;k++)w.rk.push([r()*260,Math.pow(r(),2.5)*0.5+0.05,r()]);w.pt=[];for(let k=0;k<40;k++)w.pt.push([r()*W,r(),r()*60+20,r()])}
+const TOPSTARS=[];{const r=rnd(5);for(let k=0;k<160;k++)TOPSTARS.push([r()*W,r()*520,r()*1.5+.3,r()])}
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=18;x.fillText(s,px,py);x.shadowBlur=5;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+function astro(px,gy,s,arm,i){const h=Math.max(1.8*s,58),k=h/1.8;x.save();x.translate(px,gy);
+ x.fillStyle='rgba(0,0,0,.28)';x.beginPath();x.ellipse(0,0,0.45*k,0.08*k,0,0,7);x.fill();
+ const suit='#f2f3f5',sh='#b9bec7';
+ // legs
+ x.fillStyle=sh;x.fillRect(-0.2*k,-0.85*k,0.17*k,0.85*k);x.fillStyle=suit;x.fillRect(0.03*k,-0.85*k,0.17*k,0.85*k);
+ x.fillStyle='#8a9099';x.fillRect(-0.23*k,-0.1*k,0.22*k,0.1*k);x.fillRect(0.01*k,-0.1*k,0.22*k,0.1*k);
+ // backpack + torso
+ x.fillStyle='#c8ccd3';x.fillRect(-0.36*k,-1.48*k,0.16*k,0.6*k);
+ const tg=x.createLinearGradient(-0.25*k,0,0.25*k,0);tg.addColorStop(0,'#cfd3da');tg.addColorStop(.5,suit);tg.addColorStop(1,'#dfe2e7');x.fillStyle=tg;
+ x.beginPath();x.roundRect(-0.25*k,-1.5*k,0.5*k,0.7*k,0.1*k);x.fill();
+ x.fillStyle='#e0533a';x.fillRect(-0.25*k,-1.2*k,0.5*k,0.05*k);
+ // helmet
+ x.fillStyle=suit;x.beginPath();x.arc(0.02*k,-1.62*k,0.19*k,0,7);x.fill();
+ const vg=x.createLinearGradient(0,-1.75*k,0.2*k,-1.5*k);vg.addColorStop(0,'#f6d57a');vg.addColorStop(1,'#9a6a1c');x.fillStyle=vg;x.beginPath();x.ellipse(0.08*k,-1.62*k,0.11*k,0.12*k,0,0,7);x.fill();
+ // throwing arm (shoulder pivot)
+ x.save();x.translate(0.05*k,-1.38*k);x.rotate(arm);x.fillStyle=suit;x.beginPath();x.roundRect(-0.065*k,-0.065*k,0.62*k,0.13*k,0.06*k);x.fill();x.fillStyle='#8a9099';x.beginPath();x.arc(0.6*k,0,0.075*k,0,7);x.fill();x.restore();
+ x.restore();}
+function armAngle(u){// radians, 0 = pointing right; negative = up
+ const a=u-R0;if(a<-0.55)return 1.2;if(a<-0.35)return 1.2+(2.6-1.2)*ease((a+0.55)/0.2);if(a<0)return 2.6-(2.6+ANG+Math.PI*0)*0+(-(ANG)-2.6)*ease((a+0.35)/0.35)*1;
+ if(a<0.35)return -ANG+(0.6+ANG)*ease(a/0.35);return 0.6+0.6*ease((a-0.35)/0.6)}
+function lane(i,w,u,s,t){const top=LT[i],LH=LHS[i],gy=top+LH-GOFF;x.save();x.beginPath();x.rect(0,i==0?0:top,W,(i==3?H:top+LH)-(i==0?0:top));x.clip();
+ const y0=i==0?0:top;let g=x.createLinearGradient(0,y0,0,gy);g.addColorStop(0,w.sky[0]);g.addColorStop(.6,w.sky[1]);g.addColorStop(1,w.sky[2]);x.fillStyle=g;x.fillRect(0,y0,W,gy-y0);
+ if(w.stars){for(const st of w.st){x.globalAlpha=(.3+.6*st[3])*(.7+.3*Math.sin(t*1.1+st[3]*30));x.fillStyle='#fff';x.beginPath();x.arc(st[0],top+st[1],st[2],0,7);x.fill()}x.globalAlpha=1}
+ if(w.disc){const P=w.disc,ex=P.x,ey=top+P.y,er=P.r;const eg=x.createRadialGradient(ex-er*.35,ey-er*.35,er*.1,ex,ey,er);eg.addColorStop(0,P.c[0]);eg.addColorStop(.6,P.c[1]);eg.addColorStop(1,P.c[2]);x.fillStyle=eg;x.beginPath();x.arc(ex,ey,er,0,7);x.fill();
+  x.fillStyle='rgba(0,0,0,.5)';x.beginPath();x.arc(ex+er*.35,ey,er,-Math.PI/2,Math.PI/2);x.ellipse(ex+er*.35,ey,er*.4,er,0,Math.PI/2,-Math.PI/2,false);x.fill()}
+ if(i==0){// a few soft clouds
+  x.fillStyle='rgba(255,255,255,.22)';for(const [cx,cy,cr] of [[230,250,70],[300,235,55],[760,150,80],[850,170,60],[620,640,40],[680,628,30]]){const xx=(cx+t*6)%1240-80;x.beginPath();x.ellipse(xx,cy,cr*1.6,cr*.5,0,0,7);x.fill()}}
+ // distant hills (fixed, far away)
+ const hz=s/S0,hh=(px,sc)=>gy-(22+30*(Math.sin(px/140+w.hp[0])*.5+Math.sin(px/61+w.hp[1])*.3+Math.sin(px/23+w.hp[2])*.2+.6))*sc;
+ x.fillStyle=w.hill[0];x.beginPath();x.moveTo(0,gy);for(let px=0;px<=W;px+=6)x.lineTo(px,hh(px,1));x.lineTo(W,gy);x.fill();
+ x.fillStyle=w.hill[1];x.beginPath();x.moveTo(0,gy);for(let px=0;px<=W;px+=6)x.lineTo(px,hh(px*1.9+70,.45));x.lineTo(W,gy);x.fill();
+ // ground strip
+ g=x.createLinearGradient(0,gy,0,i==3?H:top+LH);g.addColorStop(0,w.gr[0]);g.addColorStop(1,w.gr[1]);x.fillStyle=g;x.fillRect(0,gy,W,(i==3?H:top+LH)-gy);
+ if(w.tholin){x.fillStyle='rgba(150,80,50,.35)';for(const p of w.pt){x.beginPath();x.ellipse(p[0],gy+8+p[1]*(i==3?380:30),p[2]*1.5,p[2]*.18,0,0,7);x.fill()}}
+ // pebbles that move with the metre scale
+ for(const r of w.rk){const px=X0+(r[0]-10)*s,rr=Math.max(1.2,r[1]*s*.3);if(px<-10||px>W+10)continue;x.fillStyle='rgba(0,0,0,'+(.18+.15*r[2])+')';x.beginPath();x.ellipse(px,gy+3+r[2]*10,rr*1.6,rr*.6,0,0,7);x.fill()}
+ // metre ticks
+ const step=[5,10,20,25,50].find(v=>v*s>=95)||100;for(let m=step;X0+m*s<888;m+=step){const px=X0+m*s;x.fillStyle=w.tick;x.fillRect(px-1.5,gy-2,3,14);txt(m+' m',px,gy+38,24,'rgba(255,255,255,.85)',1,'Mont')}
+ // trail + ball
+ const b=ball(w,u);const br=Math.max(0.16*s,11);
+ if(b){x.save();x.setLineDash([10,10]);x.lineWidth=4;x.strokeStyle='rgba(255,255,255,.7)';x.beginPath();const tau=Math.min(u-R0,w.T);
+  for(let k=0;k<=60;k++){const tt=tau*k/60;const px=X0+VX*tt*s+0.6*Math.max(1.8*s,40)/1.8*0+0,py=gy-(H0+VY*tt-.5*w.g*tt*tt)*s;k?x.lineTo(px,py):x.moveTo(px,py)}x.stroke();x.restore()}
+ // astronaut (feet at the throw line)
+ astro(X0-0.1*s,gy,s,armAngle(u),i);
+ let bx,by;if(b){bx=X0+b[0]*s;by=gy-b[1]*s-(b[2]?br-2:0)}else{const k=Math.max(1.8*s,58)/1.8,a=armAngle(u);bx=X0-0.1*s+0.05*k+Math.cos(a)*0.62*k;by=gy-1.38*k+Math.sin(a)*0.62*k}
+ {const gl=x.createRadialGradient(bx,by,0,bx,by,br*3);gl.addColorStop(0,'rgba(255,200,90,.45)');gl.addColorStop(1,'rgba(255,200,90,0)');x.fillStyle=gl;x.fillRect(bx-br*3,by-br*3,br*6,br*6)}
+ const bg=x.createRadialGradient(bx-br*.35,by-br*.4,br*.1,bx,by,br);bg.addColorStop(0,'#fff8ea');bg.addColorStop(.5,'#f4b53f');bg.addColorStop(1,'#a8551c');x.fillStyle=bg;x.beginPath();x.arc(bx,by,br,0,7);x.fill();
+ x.strokeStyle='rgba(0,0,0,.35)';x.lineWidth=1.5;x.stroke();
+ // landing dust
+ if(b&&b[2]){const k=u-R0-w.T;const ra=ease(k/.2)*(1-ease((k-.25)/1.1));if(ra>0){const rr=12+70*Math.sqrt(cl(k/1.3));x.globalAlpha=ra*.7;const dg=x.createRadialGradient(bx,gy,rr*.2,bx,gy,rr);
+  dg.addColorStop(0,'rgba(255,245,225,0)');dg.addColorStop(.6,'rgba(255,240,215,.6)');dg.addColorStop(1,'rgba(255,240,215,0)');x.fillStyle=dg;x.beginPath();x.ellipse(bx,gy-3,rr,rr*.35,0,0,7);x.fill();x.globalAlpha=1}
+  // landing pin
+  const pa=ease(k/.25);x.globalAlpha=pa;x.fillStyle='#ffd166';x.fillRect(bx-1.5,gy-46,3,40);x.globalAlpha=1}
+ x.restore();
+ // labels: world name (left) + live distance (right)
+ const done=b&&b[2],k=done?u-R0-w.T:0,pop=done?1+0.3*Math.exp(-k/.12):1;
+ txt(w.n,72,top+48,44,'#fff',1,'Anton','left');x.font='44px Anton';const nw=x.measureText(w.n).width;txt('g = '+w.g.toFixed(2)+' m/s²',72+nw+14,top+46,24,'rgba(240,244,250,.92)',1,'Mont','left');
+ const dist=b?b[0]:0;const win=done&&i==3;txt(dist.toFixed(1)+' m',920,top+56,50*pop,win?'#9df0bf':(done?'#ffffff':'#ffd166'),u>-0.1?1:ease((u+0.4)/.3),'Anton','right');
+ if(done){txt(w.T.toFixed(1)+' s in the air',920,top+88,22,'rgba(240,244,250,.92)',ease(k/.3),'Mont','right')}}
+const CARDS=[[0,3.0,'SAME THROW, 4 WORLDS','WHO THROWS FARTHEST?'],[3.0,6.0,'SAME SPEED: 36 km/h','SAME ANGLE: 45°'],[6.0,10.3,'THE MOON:','9 SECONDS IN THE AIR'],
+ [10.3,13.4,'PLUTO:','STILL IN THE AIR…'],[13.4,17.4,'GUESS: HOW FAR?','COMMENT BEFORE IT LANDS'],[17.4,22.75,'PLUTO PULLS','16× WEAKER THAN EARTH'],
+ [22.8,26.4,'163 m!','14× FARTHER THAN EARTH'],[26.4,28.2,'WHICH WORLD WOULD','YOU THROW ON?'],[28.2,29.2,'FOLLOW →','NEW RACE TOMORROW'],[29.2,D+1,'SAME THROW, 4 WORLDS','WHO THROWS FARTHEST?']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
+ const sz=Math.min(fit(l1,78,820),l2?fit(l2,80,820):99);const pop=(l1=='163 m!')?1+0.1*Math.exp(-(t-a)/.15):1;txt(l1,495,404,sz*pop,'#fff',al);if(l2)txt(l2,495,404+sz*1.08,sz,'#ffd166',al)}}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ const u=t>=29.2?t-D:t;   // loop: cut back to the wind-up, so the last frame flows into frame 0
+ const s=scaleAt(u);
+ for(let i=0;i<4;i++)lane(i,WD[i],u,s,t);
+ // lane dividers
+ for(let i=1;i<4;i++){x.fillStyle='rgba(0,0,0,.8)';x.fillRect(0,LT[i]-3,W,6);x.fillStyle='rgba(255,255,255,.10)';x.fillRect(0,LT[i]+3,W,1.5)}
+ // top band shading so the cards read on the sky
+ let g=x.createLinearGradient(0,280,0,540);g.addColorStop(0,'rgba(0,10,30,.35)');g.addColorStop(1,'rgba(0,10,30,0)');x.fillStyle=g;x.fillRect(0,280,W,260);
+ // winner glow on Pluto after landing
+ const kp=u-R0-WD[3].T;if(kp>0&&t<29.2){x.save();x.globalAlpha=.5*ease(kp/.4);x.strokeStyle='#9df0bf';x.lineWidth=4;x.strokeRect(6,LT[3]+6,W-12,LHS[3]-12);x.restore()}
+ cards(t);
+ const fa=(t<3.0?ease((3.0-t)/.3):0)+(t>29.2?ease((t-29.2)/.3):0);txt('released 1.5 m up · no air drag',495,521,24,'#eef2f8',fa,'Mont');
+ g=x.createRadialGradient(540,980,560,540,980,1300);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=g;x.fillRect(0,0,W,H);}
+Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true});
+</script>

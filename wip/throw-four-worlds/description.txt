@@ -1,0 +1,27 @@
+Guess before it lands: how far does the ball go on Pluto? 👇
+
+Same throw on every world: 10 m/s (36 km/h) at 45°, let go 1.5 m above the ground. Only gravity changes:
+Earth (9.82 m/s²): 11.5 m, 1.6 s in the air
+Mars (3.73 m/s²): 28.2 m, 4.0 s in the air
+The Moon (1.62 m/s²): 63.2 m, 8.9 s in the air
+Pluto (0.62 m/s²): 162.8 m, 23.0 s in the air, about 14 times farther than on Earth
+
+Pluto's surface gravity is about 16 times weaker than Earth's (9.82 / 0.62 = 15.8).
+
+The math: no air drag; the ball keeps its forward speed (7.07 m/s) and gravity pulls it down. Time in the air = (7.07 + √(7.07² + 2 × g × 1.5)) / g, and distance = 7.07 m/s × time. On Earth, real air drag would cut the distance a little; Mars's air is too thin to matter much, and the Moon and Pluto have almost none.
+
+About the video: an original animation. All four lanes share one distance scale, so the throws can be compared directly; the camera zooms out as the balls fly. Landscapes are illustrative, and the astronaut and the ball are drawn bigger than scale once the camera zooms out.
+
+Sources:
+NASA NSSDC Earth Fact Sheet (surface gravity, mean: 9.82 m/s²): https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
+NASA NSSDC Mars Fact Sheet (surface gravity, mean: 3.73 m/s²): https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+NASA NSSDC Moon Fact Sheet (surface gravity: 1.62 m/s²): https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+NASA NSSDC Pluto Fact Sheet (surface gravity, mean: 0.62 m/s²): https://nssdc.gsfc.nasa.gov/planetary/factsheet/plutofact.html
+
+Footage: none; everything is drawn in code.
+Narration: AI voice (Kokoro). Music and sound: original.
+
+Follow for more: a new space race every day.
+More space every day on BeyondAtom.
+
+#space #physics #pluto #shorts
