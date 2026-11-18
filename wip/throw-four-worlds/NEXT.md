@@ -1,4 +1,5 @@
-# throw-four-worlds — 19 Nov 2026 17:00 Europe/London (series "Who Lands / Wins First?", style A, family Q). Run yt-0407-dirac-8gbprl (18 Nov 04:07)
+# throw-four-worlds — DONE v2, scheduled 19 Nov 2026 17:00 Europe/London, Metricool 432361617 (PENDING). Media: media/throw-four-worlds/.
+# (built for) 19 Nov 2026 17:00 Europe/London (series "Who Lands / Wins First?", style A, family Q). Run yt-0407-dirac-8gbprl (18 Nov 04:07)
 topic key: throw on planets — not in registry (checked 55 rows; registry lists "thrown ball" as an allowed NEW experiment for the same-experiment series; jump and ball drop not repeated)
 Same throw (10 m/s at 45°, released 1.5 m up, no drag) on Earth 9.82 / Mars 3.73 / Moon 1.62 / Pluto 0.62 m/s² (NSSDC fact sheets). Real time, one shared metre scale, camera zooms out.
 Result: 11.5 / 28.2 / 63.2 / 162.8 m; 1.6 / 4.0 / 8.9 / 23.0 s. Pluto 14x Earth.

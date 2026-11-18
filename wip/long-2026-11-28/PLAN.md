@@ -26,7 +26,7 @@ Topic registry: every chapter re-uses a topic we already made; this is allowed b
 Each chapter ~45-50 s in the long cut: guess question → the race at a calmer pace with more labels → answer → one-line "why" → link to the next chapter. 11 x ~47 s + intro/outro ≈ 9 min.
 
 ## Build steps (one or two per run, only when QUEUE >= 2)
-1. [~] (17 Nov: jump-four-moons + jump-five-worlds DONE via ?ls=1 / window.LS; 9 scenes left) Make each scene resolution-agnostic: W,H from URL params (default 1080x1920), layouts for 1920x1080 (side-by-side lanes become wider, text left/right). Start with jump-four-moons + jump-five-worlds (same family).
+1. [~] (17 Nov: jump-four-moons + jump-five-worlds DONE via ?ls=1 / window.LS; 18 Nov: planet-ball-drop DONE; 8 scenes left) Make each scene resolution-agnostic: W,H from URL params (default 1080x1920), layouts for 1920x1080 (side-by-side lanes become wider, text left/right). Start with jump-four-moons + jump-five-worlds (same family).
 2. [ ] Render chapter previews at 960x540; check layouts.
 3. [ ] Narration script (US English, chapter links) → tools/long-01.vo.py with Kokoro; facts = sources already in each Short's description (reuse, re-check).
 4. [ ] Music bed + SFX (long version of the existing beds; same audio gate: LPF 7-8 kHz, -4 dB shelf at 5 kHz, de-esser, -14 to -16 LUFS, TP <= -2 dBTP).
