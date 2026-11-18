@@ -68,6 +68,8 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 51 | 17 Kas 17:00 | What If You Grew 1 cm Every Second? 📏 | grow 1 cm per second | yayında |
 | 52 | 18 Kas 17:00 | How Many Launches to Land Starship on the Moon? 🚀 | starship refueling | planlı (Metricool 430989202) |
 | 53 | 19 Kas 17:00 | Same Throw on 4 Worlds: Who Throws Farthest? ⚾ | throw on planets | planlı (Metricool 432361617) |
+| 54 | 19 Kas 01:00 | What If Earth Stopped Orbiting the Sun? ☀️ | earth falls into sun | planlı (Metricool 433500606) |
+| 55 | 20 Kas 01:00 | What If You Fell Through Earth? 🌍 | gravity tunnel through earth | hazırlanıyor |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
@@ -79,4 +81,5 @@ Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mon
 - planet rotation periods = venus day length = mercury day length = "day longer than year"
 - planet orbital speeds = earth orbital speed; solar system galactic motion = helix
 - human g tolerance = gravity on planets for humans = "your body on Jupiter"
+- earth falls into sun = earth stops orbiting; gravity tunnel through earth = fall through earth = hole through earth
 - sun size = earths across the sun = "109 earths"; nearest star distance = sun as basketball
