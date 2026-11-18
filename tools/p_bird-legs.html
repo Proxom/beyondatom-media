@@ -22,7 +22,7 @@ function shiftAt(t){if(t<20.2)return ease((t-0.0)/12.3)*0.25+ease((t-6.5)/5.8)*0
 function earthAt(t){return t<20.0?0:(t<27.3?ease((t-20.0)/0.8):1-ease((t-27.3)/0.5))}
 const CX=470;
 function limbFluid(path,al){x.save();path();x.clip();const g=x.createLinearGradient(0,600,0,1420);g.addColorStop(0,'rgba(80,200,255,'+al[0]+')');g.addColorStop(1,'rgba(80,200,255,'+al[1]+')');x.fillStyle=g;x.fillRect(0,0,W,H);x.restore()}
-function person(sh,t,eg){const puff=sh,thin=sh,float=1-eg;const bob=Math.sin(t*0.9)*10*float;x.save();x.translate(0,bob);
+function person(sh,t,eg){const puff=sh,thin=sh,float=1-eg;const bob=Math.sin(t*0.9)*10*float;x.save();x.translate(0,bob);x.translate(CX,1426);x.scale(0.92,0.92);x.translate(-CX,-1426);
  const legW=64*(1-0.28*thin),legGap=24;
  // legs
  const lx=[CX-legGap/2-legW/2-6,CX+legGap/2+legW/2+6];
@@ -31,12 +31,12 @@ function person(sh,t,eg){const puff=sh,thin=sh,float=1-eg;const bob=Math.sin(t*0
   x.fillStyle='#2b2f36';x.beginPath();x.roundRect(lx[i]-legW/2-10,1392,legW+30,34,14);x.fill()}
  // shorts
  x.fillStyle='#b99a6b';x.beginPath();x.roundRect(CX-125,1010,250,150,22);x.fill();x.fillStyle='rgba(0,0,0,.15)';x.fillRect(CX-3,1060,6,100);
- // arms (float up a little in space)
- for(const s of [-1,1]){x.save();x.translate(CX+s*120,745);x.rotate(s*(0.12+0.5*float*ease(t/1.5)+0.05*Math.sin(t*1.2+s)));
-  x.fillStyle='#1f3c73';x.beginPath();x.roundRect(-30,-10,60,95,24);x.fill();x.fillStyle='#e7b48f';x.beginPath();x.roundRect(-24,70,48,230,22);x.fill();x.beginPath();x.arc(0,305,27,0,7);x.fill();x.restore()}
  // torso (navy polo)
  x.fillStyle='#24467f';x.beginPath();x.roundRect(CX-125,720,250,310,40);x.fill();x.fillStyle='#1a3563';x.beginPath();x.moveTo(CX-40,722);x.lineTo(CX,790);x.lineTo(CX+40,722);x.fill();
  x.fillStyle='#ffd166';x.beginPath();x.arc(CX+60,800,16,0,7);x.fill();
+ // arms (float up a little in space)
+ for(const s of [-1,1]){x.save();x.translate(CX+s*112,742);x.rotate(-s*(0.10+0.75*float*ease(t/1.2)+0.06*Math.sin(t*1.2+s)));
+  x.fillStyle='#1f3c73';x.beginPath();x.roundRect(-30,-10,60,95,24);x.fill();x.fillStyle='#e7b48f';x.beginPath();x.roundRect(-24,70,48,230,22);x.fill();x.beginPath();x.arc(0,305,27,0,7);x.fill();x.restore()}
  // neck + head
  x.fillStyle='#e0a982';x.fillRect(CX-28,660,56,70);
  const hx=CX,hy=590,rx=78*(1+0.16*puff),ry=92*(1+0.07*puff);
@@ -51,7 +51,7 @@ function person(sh,t,eg){const puff=sh,thin=sh,float=1-eg;const bob=Math.sin(t*0
  // fluid overlay: legs lose it, head and chest gain it
  const legA=0.55*(1-0.85*sh),upA=0.10+0.42*sh;
  for(let i=0;i<2;i++)limbFluid(legPath(i),[legA*0.8,legA]);
- limbFluid(()=>{x.beginPath();x.ellipse(hx,hy,rx,ry,0,0,7)},[upA,upA*0.9]);
+ limbFluid(()=>{x.beginPath();x.ellipse(hx,hy,rx,ry,0,0,7)},[upA*0.35,upA*0.3]);
  limbFluid(()=>{x.beginPath();x.roundRect(CX-125,720,250,310,40)},[upA*0.8,upA*0.35]);
  // flowing particles (up in space, down when back on Earth)
  const rate=t<20.2?(0.35+0.65*(1-cl((t-12.3)/4))*cl(t/0.5)):-(1-ease((t-24)/2));
@@ -64,8 +64,8 @@ function bottle(cxb,cyb,fill,al){if(al<=0.01)return;x.save();x.globalAlpha=al;x.
  x.save();x.clip();x.fillStyle='rgba(255,255,255,.12)';x.fillRect(-w,-h,2*w,2*h);x.fillStyle='rgba(80,200,255,.85)';const fy=h/2-(h-60)*fill;x.fillRect(-w,fy,2*w,h);x.restore();
  x.strokeStyle='rgba(255,255,255,.9)';x.lineWidth=5;x.stroke();x.fillStyle='#fff';x.fillRect(-22,-h/2-22,44,24);x.restore();
  txt('2 L',cxb,cyb+30,72,'#ffffff',al)}
-const CARDS=[[0,3.0,'IN SPACE, YOUR FLUIDS','MOVE UP'],[3.0,6.9,'GUESS: HOW MUCH LEAVES','YOUR LEGS IN 3 DAYS?'],[6.9,9.6,'ON EARTH, GRAVITY','PULLS FLUID DOWN'],[9.6,12.3,'IN SPACE, NOTHING','PULLS IT BACK DOWN'],
- [12.3,15.6,'MORE THAN 2 LITERS','GONE FROM THE LEGS BY DAY 3'],[15.6,20.2,'PUFFY FACE +','SKINNY "BIRD LEGS"'],[20.2,24.2,'BACK ON EARTH:','MOST FLOWS BACK IN HOURS'],[24.2,26.0,'DID YOU','GUESS RIGHT?'],[26.0,27.3,'FOLLOW →','MORE EVERY DAY'],[27.3,D+1,'IN SPACE, YOUR FLUIDS','MOVE UP']];
+const CARDS=[[0,3.0,'IN SPACE, YOUR FLUIDS','MOVE UP'],[3.0,7.6,'GUESS: HOW MUCH LEAVES','YOUR LEGS IN 3 DAYS?'],[7.6,10.8,'ON EARTH, GRAVITY','PULLS FLUID DOWN'],[10.8,13.3,'IN SPACE, NOTHING','PULLS IT BACK DOWN'],
+ [13.3,16.4,'MORE THAN 2 LITERS','GONE FROM THE LEGS BY DAY 3'],[16.4,20.2,'PUFFY FACE +','SKINNY "BIRD LEGS"'],[20.2,24.2,'BACK ON EARTH:','MOST FLOWS BACK IN HOURS'],[24.2,26.0,'DID YOU','GUESS RIGHT?'],[26.0,27.3,'FOLLOW →','MORE EVERY DAY'],[27.3,D+1,'IN SPACE, YOUR FLUIDS','MOVE UP']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,76,840),fit(l2,76,840));const pop=l1=='MORE THAN 2 LITERS'?1+.1*Math.exp(-(t-a)/.15):1;txt(l1,495,402,sz*pop,'#fff',al);txt(l2,495,402+sz*1.06,sz,'#ffd166',al)}}
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
@@ -79,13 +79,13 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
  if(eg>0){x.globalAlpha=eg;const sg=x.createLinearGradient(0,0,0,1430);sg.addColorStop(0,'#2a64b5');sg.addColorStop(1,'#a9d3f2');x.fillStyle=sg;x.fillRect(0,0,W,1430);x.fillStyle='#5f8f45';x.fillRect(0,1430,W,H-1430);x.globalAlpha=1}
  person(sh,t,eg);
  // labels on the body
- const la=(t>=15.6&&t<20.2)?Math.min(ease((t-15.6)/.3),ease((20.2-t)/.3)):0;if(la>0){txt('PUFFY FACE',CX+250,600,46,'#9fe3ff',la,'Anton','left');txt('BIRD LEGS',CX+150,1290,46,'#9fe3ff',la,'Anton','left');
-  x.save();x.globalAlpha=la;x.strokeStyle='#9fe3ff';x.lineWidth=4;x.beginPath();x.moveTo(CX+245,588);x.lineTo(CX+120,592);x.moveTo(CX+145,1278);x.lineTo(CX+70,1270);x.stroke();x.restore()}
+ const la=(t>=16.4&&t<20.2)?Math.min(ease((t-16.4)/.3),ease((20.2-t)/.3)):0;if(la>0){txt('PUFFY FACE',CX+250,626,46,'#9fe3ff',la,'Anton','left');txt('BIRD LEGS',CX+150,1300,46,'#9fe3ff',la,'Anton','left');
+  x.save();x.globalAlpha=la;x.strokeStyle='#9fe3ff';x.lineWidth=4;x.beginPath();x.moveTo(CX+245,614);x.lineTo(CX+110,618);x.moveTo(CX+145,1288);x.lineTo(CX+66,1282);x.stroke();x.restore()}
  // day counter (top right of the figure)
- const day=t<6.5?0:(t<12.3?3*ease((t-6.5)/5.8):3);const da=(t<20.2&&t<27.3)?1:0;if(da&&u>=0){txt('DAY '+Math.floor(day+1e-6),915,640,92,'#fff',1,'Anton','right');txt(t<6.5?'GRAVITY: OFF':(t<12.3?'IN ORBIT':'FIRST MEASUREMENT'),915,686,26,'#ffd9a0',1,'Mont','right')}
+ const day=t<6.5?0:(t<12.3?3*ease((t-6.5)/5.8):3);const da=(t<16.4)?1:0;if(da&&u>=0){txt('DAY '+Math.floor(day+1e-6),915,640,92,'#fff',1,'Anton','right');txt(t<6.5?'GRAVITY: OFF':(t<12.3?'IN ORBIT':'FIRST MEASUREMENT'),915,686,26,'#ffd9a0',1,'Mont','right')}
  if(eg>0.3&&t<27.3){txt('GRAVITY: ON',915,686,26,'#ffd9a0',eg,'Mont','right')}
  // 2-liter bottle at the answer
- const ba=(t>=12.3&&t<15.8)?Math.min(ease((t-12.3)/.25),ease((15.8-t)/.3)):0;bottle(830,1040,ease((t-12.4)/1.2),ba);
+ const ba=(t>=13.3&&t<16.4)?Math.min(ease((t-13.3)/.25),ease((16.4-t)/.3)):0;bottle(830,1040,ease((t-13.4)/1.2),ba);
  const g=x.createLinearGradient(0,250,0,560);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.35,'rgba(0,0,0,.45)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,250,W,310);
  cards(t);}
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont'),new Promise(r=>{if(img.complete)r();img.onload=r;img.onerror=r})]).then(()=>{window.TEXREADY=true});
