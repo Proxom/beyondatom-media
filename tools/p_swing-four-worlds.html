@@ -50,7 +50,7 @@ function rider(th){// seated astronaut, drawn in the rope frame: origin at the p
  x.fillStyle=vg;x.beginPath();x.ellipse(0.06*k,-0.98*k,0.1*k,0.11*k,0,0,7);x.fill();x.restore()}
 function lane(i,w,u,t){const top=LT[i],gy=top+LH-GOFF,bot=i==3?H:top+LH;x.save();x.beginPath();x.rect(0,i==0?0:top,W,bot-(i==0?0:top));x.clip();
  const y0=i==0?0:top;let g=x.createLinearGradient(0,y0,0,gy);g.addColorStop(0,w.sky[0]);g.addColorStop(.6,w.sky[1]);g.addColorStop(1,w.sky[2]);x.fillStyle=g;x.fillRect(0,y0,W,gy-y0);
- if(i==0)for(const st of TOP){x.globalAlpha=.25+.5*st[3];x.fillStyle='#fff';x.beginPath();x.arc(st[0],st[1],st[2],0,7);x.fill()}x.globalAlpha=1;
+ 
  if(w.stars){for(const st of w.st){x.globalAlpha=(.3+.6*st[3])*(.7+.3*Math.sin(t*1.1+st[3]*30));x.fillStyle='#fff';x.beginPath();x.arc(st[0],top+st[1],st[2],0,7);x.fill()}x.globalAlpha=1}
  if(w.disc){const P=w.disc,ex=P.x,ey=top+P.y,er=P.r;const eg=x.createRadialGradient(ex-er*.35,ey-er*.35,er*.1,ex,ey,er);eg.addColorStop(0,P.c[0]);eg.addColorStop(.6,P.c[1]);eg.addColorStop(1,P.c[2]);x.fillStyle=eg;x.beginPath();x.arc(ex,ey,er,0,7);x.fill()}
  if(i==0){x.fillStyle='rgba(255,255,255,.22)';for(const [cx,cy,cr] of [[230,560,50],[300,548,40],[820,575,60],[900,590,40]]){const xx=(cx+t*6)%1240-80;x.beginPath();x.ellipse(xx,cy,cr*1.6,cr*.45,0,0,7);x.fill()}}
@@ -69,11 +69,15 @@ function lane(i,w,u,t){const top=LT[i],gy=top+LH-GOFF,bot=i==3?H:top+LH;x.save()
  // labels: world name + g (left), swing count (right)
  const n=Math.max(0,w.peaks.filter(p=>p<=s).length-1),last=w.peaks[n],k=s-last,pop=(n>0&&k<0.25)?1+0.3*Math.exp(-k/.1):1;
  txt(w.n,72,top+46,42,'#fff',1,'Anton','left');x.font='42px Anton';const nw=x.measureText(w.n).width;txt('g = '+w.g.toFixed(2)+' m/s²',72+nw+14,top+44,23,'rgba(240,244,250,.92)',1,'Mont','left');
- const won=i==3&&n>=1;txt(n+(n==1?' SWING':' SWINGS'),915,top+110,48*pop,won?'#9df0bf':'#ffd166',1,'Anton','right');
- txt((n>=1?w.T.toFixed(1)+' s each':'…'),915,top+148,24,'rgba(240,244,250,.92)',n>=1?1:.7,'Mont','right');
- if(i==3&&n<1&&s>0){txt(s.toFixed(1)+' s',915,top+190,34,'#ffffff',1,'Anton','right')}}
+ const won=i==3&&n>=1,ks=s-WD[3].T,stamp=i==3&&ks>0&&ks<2.4;
+ if(!stamp)txt(n+(n==1?' SWING':' SWINGS'),915,top+105,48*pop,won?'#9df0bf':'#ffd166',1,'Anton','right');
+ // live 'time for one swing' bar: grows until the first full swing, then freezes (Pluto's ends up 4x Earth's)
+ {const tb=cl(s,0,w.T),bw=tb/12.918*280,bx=560,by=top+140;x.fillStyle='rgba(0,0,0,.45)';x.beginPath();x.roundRect(bx-4,by-4,288,26,8);x.fill();
+  x.fillStyle=n>=1?(i==3?'#9df0bf':'#ffd166'):'#ffffff';x.beginPath();x.roundRect(bx,by,Math.max(4,bw),18,6);x.fill();
+  txt(tb.toFixed(1)+' s',bx+Math.max(4,bw)+10,by+17,26,'#ffffff',1,'Anton','left');if(!stamp)txt('TIME FOR ONE SWING',bx,by-10,19,'rgba(240,244,250,.9)',1,'Mont','left')}
+ if(stamp){const a=Math.min(ease(ks/.12),ease((2.4-ks)/.3)),pp=1+0.35*Math.exp(-ks/.12);txt('12.9 s',700,top+118,96*pp,'#9df0bf',a,'Anton','center')}}
 const CARDS=[[0,2.6,'SAME SWING, 4 WORLDS','WHICH ONE IS SLOWEST?'],[2.6,5.85,'EARTH: ONE SWING','EVERY 3.2 SECONDS'],[5.85,7.65,'MARS: 5.3 SECONDS',''],[7.65,8.9,'THE MOON: 8 SECONDS',''],
- [8.9,12.32,'GUESS: ONE SWING','ON PLUTO TAKES…?'],[12.32,15.5,'12.9 SECONDS!','EARTH: 4 SWINGS ALREADY'],[15.5,19.7,'YOUR WEIGHT DOESN\'T MATTER','ONLY GRAVITY + ROPE LENGTH'],
+ [8.9,12.40,'GUESS: ONE SWING','ON PLUTO TAKES…?'],[12.40,15.5,'12.9 SECONDS!','EARTH: 4 SWINGS ALREADY'],[15.5,19.7,'YOUR WEIGHT DOESN\'T MATTER','ONLY GRAVITY + ROPE LENGTH'],
  [19.7,24.8,'PLUTO PULLS 16 TIMES WEAKER','SO IT SWINGS 4 TIMES SLOWER'],[24.8,27.1,'WHICH WORLD WOULD','YOU SWING ON?'],[27.1,28.8,'FOLLOW →','MORE EVERY DAY'],[28.8,D+1,'SAME SWING, 4 WORLDS','WHICH ONE IS SLOWEST?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,70,820),l2?fit(l2,70,820):99);const pop=(l1=='12.9 SECONDS!')?1+0.1*Math.exp(-(t-a)/.15):1;txt(l1,495,402,sz*pop,'#fff',al);if(l2)txt(l2,495,402+sz*1.06,sz,'#ffd166',al)}}
@@ -82,7 +86,7 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
  for(let i=0;i<4;i++)lane(i,WD[i],u,t);
  for(let i=1;i<4;i++){x.fillStyle='rgba(0,0,0,.8)';x.fillRect(0,LT[i]-3,W,6);x.fillStyle='rgba(255,255,255,.10)';x.fillRect(0,LT[i]+3,W,1.5)}
  let g=x.createLinearGradient(0,280,0,540);g.addColorStop(0,'rgba(0,10,30,.35)');g.addColorStop(1,'rgba(0,10,30,0)');x.fillStyle=g;x.fillRect(0,280,W,260);
- const s3=u-T0-WD[3].T;if(s3>0&&t<28.8){x.save();x.globalAlpha=.5*ease(s3/.4);x.strokeStyle='#9df0bf';x.lineWidth=4;x.strokeRect(6,LT[3]+6,W-12,LH-12);x.restore()}
+ const s3=u-T0-WD[3].T;if(s3>0&&t<28.8){x.save();x.globalAlpha=.5*ease(s3/.4)+.5*Math.exp(-s3/.25);x.strokeStyle='#9df0bf';x.lineWidth=4+8*Math.exp(-s3/.25);x.strokeRect(6,LT[3]+6,W-12,LH-12);x.restore()}
  cards(t);
  const fa=(t<2.6?ease((2.6-t)/.3):0)+(t>28.8?ease((t-28.8)/.3):0);txt('2.5 m rope · let go from 35° · no air drag',495,506,22,'#eef2f8',fa,'Mont');
  g=x.createRadialGradient(540,980,560,540,980,1300);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=g;x.fillRect(0,0,W,H);}
