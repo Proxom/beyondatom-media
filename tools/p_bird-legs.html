@@ -18,7 +18,8 @@ function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globa
  x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=22;x.fillText(s,px,py);x.shadowBlur=6;x.fillText(s,px,py);x.restore()}
 function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
 // state over time: shift 0..1 (how far the fluid has moved up), earth 0..1 (back on Earth)
-function shiftAt(t){if(t<20.2)return ease((t-0.0)/12.3)*0.25+ease((t-6.5)/5.8)*0.75;return 1-ease((t-20.6)/3.2)}
+function shiftAt(t){// frame 0 shows the day-3 result (hook), rewinds to day 0, and the shape only changes at the day-3 reveal (no day-by-day data)
+ if(t<1.7)return 1;if(t<2.3)return 1-ease((t-1.7)/0.6);if(t<13.35)return 0;if(t<20.2)return ease((t-13.35)/0.7);return 1-ease((t-20.6)/3.2)}
 function earthAt(t){return t<20.0?0:(t<27.3?ease((t-20.0)/0.8):1-ease((t-27.3)/0.5))}
 const CX=470;
 function limbFluid(path,al){x.save();path();x.clip();const g=x.createLinearGradient(0,600,0,1420);g.addColorStop(0,'rgba(80,200,255,'+al[0]+')');g.addColorStop(1,'rgba(80,200,255,'+al[1]+')');x.fillStyle=g;x.fillRect(0,0,W,H);x.restore()}
@@ -63,9 +64,9 @@ function bottle(cxb,cyb,fill,al){if(al<=0.01)return;x.save();x.globalAlpha=al;x.
  x.beginPath();x.moveTo(-18,-h/2);x.lineTo(18,-h/2);x.lineTo(18,-h/2+40);x.quadraticCurveTo(w/2,-h/2+80,w/2,-h/2+130);x.lineTo(w/2,h/2-16);x.quadraticCurveTo(w/2,h/2,w/2-16,h/2);x.lineTo(-w/2+16,h/2);x.quadraticCurveTo(-w/2,h/2,-w/2,h/2-16);x.lineTo(-w/2,-h/2+130);x.quadraticCurveTo(-w/2,-h/2+80,-18,-h/2+40);x.closePath();
  x.save();x.clip();x.fillStyle='rgba(255,255,255,.12)';x.fillRect(-w,-h,2*w,2*h);x.fillStyle='rgba(80,200,255,.85)';const fy=h/2-(h-60)*fill;x.fillRect(-w,fy,2*w,h);x.restore();
  x.strokeStyle='rgba(255,255,255,.9)';x.lineWidth=5;x.stroke();x.fillStyle='#fff';x.fillRect(-22,-h/2-22,44,24);x.restore();
- txt('2 L',cxb,cyb+30,72,'#ffffff',al)}
-const CARDS=[[0,3.0,'IN SPACE, YOUR FLUIDS','MOVE UP'],[3.0,7.6,'GUESS: HOW MUCH LEAVES','YOUR LEGS IN 3 DAYS?'],[7.6,10.8,'ON EARTH, GRAVITY','PULLS FLUID DOWN'],[10.8,13.3,'IN SPACE, NOTHING','PULLS IT BACK DOWN'],
- [13.3,16.4,'MORE THAN 2 LITERS','GONE FROM THE LEGS BY DAY 3'],[16.4,20.2,'PUFFY FACE +','SKINNY "BIRD LEGS"'],[20.2,24.2,'BACK ON EARTH:','MOST FLOWS BACK IN HOURS'],[24.2,26.0,'DID YOU','GUESS RIGHT?'],[26.0,27.3,'FOLLOW →','MORE EVERY DAY'],[27.3,D+1,'IN SPACE, YOUR FLUIDS','MOVE UP']];
+ txt('2+ L',cxb,cyb+30,64,'#ffffff',al)}
+const CARDS=[[0,2.3,'WHY DO ASTRONAUTS GET','BIRD LEGS?'],[2.3,7.6,'GUESS: HOW MUCH LEAVES','THE LEGS IN 3 DAYS?'],[7.6,10.8,'ON EARTH, GRAVITY','PULLS FLUID DOWN'],[10.8,13.3,'IN SPACE, NOTHING','PULLS IT BACK DOWN'],
+ [13.3,16.4,'MORE THAN 2 LITERS','GONE FROM THE LEGS BY DAY 3'],[16.4,20.2,'PUFFY FACE +','SKINNY "BIRD LEGS"'],[20.2,24.2,'BACK ON EARTH:','MUCH FLOWS BACK IN A FEW HOURS'],[24.2,26.0,'DID YOU','GUESS RIGHT?'],[26.0,27.3,'FOLLOW →','MORE EVERY DAY'],[27.3,D+1,'WHY DO ASTRONAUTS GET','BIRD LEGS?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,76,840),fit(l2,76,840));const pop=l1=='MORE THAN 2 LITERS'?1+.1*Math.exp(-(t-a)/.15):1;txt(l1,495,402,sz*pop,'#fff',al);txt(l2,495,402+sz*1.06,sz,'#ffd166',al)}}
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
@@ -73,19 +74,22 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
  // space background
  const bg=x.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#04060d');bg.addColorStop(1,'#0a1426');x.fillStyle=bg;x.fillRect(0,0,W,H);
  for(const st of STARS){x.globalAlpha=(.3+.5*st[3])*(1-eg);x.fillStyle='#fff';x.beginPath();x.arc((st[0]-t*4+W)%W,st[1],st[2],0,7);x.fill()}x.globalAlpha=1;
- if(img.complete&&img.naturalWidth){x.save();x.globalAlpha=1-eg;x.translate(820,1640);x.rotate(t*0.01);x.drawImage(img,-520,-520,1040,1040);x.restore();
+ if(img.complete&&img.naturalWidth){x.save();x.globalAlpha=1-eg;x.translate(820,1640);x.rotate(t*0.01);x.beginPath();x.arc(0,0,512,0,7);x.clip();x.drawImage(img,-520,-520,1040,1040);x.restore();
   const ag=x.createRadialGradient(820,1640,500,820,1640,600);ag.addColorStop(0,'rgba(120,180,255,.5)');ag.addColorStop(1,'rgba(120,180,255,0)');x.globalAlpha=1-eg;x.fillStyle=ag;x.fillRect(200,1000,880,920);x.globalAlpha=1}
  // Earth surface background (back on Earth)
  if(eg>0){x.globalAlpha=eg;const sg=x.createLinearGradient(0,0,0,1430);sg.addColorStop(0,'#2a64b5');sg.addColorStop(1,'#a9d3f2');x.fillStyle=sg;x.fillRect(0,0,W,1430);x.fillStyle='#5f8f45';x.fillRect(0,1430,W,H-1430);x.globalAlpha=1}
  person(sh,t,eg);
  // labels on the body
- const la=(t>=16.4&&t<20.2)?Math.min(ease((t-16.4)/.3),ease((20.2-t)/.3)):0;if(la>0){txt('PUFFY FACE',CX+250,626,46,'#9fe3ff',la,'Anton','left');txt('BIRD LEGS',CX+150,1300,46,'#9fe3ff',la,'Anton','left');
+ const la=t<1.7?1-ease((t-1.4)/.3):((t>=16.4&&t<20.2)?Math.min(ease((t-16.4)/.3),ease((20.2-t)/.3)):(t>=27.3?ease((t-27.3)/.2):0));if(la>0){txt('PUFFY FACE',CX+250,626,46,'#9fe3ff',la,'Anton','left');txt('BIRD LEGS',CX+150,1300,46,'#9fe3ff',la,'Anton','left');
   x.save();x.globalAlpha=la;x.strokeStyle='#9fe3ff';x.lineWidth=4;x.beginPath();x.moveTo(CX+245,614);x.lineTo(CX+110,618);x.moveTo(CX+145,1288);x.lineTo(CX+66,1282);x.stroke();x.restore()}
  // day counter (top right of the figure)
- const day=t<6.5?0:(t<12.3?3*ease((t-6.5)/5.8):3);const da=(t<16.4)?1:0;if(da&&u>=0){txt('DAY '+Math.floor(day+1e-6),915,640,92,'#fff',1,'Anton','right');txt(t<6.5?'GRAVITY: OFF':(t<12.3?'IN ORBIT':'FIRST MEASUREMENT'),915,686,26,'#ffd9a0',1,'Mont','right')}
- if(eg>0.3&&t<27.3){txt('GRAVITY: ON',915,686,26,'#ffd9a0',eg,'Mont','right')}
+ const day=t<6.5?0:(t<13.35?Math.min(2,Math.floor(3*(t-6.5)/6.85)):3);const da=(t>=2.3&&t<16.4)?1:0;if(da){txt('DAY '+day,915,640,92,'#fff',1,'Anton','right');txt(t<6.5?'WEIGHTLESS IN ORBIT':(t<13.35?'…':'FIRST MEASUREMENT'),915,686,26,'#ffd9a0',1,'Mont','right')}
+ if(eg>0.3&&t<27.3){txt('BACK TO 1 G',915,686,26,'#ffd9a0',eg,'Mont','right')}
  // 2-liter bottle at the answer
- const ba=(t>=13.3&&t<16.4)?Math.min(ease((t-13.3)/.25),ease((16.4-t)/.3)):0;bottle(830,1040,ease((t-13.4)/1.2),ba);
+ const ba=(t>=13.3&&t<16.4)?Math.min(ease((t-13.3)/.25),ease((16.4-t)/.3)):0;x.save();x.translate(800,960);x.scale(1.3,1.3);x.translate(-800,-960);bottle(800,960,1.0*ease((t-13.4)/1.0),ba);x.restore();
+ // quiz chips: shown with the guess, then the answer highlights 2+ LITERS
+ {const qa=(t>=2.5&&t<7.6)?Math.min(ease((t-2.5)/.25),ease((7.6-t)/.2)):((t>=13.35&&t<16.4)?Math.min(ease((t-13.35)/.2),ease((16.4-t)/.3)):0);if(qa>0){const ans=t>=13.35,L=[['A CUP',0],['1 LITER',0],[ans?'2+ LITERS':'2 LITERS',1]];
+  L.forEach(([lab,ok],i)=>{const cx=810,cy=1210+i*84;x.save();x.globalAlpha=qa*(ans&&!ok?0.35:1);x.fillStyle=ans&&ok?'#2fbf71':'rgba(10,20,40,.8)';x.strokeStyle=ans&&ok?'#9df0bf':'rgba(255,255,255,.7)';x.lineWidth=3;x.beginPath();x.roundRect(cx-110,cy-36,220,66,33);x.fill();x.stroke();x.restore();txt(lab,cx,cy+13,36,'#ffffff',qa*(ans&&!ok?0.35:1),'Anton')})}}
  const g=x.createLinearGradient(0,250,0,560);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.35,'rgba(0,0,0,.45)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,250,W,310);
  cards(t);}
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont'),new Promise(r=>{if(img.complete)r();img.onload=r;img.onerror=r})]).then(()=>{window.TEXREADY=true});

@@ -1,9 +1,9 @@
 Guess first: a cup, a liter or two liters? 👇
 
-On Earth, gravity pulls blood and other body fluids down toward your feet. In space, nothing pulls them back down, so they shift up toward your chest and head.
+On Earth, gravity pulls blood and other body fluids down toward your feet. In orbit you are in free fall (weightless), so nothing pulls them down toward your feet, and they shift up toward your chest and head.
 NASA measured it on Skylab 4: by the first in-flight measurement, on mission day 3, every crewman had lost more than 2 liters of fluid from his calves and thighs.
 The result has a name: "puffy face, bird legs". The face swells, the veins in the upper body fill up, and the legs get thinner.
-Back on Earth it reverses fast: most of the fluid flows back down within a few hours of landing.
+Back on Earth it reverses fast: a major part of the shift reverses within a few hours of landing.
 
 Only the day-3 measurement is known from this study, so the video does not show numbers for days 0 to 2.
 

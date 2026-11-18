@@ -72,7 +72,7 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 55 | 20 Kas 01:00 | What If You Fell Through Earth? 🌍 | gravity tunnel through earth | planlı (Metricool 433511597) |
 | 56 | 20 Kas 17:00 | Same Swing on 4 Worlds: Which Is Slowest? 🎢 | swing on planets | planlı (Metricool 433518934) |
 | 57 | 21 Kas 01:00 | What If You Jumped Off the Tallest Cliff? 🧗 | miranda cliff fall | planlı (Metricool 433530519) |
-| 58 | 21 Kas 17:00 | Why Do Astronauts Get Bird Legs? 🦵 | fluid shift space | hazırlanıyor |
+| 58 | 21 Kas 17:00 | Why Do Astronauts Get Bird Legs? 🦵 | fluid shift space | planlanıyor |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
