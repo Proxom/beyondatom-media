@@ -1,0 +1,86 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- miranda-cliff (series "What If…?"): jump off Verona Rupes on Uranus's moon Miranda, the tallest known cliff in the solar system (~20 km, NASA APOD 27 Nov 2016).
+     Miranda GM = G x 6.6e19 kg = 4.4 km^3/s^2, mean radius 235.8 km (NASA NSSDC Uranian satellite fact sheet): surface g = 0.0791 m/s^2 (124 times weaker than Earth's 9.82),
+     0.0672 m/s^2 at the top of the cliff. Free fall with g(r) = GM/r^2, no air (Miranda has none): 20 km in 761 s (12 min 41 s), landing at 54.0 m/s = 194 km/h.
+     Video: real time 2 -> 761 s mapped linearly onto 0 -> 21.5 s (about 35x). Cliff texture, Uranus and terrain are illustrative; the astronaut is not to scale. -->
+<script>
+const W=1080,H=1920,FPS=30,D=31.0,GM=4.4e9,RM=235.8e3,HC=20e3,TL=21.5,S0=2;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)};
+// integrate the fall (dt 0.05 s)
+const TT=[0],ZZ=[0],VV=[0];{let r=RM+HC,v=0,t=0;const dt=0.05;while(r>RM){v+=GM/(r*r)*dt;r-=v*dt;t+=dt;TT.push(t);ZZ.push(Math.min(HC,RM+HC-r));VV.push(v)}}
+const TF=TT[TT.length-1],VF=VV[VV.length-1];
+function fallAt(ts){if(ts<=0)return [0,0];if(ts>=TF)return [HC,VF];const i=Math.floor(ts/0.05),k=ts/0.05-i;return [ZZ[i]*(1-k)+ZZ[i+1]*k,VV[i]*(1-k)+VV[i+1]*k]}
+const simT=u=>u<TL?S0+u*(TF-S0)/TL:TF;
+window.MODEL={TF:TF.toFixed(1),min:Math.floor(TF/60)+':'+String(Math.round(TF%60)).padStart(2,'0'),VF:VF.toFixed(2),kmh:(VF*3.6).toFixed(0),gs:(GM/RM/RM).toFixed(4),gt:(GM/(RM+HC)**2).toFixed(4),ratio:(9.82/(GM/RM/RM)).toFixed(1),
+ t5:((300-S0)/(TF-S0)*TL).toFixed(2),t10:((600-S0)/(TF-S0)*TL).toFixed(2)};
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const R=rnd(17),STARS=[];for(let i=0;i<300;i++)STARS.push([R()*W,R()*H,R()*1.3+.3,R()]);
+// cliff texture: a 1080 x 2400 strip that tiles vertically
+const CT=document.createElement('canvas');CT.width=560;CT.height=2400;{const g=CT.getContext('2d');const r=rnd(3);
+ let gr=g.createLinearGradient(0,0,560,0);gr.addColorStop(0,'#5d6670');gr.addColorStop(.7,'#8e9aa6');gr.addColorStop(1,'#c3ccd4');g.fillStyle=gr;g.fillRect(0,0,560,2400);
+ for(let i=0;i<900;i++){const y=r()*2400,xx=r()*560,w=40+r()*260,h=2+r()*10,a=.05+r()*.18;for(const oy of [0,2400,-2400]){g.fillStyle=r()<.5?'rgba(20,26,34,'+a+')':'rgba(235,242,250,'+a*.8+')';g.fillRect(xx-w/2,y+oy,w,h)}}
+ for(let i=0;i<70;i++){const y=r()*2400,xx=r()*500;for(const oy of [0,2400,-2400]){g.strokeStyle='rgba(10,14,20,.45)';g.lineWidth=2+r()*3;g.beginPath();g.moveTo(xx,y+oy);let yy=y+oy,cx=xx;for(let k=0;k<6;k++){cx+=(r()-.5)*40;yy+=20+r()*50;g.lineTo(cx,yy)}g.stroke()}}}
+// cliff edge profile (x of the face as a function of texture y)
+const EP=[];{const r=rnd(8);for(let i=0;i<=240;i++)EP.push(470+40*Math.sin(i/7)+25*(r()-.5)+18*Math.sin(i/2.3));EP[240]=EP[0]}
+const edgeX=ty=>{const f=((ty%2400)+2400)%2400/10,i=Math.floor(f),k=f-i;return EP[i]*(1-k)+EP[(i+1)%240]*k};
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=22;x.fillText(s,px,py);x.shadowBlur=6;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+function uranus(){const ux=880,uy=700,ur=250;const g=x.createRadialGradient(ux-90,uy-110,30,ux,uy,ur);g.addColorStop(0,'#e6fbff');g.addColorStop(.5,'#a6e0ea');g.addColorStop(.85,'#6fb6c7');g.addColorStop(1,'#3f7f92');
+ x.fillStyle=g;x.beginPath();x.arc(ux,uy,ur,0,7);x.fill();x.save();x.beginPath();x.arc(ux,uy,ur,0,7);x.clip();x.fillStyle='rgba(255,255,255,.06)';for(let i=-4;i<5;i++){x.beginPath();x.ellipse(ux,uy+i*55,ur*1.1,10,0.25,0,7);x.fill()}
+ const sh=x.createLinearGradient(ux-ur,0,ux+ur,0);sh.addColorStop(0,'rgba(0,0,0,0)');sh.addColorStop(.62,'rgba(0,0,0,0)');sh.addColorStop(1,'rgba(0,0,10,.75)');x.fillStyle=sh;x.fillRect(ux-ur,uy-ur,2*ur,2*ur);x.restore();
+ x.save();x.strokeStyle='rgba(200,230,240,.25)';x.lineWidth=2;x.beginPath();x.ellipse(ux,uy,ur*1.45,ur*0.32,1.35,0,7);x.stroke();x.restore()}
+function astro(k,t){const suit='#f2f3f5';x.save();x.rotate(Math.sin(t*0.9)*0.18);
+ x.fillStyle='#b9bec7';x.save();x.translate(-0.11*k,-0.85*k);x.rotate(0.25);x.fillRect(-0.085*k,0,0.17*k,0.85*k);x.restore();x.fillStyle=suit;x.save();x.translate(0.11*k,-0.85*k);x.rotate(-0.2);x.fillRect(-0.085*k,0,0.17*k,0.85*k);x.restore();
+ x.fillStyle='#c8ccd3';x.fillRect(-0.36*k,-1.48*k,0.16*k,0.6*k);const tg=x.createLinearGradient(-0.25*k,0,0.25*k,0);tg.addColorStop(0,'#cfd3da');tg.addColorStop(.5,suit);tg.addColorStop(1,'#dfe2e7');
+ x.fillStyle=tg;x.beginPath();x.roundRect(-0.25*k,-1.5*k,0.5*k,0.7*k,0.1*k);x.fill();x.fillStyle='#e0533a';x.fillRect(-0.25*k,-1.2*k,0.5*k,0.05*k);
+ for(const s of [-1,1]){x.save();x.translate(s*0.22*k,-1.42*k);x.rotate(s*(0.7+0.15*Math.sin(t*2+s)));x.fillStyle=suit;x.beginPath();x.roundRect(-0.065*k,-0.62*k,0.13*k,0.62*k,0.06*k);x.fill();x.restore()}
+ x.fillStyle=suit;x.beginPath();x.arc(0.02*k,-1.62*k,0.19*k,0,7);x.fill();const vg=x.createLinearGradient(0,-1.75*k,0.2*k,-1.5*k);vg.addColorStop(0,'#f6d57a');vg.addColorStop(1,'#9a6a1c');
+ x.fillStyle=vg;x.beginPath();x.ellipse(0.06*k,-1.62*k,0.12*k,0.12*k,0,0,7);x.fill();x.restore()}
+const K=0.6,AY=980,AX=640;  // px per metre for the cliff scroll; astronaut screen position
+const CARDS=[[0,3.4,'JUMP OFF A 20 km CLIFF','HOW LONG IS THE FALL?'],[3.4,6.4,'GUESS NOW:','SECONDS, MINUTES OR HOURS?'],[6.4,12.3,'MIRANDA, A MOON OF URANUS','GRAVITY 124 TIMES WEAKER'],
+ [12.3,16.8,'NO AIR:','NOTHING SLOWS YOU DOWN'],[16.9,19.6,'10 MINUTES…','STILL FALLING'],[19.6,21.45,'HERE COMES','THE GROUND']];
+const BIG=[[21.6,27.4,'12 MIN 41 S','LANDING AT 194 km/h'],[27.4,28.7,'WOULD YOU','JUMP?'],[28.7,30.0,'FOLLOW →','MORE EVERY DAY'],[30.0,D+1,'JUMP OFF A 20 km CLIFF','HOW LONG IS THE FALL?']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),ease((b-t)/.18));
+  const sz=Math.min(fit(l1,76,840),fit(l2,76,840));txt(l1,495,402,sz,'#fff',al);txt(l2,495,402+sz*1.06,sz,'#ffd166',al)}
+ for(const [a,b,l1,l2] of BIG){if(t<a||t>=b)continue;const al=Math.min(b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.15)),big=l1=='12 MIN 41 S';const pop=big?1+.1*Math.exp(-(t-a)/.15):1;
+  const s1=Math.min(fit(l1,big?112:76,840),big?999:fit(l2,76,840))*pop;txt(l1,495,410+(big?40:0),s1,'#fff',al);txt(l2,495,410+(big?40:0)+(big?76:s1*1.06),big?fit(l2,64,840):s1,'#ffd166',al)}}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ const u=t>=30.0?t-D:t;const ts=u<0?S0+u*0.05:simT(u);const [z,v]=fallAt(ts);const left=HC-z;
+ for(const st of STARS){x.globalAlpha=.3+.5*st[3];x.fillStyle='#fff';x.beginPath();x.arc(st[0],st[1],st[2],0,7);x.fill()}x.globalAlpha=1;
+ uranus();
+ // far floor: grooved terrain glow below, growing as the floor gets closer
+ const near=cl(1-left/HC);const fy=H-200-900*Math.pow(near,3);const fg=x.createLinearGradient(0,fy-500,0,H);fg.addColorStop(0,'rgba(60,70,82,0)');fg.addColorStop(.5,'rgba(70,80,92,'+(.35+.4*near)+')');fg.addColorStop(1,'rgba(110,120,130,'+(.6+.4*near)+')');
+ x.fillStyle=fg;x.fillRect(0,fy-500,W,H-fy+500);
+ x.save();x.beginPath();x.rect(0,fy-20,W,H);x.clip();x.globalAlpha=.12+.25*near;x.strokeStyle='rgba(30,36,44,.8)';const sc=1+40*Math.pow(near,4);x.lineWidth=2*sc;for(let i=0;i<9;i++){const yy=fy+i*30*sc;if(yy>H)break;x.beginPath();x.moveTo(380,yy);x.bezierCurveTo(600,yy-20*sc,800,yy+25*sc,1080,yy-10*sc);x.stroke()}x.restore();
+ // cliff: texture scrolls up as you fall (world metres * K)
+ const off=z*K;const top0=AY-260+off*0;  // top edge of the cliff in screen px at z = 0 is at AY+60 (you just jumped)
+ const topY=AY+80-off; // screen y of the cliff top
+ x.save();x.beginPath();const y0=Math.max(-10,topY);x.moveTo(0,y0);for(let y=y0;y<=H+20;y+=12){const ty=y+off;x.lineTo(edgeX(ty),y)}x.lineTo(0,H+20);x.closePath();x.clip();
+ for(let k=-1;k<3;k++){const yy=((-off%2400)+2400)%2400+k*2400-2400;x.drawImage(CT,0,yy)}
+ const lg=x.createLinearGradient(0,0,560,0);lg.addColorStop(0,'rgba(0,0,0,.45)');lg.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=lg;x.fillRect(0,0,560,H);x.restore();
+ // cliff top plateau (only near the start)
+ if(topY>-40){x.fillStyle='#aab4bd';x.beginPath();x.moveTo(0,topY);x.lineTo(edgeX(topY+off)+10,topY);x.lineTo(edgeX(topY+off),topY+16);x.lineTo(0,topY+16);x.fill()}
+ // ground rush in the last ~1000 m
+ const gY=AY+120+left*K;if(gY<H+50){x.fillStyle='#7d8790';x.fillRect(0,gY,W,H-gY+60);const gg=x.createLinearGradient(0,gY,0,gY+300);gg.addColorStop(0,'#b9c2ca');gg.addColorStop(1,'#59626b');x.fillStyle=gg;x.fillRect(0,gY,W,300);x.strokeStyle='rgba(40,46,54,.5)';x.lineWidth=3;for(let i=0;i<7;i++){const yy=gY+20+i*i*14;x.beginPath();x.moveTo(0,yy);x.bezierCurveTo(300,yy-12,700,yy+14,1080,yy-6);x.stroke()}}
+ // speed streaks
+ const vs=v/VF;if(vs>.05&&u<TL){x.save();x.strokeStyle='rgba(220,235,255,'+(.15+.35*vs)+')';x.lineWidth=2;const r=rnd(Math.floor(t*30));for(let i=0;i<14*vs;i++){const sx=520+r()*480,sy=r()*H,L=60+600*vs*vs;x.beginPath();x.moveTo(sx,sy);x.lineTo(sx,sy-L);x.stroke()}x.restore()}
+ // astronaut
+ const landed=u>=TL;let ay=AY;if(landed)ay=Math.min(gY,AY+120);
+ const gl=x.createRadialGradient(AX,ay-110,0,AX,ay-110,190);gl.addColorStop(0,'rgba(255,255,255,.28)');gl.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=gl;x.fillRect(AX-200,ay-300,400,400);
+ if(!landed){x.save();x.translate(AX,ay+60);astro(130,t);x.restore()}
+ // landing dust
+ if(landed&&u<TL+3){const k=u-TL;const a=ease(k/.15)*(1-0.6*ease((k-.6)/2.4));const rr=80+500*Math.sqrt(cl(k/2.5));x.globalAlpha=a*.8;const dg=x.createRadialGradient(AX,gY,rr*.2,AX,gY,rr);dg.addColorStop(0,'rgba(230,236,242,.9)');dg.addColorStop(1,'rgba(230,236,242,0)');x.fillStyle=dg;x.beginPath();x.ellipse(AX,gY,rr*1.3,rr*.5,0,0,7);x.fill();x.globalAlpha=1}
+ // clock + height + gauge (right)
+ const ca=(t<30.0&&!(t>=21.6&&t<27.4))?1:0;if(ca){const sec=Math.round(ts),clock=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');
+  txt(clock,80,640,96,'#fff',1,'Anton','left');txt('HEIGHT '+(left/1000).toFixed(1)+' km',80,688,30,'#ffd9a0',1,'Mont','left');txt(Math.round(v*3.6)+' km/h',80,728,30,'#cfe8ff',1,'Mont','left');
+  const gx=96,gt=790,gb=1380;x.fillStyle='rgba(0,0,0,.55)';x.fillRect(gx-4,gt,8,gb-gt);x.fillStyle='rgba(255,255,255,.75)';x.fillRect(gx-2,gt,4,gb-gt);txt('20 km',gx+16,gt+8,22,'#fff',1,'Mont','left');txt('0',gx+16,gb+8,22,'#fff',1,'Mont','left');
+  const gy=gt+(gb-gt)*z/HC;x.fillStyle='#ffd166';x.beginPath();x.arc(gx,gy,11,0,7);x.fill()}
+ // card band
+ const g=x.createLinearGradient(0,250,0,560);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.35,'rgba(0,0,0,.5)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,250,W,310);
+ cards(t);}
+Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true});
+</script>

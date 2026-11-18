@@ -70,7 +70,8 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 53 | 19 Kas 17:00 | Same Throw on 4 Worlds: Who Throws Farthest? ⚾ | throw on planets | planlı (Metricool 432361617) |
 | 54 | 19 Kas 01:00 | What If Earth Stopped Orbiting the Sun? ☀️ | earth falls into sun | planlı (Metricool 433500606) |
 | 55 | 20 Kas 01:00 | What If You Fell Through Earth? 🌍 | gravity tunnel through earth | planlı (Metricool 433511597) |
-| 56 | 20 Kas 17:00 | Same Swing on 4 Worlds: Which Is Slowest? 🎢 | swing on planets | hazırlanıyor |
+| 56 | 20 Kas 17:00 | Same Swing on 4 Worlds: Which Is Slowest? 🎢 | swing on planets | planlı (Metricool 433518934) |
+| 57 | 21 Kas 01:00 | What If You Jumped Off the Tallest Cliff? 🧗 | miranda cliff fall | hazırlanıyor |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
