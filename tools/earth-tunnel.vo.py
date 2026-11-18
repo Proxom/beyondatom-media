@@ -9,6 +9,7 @@ L = {
  'l5': "Now gravity pulls you back, and you slow down.",
  'l6': "You stop right at the South Pole.",
  'l7': "Thirty-eight minutes, eleven seconds.",
+ 'l7b': "Not the textbook forty-two!",
  'l8': "Then you fall all the way back.",
  'l9': "Did you guess right?",
 }

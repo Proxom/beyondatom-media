@@ -6,7 +6,7 @@ After 19.1 minutes you fly through the center at about 9.9 km/s, your top speed.
 Past the center, gravity pulls you back toward the middle, so you slow down.
 After 38 minutes and 11 seconds you stop, right at the South Pole... and then you fall all the way back.
 
-Why not the "classic" 42 minutes? That number assumes Earth has the same density everywhere. Real Earth is much denser in its core, so gravity stays close to its surface strength most of the way down, and the trip is shorter: 38 min 11 s (Klotz, American Journal of Physics, 2015).
+Why not the "classic" 42 minutes? That number assumes Earth has the same density everywhere. Real Earth is much denser in its core, so gravity stays at or above its surface strength most of the way down (it even rises to about 10.7 m/s² at the top of the core), and the trip is shorter: 38 min 11 s (Klotz, American Journal of Physics, 2015).
 
 The math: we added up Earth's mass layer by layer with the PREM model of Earth's density, worked out gravity at every depth, and stepped the fall forward in time. It gives Earth's mass (5.97 × 10²⁴ kg), surface gravity (9.82 m/s²) and the published 38 min 11 s.
 

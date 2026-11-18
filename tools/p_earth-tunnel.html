@@ -65,9 +65,9 @@ function earth(t,rot,Z){const tw=14*Math.pow(Z,-0.42);// cross-section, drawn in
 function cam(t){// zoom Z and focus point (world px) + rotation
  const zin=t>=30.2?1:(t<3.6?1-ease(t/3.6):(t>28.9?ease((t-28.9)/1.3):0));const Z=Math.exp(Math.log(34)*zin);
  const rot=Math.PI*ease((t-24.3)/2.6);return [Z,zin,rot]}
-const CARDS=[[0,3.9,'A TUNNEL THROUGH EARTH','HOW LONG TO FALL THROUGH?'],[3.9,6.0,'GUESS NOW:','MINUTES, HOURS OR DAYS?'],[6.0,6.9,'GRAVITY PULLS YOU','FASTER AND FASTER'],
- [6.9,9.9,'13 MINUTES: THE CORE','2,891 km DOWN'],[9.9,13.3,'THE CENTER:','9.9 km PER SECOND'],[13.3,18.7,'NOW GRAVITY','SLOWS YOU DOWN'],[18.7,21.3,'YOU STOP RIGHT AT','THE SOUTH POLE']];
-const BIG=[[21.3,24.4,'38 MIN 11 S','TO FALL THROUGH EARTH'],[24.4,27.6,'THEN YOU FALL','ALL THE WAY BACK'],[27.6,28.9,'DID YOU','GUESS RIGHT?'],[28.9,30.2,'FOLLOW →','MORE EVERY DAY'],[30.2,D+1,'A TUNNEL THROUGH EARTH','HOW LONG TO FALL THROUGH?']];
+const CARDS=[[0,3.9,'A TUNNEL THROUGH EARTH','MINUTES, HOURS OR DAYS?'],[3.9,6.0,'GUESS NOW:','HOW LONG TO FALL THROUGH?'],[6.0,7.03,'GRAVITY PULLS YOU','FASTER AND FASTER'],
+ [7.03,9.9,'13 MINUTES: THE CORE','INTO THE LIQUID OUTER CORE'],[9.9,13.3,'THE CENTER:','9.9 km PER SECOND'],[13.3,18.7,'NOW GRAVITY','SLOWS YOU DOWN'],[18.7,21.3,'YOU STOP RIGHT AT','THE SOUTH POLE']];
+const BIG=[[21.3,23.6,'38 MIN 11 S','TO FALL THROUGH EARTH'],[23.6,25.6,'NOT THE TEXTBOOK 42 MIN:','THE HEAVY CORE SPEEDS YOU UP'],[25.6,27.6,'THEN YOU FALL','ALL THE WAY BACK'],[27.6,28.9,'DID YOU','GUESS RIGHT?'],[28.9,30.2,'FOLLOW →','MORE EVERY DAY'],[30.2,D+1,'A TUNNEL THROUGH EARTH','MINUTES, HOURS OR DAYS?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),ease((b-t)/.18));
   const sz=Math.min(fit(l1,76,840),fit(l2,76,840));txt(l1,495,398,sz,'#fff',al);txt(l2,495,398+sz*1.08,sz,'#ffd166',al)}
  for(const [a,b,l1,l2] of BIG){if(t<a||t>=b)continue;const al=Math.min(b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.15)),big=l1=='38 MIN 11 S';const pop=big?1+.1*Math.exp(-(t-a)/.15):1;
@@ -88,12 +88,13 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';
  const gl=x.createRadialGradient(sx,sy-k*.9,0,sx,sy-k*.9,k*1.4);gl.addColorStop(0,'rgba(255,255,255,.45)');gl.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=gl;x.fillRect(sx-k*1.5,sy-k*2.4,k*3,k*3);
  x.save();x.translate(sx,sy+k*0.9);x.rotate(Math.sin(t*1.7)*0.12);astro(k,t*3);x.restore();
  // layer labels (left of the tunnel, upright), shown in the full view
- const la=(1-zin)*(t<21.3?1:cl((24.3-t)/.3));if(la>0.01){const L=[['CRUST',0.992],['MANTLE',0.77],['OUTER CORE',0.37],['INNER CORE',0.0]];
+ const la=(1-zin)*(t<21.3?1:cl((24.3-t)/.3));
+ {const pa=t<30.2?cl(1-(1-zin)*3):1;if(pa>0.01){txt('NORTH POLE',sx+100,sy-k*1.9,40,'#ffffff',pa,'Anton','left')}}if(la>0.01){const L=[['CRUST',0.992],['MANTLE',0.77],['OUTER CORE',0.37],['INNER CORE',0.0]];
   const depth=RE-Math.abs(p),pr=Math.abs(p)/RE;
   for(const [n,f] of L){const yy=CY-f*RP+(f==0?10:24);const here=(n=='CRUST'&&pr>0.985)||(n=='MANTLE'&&pr<=0.985&&pr>0.5462)||(n=='OUTER CORE'&&pr<=0.5462&&pr>0.1917)||(n=='INNER CORE'&&pr<=0.1917);
    txt(n,CX-38,yy,here?38:30,here?'#ffffff':'rgba(255,255,255,.7)',la,'Mont','right')}}
  // clock (top right) + depth line
- const ca=(1-zin)*(t<30.2?1:0);if(ca>0.01&&!(t>=21.3&&t<24.4)){const sec=Math.floor(ts),mm=Math.floor(sec/60),ss=sec%60;const clock=mm+':'+String(ss).padStart(2,'0');
+ const ca=(1-zin)*(t<30.2?1:0);if(ca>0.01&&!(t>=21.3&&t<23.6)){const sec=Math.round(ts),mm=Math.floor(sec/60),ss=sec%60;const clock=mm+':'+String(ss).padStart(2,'0');
   txt(clock,925,640,96,'#fff',ca,'Anton','right');const dkm=Math.round((RE-Math.abs(p))/1e3);const far=p<0;
   txt(far?(Math.round((RE-Math.abs(p))/1e3)).toLocaleString('en-US')+' km TO GO':'DEPTH '+dkm.toLocaleString('en-US')+' km',925,688,30,'#ffd9a0',ca,'Mont','right');
   txt(Math.round(v/1e3*10)/10+' km/s',925,728,30,'#cfe8ff',ca,'Mont','right')}
