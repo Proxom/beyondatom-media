@@ -69,14 +69,15 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 52 | 18 Kas 17:00 | How Many Launches to Land Starship on the Moon? 🚀 | starship refueling | planlı (Metricool 430989202) |
 | 53 | 19 Kas 17:00 | Same Throw on 4 Worlds: Who Throws Farthest? ⚾ | throw on planets | planlı (Metricool 432361617) |
 | 54 | 19 Kas 01:00 | What If Earth Stopped Orbiting the Sun? ☀️ | earth falls into sun | planlı (Metricool 433500606) |
-| 55 | 20 Kas 01:00 | What If You Fell Through Earth? 🌍 | gravity tunnel through earth | hazırlanıyor |
+| 55 | 20 Kas 01:00 | What If You Fell Through Earth? 🌍 | gravity tunnel through earth | planlı (Metricool 433511597) |
+| 56 | 20 Kas 17:00 | Same Swing on 4 Worlds: Which Is Slowest? 🎢 | swing on planets | hazırlanıyor |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
 ## Eş anlamlı grupları (bunlardan biri varsa diğerleri de ENGELLİ)
 - black hole fall = spaghettification = falling into black hole = event horizon crossing
 - black hole lensing = light bending = "see behind black hole" = Interstellar/Gargantua görünümü (dikkat: 1M+ #9 "Interstellar's black hole vs the real one" bu satırla çakışıyor)
-- jump on planets / jump on moons / ball drop planets / throw on planets = "aynı deney, farklı dünyalar" serisi (fırlatılan top #53 ile KULLANILDI); yeni bölüm ancak YENİ bir deneyle olur (ör. fırlatılan top, sarkaç, paraşüt), zıplama ve top düşürme tekrar edilmez
+- jump on planets / jump on moons / ball drop planets / throw on planets = "aynı deney, farklı dünyalar" serisi (fırlatılan top #53, salıncak/sarkaç #56 ile KULLANILDI); yeni bölüm ancak YENİ bir deneyle olur (ör. fırlatılan top, sarkaç, paraşüt), zıplama ve top düşürme tekrar edilmez
 - iss sunrises = iss orbit period = "16 sunrises"; iss free fall orbit = newton's cannon
 - planet rotation periods = venus day length = mercury day length = "day longer than year"
 - planet orbital speeds = earth orbital speed; solar system galactic motion = helix

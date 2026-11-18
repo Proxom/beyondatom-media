@@ -6,9 +6,9 @@
      Surface gravity from the NASA NSSDC fact sheets: Earth 9.82, Mars 3.73, Moon 1.62, Pluto 0.62 m/s^2. No air drag, no friction.
      Landscapes are illustrative; the swing set, rope and astronaut are drawn to one scale in every lane. -->
 <script>
-const W=1080,H=1920,FPS=30,D=30.0,LR=2.5,A0=35*Math.PI/180,T0=0.25;
+const W=1080,H=1920,FPS=30,D=30.0,LR=2.5,A0=35*Math.PI/180,T0=-0.6;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)};
-const LT=[520,750,980,1210],LH=230,GOFF=40,PX=58;  // lane tops, lane height, ground strip, px per metre
+const LT=[520,750,980,1210],LH=230,GOFF=36,PX=64;  // lane tops, lane height, ground strip, px per metre
 const WD=[
  {n:'EARTH',g:9.82,sky:['#1d5eb0','#5d9be0','#b6dcf6'],hill:['#6e9a5c','#557f46'],gr:['#5e8f3a','#3b2a1a'],stars:0},
  {n:'MARS',g:3.73,sky:['#9c6a45','#c99368','#e9c49a'],hill:['#b06a42','#93512f'],gr:['#b4552d','#5a2412'],stars:0},
@@ -60,31 +60,31 @@ function lane(i,w,u,t){const top=LT[i],gy=top+LH-GOFF,bot=i==3?H:top+LH;x.save()
  g=x.createLinearGradient(0,gy,0,bot);g.addColorStop(0,w.gr[0]);g.addColorStop(1,w.gr[1]);x.fillStyle=g;x.fillRect(0,gy,W,bot-gy);
  if(w.tholin){x.fillStyle='rgba(150,80,50,.35)';for(const p of w.pt){x.beginPath();x.ellipse(p[0],gy+8+p[1]*300,p[2]*1.5,p[2]*.18,0,0,7);x.fill()}}
  // swing frame (A-frame), pivot 2.5 m rope + 0.45 m seat height
- const py=gy-(LR+0.45)*PX;x.strokeStyle='#4c5560';x.lineWidth=7;x.lineCap='round';
+ const py=gy-(LR+0.42)*PX;x.strokeStyle='#4c5560';x.lineWidth=7;x.lineCap='round';
  x.beginPath();x.moveTo(SX-150,py);x.lineTo(SX+150,py);x.stroke();for(const sx of [-150,150]){x.beginPath();x.moveTo(SX+sx-34,gy);x.lineTo(SX+sx,py);x.lineTo(SX+sx+34,gy);x.stroke()}
  // swing arc guide
  x.save();x.setLineDash([6,10]);x.strokeStyle='rgba(255,255,255,.35)';x.lineWidth=2;x.beginPath();x.arc(SX,py,LR*PX+6,Math.PI/2-A0,Math.PI/2+A0);x.stroke();x.restore();
  const s=u-T0,th=thAt(w,s);x.save();x.translate(SX,py);rider(th);x.restore();
  x.restore();
  // labels: world name + g (left), swing count (right)
- const n=w.peaks.filter(p=>p<=s).length-1,last=w.peaks[n],k=s-last,pop=(n>0&&k<0.25)?1+0.3*Math.exp(-k/.1):1;
+ const n=Math.max(0,w.peaks.filter(p=>p<=s).length-1),last=w.peaks[n],k=s-last,pop=(n>0&&k<0.25)?1+0.3*Math.exp(-k/.1):1;
  txt(w.n,72,top+46,42,'#fff',1,'Anton','left');x.font='42px Anton';const nw=x.measureText(w.n).width;txt('g = '+w.g.toFixed(2)+' m/s²',72+nw+14,top+44,23,'rgba(240,244,250,.92)',1,'Mont','left');
  const won=i==3&&n>=1;txt(n+(n==1?' SWING':' SWINGS'),915,top+110,48*pop,won?'#9df0bf':'#ffd166',1,'Anton','right');
  txt((n>=1?w.T.toFixed(1)+' s each':'…'),915,top+148,24,'rgba(240,244,250,.92)',n>=1?1:.7,'Mont','right');
  if(i==3&&n<1&&s>0){txt(s.toFixed(1)+' s',915,top+190,34,'#ffffff',1,'Anton','right')}}
-const CARDS=[[0,3.1,'SAME SWING, 4 WORLDS','WHICH ONE IS SLOWEST?'],[3.1,5.0,'EARTH: ONE SWING','EVERY 3.2 SECONDS'],[5.0,7.4,'MARS: 5.3 SECONDS',''],[7.4,9.1,'THE MOON: 8 SECONDS',''],
- [9.1,13.05,'GUESS: ONE SWING','ON PLUTO TAKES…?'],[13.05,16.0,'12.9 SECONDS!','EARTH: 4 SWINGS ALREADY'],[16.0,20.2,'YOUR WEIGHT DOESN\'T MATTER','ONLY GRAVITY + ROPE LENGTH'],
- [20.2,25.3,'PLUTO PULLS 16 TIMES WEAKER','SO IT SWINGS 4 TIMES SLOWER'],[25.3,27.6,'WHICH WORLD WOULD','YOU SWING ON?'],[27.6,29.0,'FOLLOW →','MORE EVERY DAY'],[29.0,D+1,'SAME SWING, 4 WORLDS','WHICH ONE IS SLOWEST?']];
+const CARDS=[[0,2.6,'SAME SWING, 4 WORLDS','WHICH ONE IS SLOWEST?'],[2.6,5.85,'EARTH: ONE SWING','EVERY 3.2 SECONDS'],[5.85,7.65,'MARS: 5.3 SECONDS',''],[7.65,8.9,'THE MOON: 8 SECONDS',''],
+ [8.9,12.32,'GUESS: ONE SWING','ON PLUTO TAKES…?'],[12.32,15.5,'12.9 SECONDS!','EARTH: 4 SWINGS ALREADY'],[15.5,19.7,'YOUR WEIGHT DOESN\'T MATTER','ONLY GRAVITY + ROPE LENGTH'],
+ [19.7,24.8,'PLUTO PULLS 16 TIMES WEAKER','SO IT SWINGS 4 TIMES SLOWER'],[24.8,27.1,'WHICH WORLD WOULD','YOU SWING ON?'],[27.1,28.8,'FOLLOW →','MORE EVERY DAY'],[28.8,D+1,'SAME SWING, 4 WORLDS','WHICH ONE IS SLOWEST?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
- const sz=Math.min(fit(l1,76,820),l2?fit(l2,76,820):99);const pop=(l1=='12.9 SECONDS!')?1+0.1*Math.exp(-(t-a)/.15):1;txt(l1,495,404,sz*pop,'#fff',al);if(l2)txt(l2,495,404+sz*1.08,sz,'#ffd166',al)}}
+ const sz=Math.min(fit(l1,70,820),l2?fit(l2,70,820):99);const pop=(l1=='12.9 SECONDS!')?1+0.1*Math.exp(-(t-a)/.15):1;txt(l1,495,402,sz*pop,'#fff',al);if(l2)txt(l2,495,402+sz*1.06,sz,'#ffd166',al)}}
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
- const u=t>=29.0?t-D:t;
+ const u=t>=28.8?t-D:t;
  for(let i=0;i<4;i++)lane(i,WD[i],u,t);
  for(let i=1;i<4;i++){x.fillStyle='rgba(0,0,0,.8)';x.fillRect(0,LT[i]-3,W,6);x.fillStyle='rgba(255,255,255,.10)';x.fillRect(0,LT[i]+3,W,1.5)}
  let g=x.createLinearGradient(0,280,0,540);g.addColorStop(0,'rgba(0,10,30,.35)');g.addColorStop(1,'rgba(0,10,30,0)');x.fillStyle=g;x.fillRect(0,280,W,260);
- const s3=u-T0-WD[3].T;if(s3>0&&t<29){x.save();x.globalAlpha=.5*ease(s3/.4);x.strokeStyle='#9df0bf';x.lineWidth=4;x.strokeRect(6,LT[3]+6,W-12,LH-12);x.restore()}
+ const s3=u-T0-WD[3].T;if(s3>0&&t<28.8){x.save();x.globalAlpha=.5*ease(s3/.4);x.strokeStyle='#9df0bf';x.lineWidth=4;x.strokeRect(6,LT[3]+6,W-12,LH-12);x.restore()}
  cards(t);
- const fa=(t<3.1?ease((3.1-t)/.3):0)+(t>29.0?ease((t-29.0)/.3):0);txt('2.5 m rope · let go from 35° · no air drag',495,500,24,'#eef2f8',fa,'Mont');
+ const fa=(t<2.6?ease((2.6-t)/.3):0)+(t>28.8?ease((t-28.8)/.3):0);txt('2.5 m rope · let go from 35° · no air drag',495,506,22,'#eef2f8',fa,'Mont');
  g=x.createRadialGradient(540,980,560,540,980,1300);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=g;x.fillRect(0,0,W,H);}
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true});
 </script>
