@@ -7,8 +7,8 @@ L = {
  'l3': "For a whole month, the Sun barely grows.",
  'l4': "But we keep speeding up.",
  'l5': "Day forty-one: Venus's orbit. Almost twice the sunlight.",
- 'l6': "Day fifty-seven: Mercury's orbit. Almost seven times.",
- 'l7': "Sixty-five days. Impact at over six hundred kilometers a second.",
+ 'l6': "Day fifty-seven: Mercury's orbit. Over six and a half times.",
+ 'l7': "About sixty-five days. Impact at over six hundred kilometers a second.",
  'l8': "Did you guess right?",
 }
 for n, s in L.items():
