@@ -4,20 +4,20 @@
 <!-- shout-four-worlds (series "Who Lands / Wins First?"): the same shout to a friend 100 m away on Venus, Earth, Mars and the Moon.
      Thought experiment ("imagine"), no suits drawn. Wave fronts move at the surface speed of sound of each world:
      Venus ~409 m/s (Petculescu & Lueptow 2007, Icarus 186: 100 Hz wavelength 4.09 m), Earth 343 m/s and Mars 240 m/s (NASA/JPL, Perseverance 2022),
-     Moon: no air, no sound. Slowed 20x: video seconds = 20 x real seconds. Distances share one scale (6.6 px per m). People are drawn bigger than scale. -->
+     Moon: no air, no sound. Slowed 20x: video seconds = 20 x real seconds. Distances share one scale (6.2 px per m). People are drawn bigger than scale. -->
 <script>
-const W=1080,H=1920,FPS=30,D=25.5,LOOP=25.0,SLOW=20,T0=-0.4,DIST=100,PXM=6.2,PS=0.72;
+const W=1080,H=1920,FPS=30,D=25.5,LOOP=25.0,SLOW=20,T0=-1.0,DIST=100,PXM=6.2,PS=0.8;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)};
 const X0=60,X1=930,SX=200,FX=SX+DIST*PXM; // shouter mouth x, friend ear x
-const ROWS=[600,812,1024,1236],RH=200;
+const ROWS=[590,805,1020,1235],RH=203;
 const WD=[
- {n:'VENUS',v:409,sky:['#5a300c','#a8641c','#d9a04a'],gr:['#5b3a1f','#2c1a0c'],tag:'≈410 m/s',sub:'thick, hot air',tc:4.49},
- {n:'EARTH',v:343,sky:['#123c70','#3f7fc0','#8cc0ea'],gr:['#3c7a2c','#1b3d14'],tag:'343 m/s',sub:'',tc:5.43},
- {n:'MARS',v:240,sky:['#5c3420','#a8704a','#d2a27a'],gr:['#8a3e1e','#3e180a'],tag:'240 m/s',sub:'thin, cold air',tc:7.93},
+ {n:'VENUS',v:409,sky:['#5a300c','#a8641c','#d9a04a'],gr:['#5b3a1f','#2c1a0c'],tag:'≈410 m/s',sub:'very hot air',tc:3.89},
+ {n:'EARTH',v:343,sky:['#123c70','#3f7fc0','#8cc0ea'],gr:['#3c7a2c','#1b3d14'],tag:'343 m/s',sub:'',tc:4.83},
+ {n:'MARS',v:240,sky:['#5c3420','#a8704a','#d2a27a'],gr:['#8a3e1e','#3e180a'],tag:'240 m/s',sub:'cold air',tc:7.33},
  {n:'MOON',v:0,sky:['#000','#03040a','#080a12'],gr:['#9a9892','#3a3936'],tag:'NO AIR',sub:'no sound',tc:null}];
 for(const w of WD){w.ta=w.v?DIST/w.v:null;w.ua=w.v?T0+SLOW*w.ta:null}
 window.MODEL=WD.map(w=>[w.n,w.ta&&w.ta.toFixed(3),w.ua&&w.ua.toFixed(2)]);
-const REVEAL=[5.7,11.7,13.75,17.7]; // when the voice names each world (colour + speed tag)
+const REVEAL=[5.2,11.4,13.7,17.4]; // when the voice names each world (colour + speed tag)
 const cv=document.getElementById('c'),x=cv.getContext('2d');
 function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
 const STARS=[];{const r=rnd(91);for(let k=0;k<380;k++)STARS.push([r()*W,r()*H,r()*1.6+.3,r()])}
@@ -43,7 +43,7 @@ function row(i,w,u,t){const y0=ROWS[i],gy=y0+RH-28;
  x.save();x.beginPath();x.roundRect(X0,y0,X1-X0,RH,18);x.clip();
  let g=x.createLinearGradient(0,y0,0,gy);g.addColorStop(0,w.sky[0]);g.addColorStop(.6,w.sky[1]);g.addColorStop(1,w.sky[2]);x.fillStyle=g;x.fillRect(X0,y0,X1-X0,RH);
  if(i==3){for(const s of MSTARS){x.globalAlpha=.4+.5*s[3];x.fillStyle='#fff';x.beginPath();x.arc(s[0],y0+s[1],s[2],0,7);x.fill()}x.globalAlpha=1;
-  const eg=x.createRadialGradient(660,y0+112,4,660,y0+112,30);eg.addColorStop(0,'#bfe0ff');eg.addColorStop(.5,'#3c78c0');eg.addColorStop(1,'rgba(30,60,120,0)');x.fillStyle=eg;x.beginPath();x.arc(660,y0+112,30,0,7);x.fill()}
+}
  if(i==0){const hz=x.createLinearGradient(0,y0,0,gy);hz.addColorStop(0,'rgba(255,200,120,0)');hz.addColorStop(1,'rgba(255,210,130,.18)');x.fillStyle=hz;x.fillRect(X0,y0,X1-X0,RH)}
  g=x.createLinearGradient(0,gy,0,y0+RH);g.addColorStop(0,w.gr[0]);g.addColorStop(1,w.gr[1]);x.fillStyle=g;x.fillRect(X0,gy,X1-X0,RH);
  x.fillStyle='rgba(255,255,255,.18)';x.fillRect(X0,gy,X1-X0,2);
@@ -61,8 +61,8 @@ function row(i,w,u,t){const y0=ROWS[i],gy=y0+RH-28;
  person(SX-24,gy,1,i==3?'#c8ccd4':'#e0574a',mo,0,0,t);
  const ka=arrived?u-w.ua:-1;const hop=ka>=0?18*Math.sin(Math.PI*cl(ka/.35)):0;
  person(FX+14,gy,-1,i==3?'#c8ccd4':'#4a8fe0',0,ka>=0?1:0,hop,t);
- if(ka>=0){const pa=ease(ka/.12)*(1-ease((ka-1.0)/.3));txt('!',FX-34,gy-118-hop,56,'#fff',pa,'Anton')}
- if(i==3&&t>=REVEAL[3]&&t<LOOP){const qa=ease((t-REVEAL[3]-.3)/.25);txt('?',FX-34,gy-118,56,'#fff',qa,'Anton')}
+ if(ka>=0){const pa=ease(ka/.12)*(1-ease((ka-1.0)/.3));txt('!',FX+52,gy-78-hop,50,'#fff',pa,'Anton')}
+ if(i==3&&t>=REVEAL[3]&&t<LOOP){const qa=ease((t-REVEAL[3]-.3)/.25);txt('?',FX+52,gy-78,50,'#fff',qa,'Anton')}
  x.restore();
  // label + timer
  const rv=t>=REVEAL[i]&&t<LOOP;const ra=rv?ease((t-REVEAL[i])/.25):0;
@@ -74,9 +74,9 @@ function row(i,w,u,t){const y0=ROWS[i],gy=y0+RH-28;
  if(arrived&&i<3){const rk=['1ST','2ND','3RD'][i];txt(rk,X1-130,y0+46,26,gold?'#ffd166':'rgba(255,255,255,.85)',ease((u-w.ua)/.2),'Mont','right')}
  txt(w.tag+(w.sub?' · '+w.sub:''),(SX+FX)/2,y0+52,30,i==0?'#ffe3a0':(i==3?'#ffb8ab':'#eaf3ff'),ra,'Mont');
  if(gold){x.save();x.globalAlpha=.75*ease((t-REVEAL[0])/.3);x.strokeStyle='#ffd166';x.lineWidth=5;x.beginPath();x.roundRect(X0+2,y0+2,X1-X0-4,RH-4,16);x.stroke();x.restore()}}
-const CARDS=[[0,5.7,'SAME SHOUT, 4 WORLDS','WHO HEARS IT FIRST?'],[5.7,11.7,'VENUS WINS','THICK, HOT AIR = FASTEST'],
- [11.7,17.7,'EARTH 343 m/s','MARS ONLY 240 m/s'],[17.7,22.2,'THE MOON: NO AIR','SO NO SOUND AT ALL'],[22.2,23.5,'DID YOU','GUESS RIGHT?'],
- [23.5,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'SAME SHOUT, 4 WORLDS','WHO HEARS IT FIRST?']];
+const CARDS=[[0,5.2,'SAME SHOUT, 4 WORLDS','WHO HEARS IT FIRST?'],[5.2,11.4,'VENUS WINS','HOT AIR = FASTEST'],
+ [11.4,17.4,'EARTH 343 m/s','MARS ONLY 240 m/s'],[17.4,21.9,'THE MOON: NO AIR','SO NO SOUND AT ALL'],[21.9,23.2,'DID YOU','GUESS RIGHT?'],
+ [23.2,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'SAME SHOUT, 4 WORLDS','WHO HEARS IT FIRST?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,80,820),l2?fit(l2,80,820):99);const pop=(l1.startsWith('VENUS')||l1.startsWith('THE MOON'))?1+0.08*Math.exp(-(t-a)/.15):1;
  txt(l1,495,404,sz*pop,'#fff',al);if(l2)txt(l2,495,404+sz*1.06,sz,'#ffd166',al)}}

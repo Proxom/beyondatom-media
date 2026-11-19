@@ -1,4 +1,4 @@
-# Original bed for "Same Shout on 4 Worlds" (shout-four-worlds, 25.5 s). Adapted from escape-four-worlds.sound.py: thumps on the hear moments (Venus 4.49, Earth 5.43, Mars 7.93 s), swell into the Moon reveal (17.7 s). Warm low pad (D minor -> Bb -> F -> C), a soft low pulse while
+# Original bed for "Same Shout on 4 Worlds" (shout-four-worlds, 25.5 s). Adapted from escape-four-worlds.sound.py: thumps on the hear moments (Venus 3.89, Earth 4.83, Mars 7.33 s), swell into the Moon reveal (17.4 s). Warm low pad (D minor -> Bb -> F -> C), a soft low pulse while
 # the balls fly that tightens toward Pluto's landing, felt-mallet thumps on each landing (Earth 1.38, Mars 3.74,
 # Moon 8.69, Pluto 22.77 s), a slow swell into the Pluto landing, a low whoosh on the loop cut and the wind-up.
 # No beeps, chimes or bright tones: everything sits below ~1.5 kHz before the master low-pass.
@@ -17,7 +17,7 @@ def add(sig, pan=0.0, i0=0):
     n = min(len(sig), N - i0)
     if n <= 0: return
     L[i0:i0 + n] += sig[:n] * np.cos(a); R[i0:i0 + n] += sig[:n] * np.sin(a)
-LAND = [4.49, 5.43, 7.93, 17.7]   # Earth, Mars, Mercury landings; Moon 'gone forever' reveal
+LAND = [3.89, 4.83, 7.33, 17.4]   # Earth, Mars, Mercury landings; Moon 'gone forever' reveal
 def pad(freqs, t0, t1, amp, fc=750):
     n0, n1 = int(t0 * SR), int(min(t1, D) * SR); tt = np.arange(n1 - n0) / SR; s = np.zeros(n1 - n0)
     for f in freqs:
@@ -29,7 +29,7 @@ P = pad([146.83, 174.61, 220.0], 0, 6.0, .05) + pad([116.54, 146.83, 174.61], 5.
 P += pad([130.81, 174.61, 220.0], 11.5, 17.9, .045, 650) + pad([130.81, 164.81, 196.0, 261.63], 17.5, 23.6, .055, 850)
 P += pad([146.83, 174.61, 220.0], 23.2, D, .05)
 add(P, -.25); add(np.roll(P, 900), .25)
-da = env([(0, .35), (5, .4), (12, .35), (16, .5), (17.7, .75), (19.2, .4), (25.5, .35)])
+da = env([(0, .35), (5, .4), (12, .35), (16, .5), (17.4, .75), (18.9, .4), (25.5, .35)])
 for m, a in [(1, .5), (2, .22), (3, .08)]:
     add(da * a * np.sin(2 * np.pi * 73.42 * m * t + m), 0)
 def pluck(t0, f, amp, pan):
@@ -51,7 +51,7 @@ def whoosh(tc, amp, dur=.9):
     n = int(dur * SR); nz = lp(rng.standard_normal(n), 700); e = np.sin(np.pi * np.linspace(0, 1, n)) ** 2
     add(nz * e * amp * 2.5, -.4, int((tc - dur / 2) * SR)); add(np.roll(nz, 500) * e * amp * 2.5, .4, int((tc - dur / 2) * SR))
 whoosh(25.05, .45); whoosh(0.1, .35, .7)
-sw = np.zeros(N); n0, n1 = int(14.0 * SR), int(LAND[3] * SR); rr = rng.standard_normal(n1 - n0)
+sw = np.zeros(N); n0, n1 = int(13.7 * SR), int(LAND[3] * SR); rr = rng.standard_normal(n1 - n0)
 for i in range(5):
     a, b = i * (n1 - n0) // 5, (i + 1) * (n1 - n0) // 5; sw[n0 + a:n0 + b] = lp(rr, 200 + 500 * (i + .5) / 5)[a:b]
 sw[n0:n1] *= np.linspace(0, 1, n1 - n0) ** 2 * 2.2; add(sw * .55)
