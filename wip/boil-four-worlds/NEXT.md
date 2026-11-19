@@ -8,3 +8,7 @@ Mix: mix-vo.py . bed.wav mix0.wav 23.6 l1=0.1 l2=4.2 l3=9.8 l4=12.0 l5=15.6 l6=2
 Anton renders "~" like a minus sign: never use "~" before numbers (use "ABOUT").
 ## Gate (v1)
 1080x1920, 30 fps, H.264 (encode.sh 2-pass), AAC, 23.6 s; -15.1 LUFS, -3.9 dBTP; HF 20.5 dB below; first/last YAVG 62.7/62.7; text zones {}; spelling clean.
+## Review
+r1 avg 6.75 (hook 7, visual 6, clarity 8, payoff 6). Minor fact error: "92 TIMES EARTH'S" (92 bar / 1.013 bar = ~91x) -> "ABOUT 90 TIMES". Start temperature showed 24 °C at frame 0 -> knots start at (0, 20). Fixes applied once (v2): "ONLY THE AIR PRESSURE CHANGES" line under the hook; rows lower; graphics-only shared heat bar with boiling-point markers in the empty bottom band; "ALREADY?!" white; rank badges moved right.
+## Gate (v2)
+1080x1920, 30 fps, AAC, 23.6 s; -15.1 LUFS, -3.9 dBTP; HF 20.5 dB below; first/last YAVG 62.2/62.2; text zones {}; spelling clean.

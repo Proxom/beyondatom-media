@@ -6,7 +6,7 @@ Imagine the same pot of water (starting at 20 °C) on the same stove on four wor
 Mars: the air is so thin (about 0.006 bar, under 1% of Earth's) that water boils at about 0.5 °C, barely above freezing. Water at 20 °C boils at once.
 Earth: 1 bar at sea level, so water boils at 100 °C.
 Titan (Saturn's largest moon): its thicker air (about 1.5 bar) pushes the boiling point to about 111 °C.
-Venus: the air presses about 92 times harder than Earth's, so water would not boil until about 305 °C.
+Venus: the air presses about 90 times harder than Earth's (92 bar), so water would not boil until about 305 °C.
 
 About the video: an original animation and a thought experiment. Only the air pressure changes: in reality Venus's air (about 464 °C) would boil the water by itself, and Mars and Titan are freezing cold. Mars's air pressure also changes with the seasons (about 0.004 to 0.009 bar). The temperature counter is sped up and not in real time; the boiling points are true.
 Boiling points: computed from the standard water and steam tables (IAPWS-IF97) at each world's surface pressure.
