@@ -10,4 +10,4 @@ VO tools/mercury-stand.vo.py; bed tools/mercury-stand.sound.py. Mix: mix-vo.py .
 r1 avg 6.75 (hook 7, visual 6, clarity 7, payoff 7), no fact errors. Hedged: "The Sun CAN look over 3 times bigger" (true near perihelion), "strong evidence of water ice" / card "EVIDENCE OF WATER ICE!" / label "WATER ICE (LIKELY)". Fixes (v2): 430 °C counter moved into the sky with "DAYTIME HIGH"; comparison labels fade before it; crater floor dark grey (not starfield), brighter ice sparkles. Video 24.5 s.
 Mix v2: mix-vo.py . bed.wav mix0.wav 24.5 l1=0.1 l2=3.7 l3=10.3 l4=15.8 l5=22.4 (fade out at 24.42).
 ## Gate (v2)
-1080x1920, 30 fps, AAC, 24.5 s; about -15.1 LUFS, under -3.5 dBTP; HF about 20.5 dB below; first/last frames not black; text zones {}; spelling clean.
+1080x1920, 30 fps, AAC, 24.5 s; -15.1 LUFS, -2.9 dBTP (limit -2); HF 21.2 dB below; first/last frames not black; text zones {}; spelling clean.

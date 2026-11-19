@@ -83,7 +83,8 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 66 | 25 Kas 17:00 | What Happens to Your Heart in Space? ❤️ | heart in space | planlı (Metricool 434330451) |
 | 67 | 26 Kas 01:00 | Is the Moon Bigger Than Australia? 🌕 | moon size | planlı (Metricool 434338429) |
 | 68 | 26 Kas 17:00 | December 2026 Sky: 4 Dates to Save 🌠 | december 2026 sky events | planlı (Metricool 434343324) |
-| 69 | 27 Kas 01:00 | How Do Astronauts Sleep in Space? 😴 | sleep in space | planlı (yt-1410) |
+| 69 | 27 Kas 01:00 | How Do Astronauts Sleep in Space? 😴 | sleep in space | planlı (Metricool 434354206) |
+| 70 | 27 Kas 17:00 | What If You Stood on Mercury? ☀️ | mercury surface conditions | planlı (Metricool 434364842) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
@@ -105,6 +106,7 @@ Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mon
 - speed of sound on planets = sound on mars = "shout on planets" = no sound on the moon / in space
 - venus surface conditions = venus pressure/heat = "stand on venus" = venera landers; boiling point on planets = water boils on mars
 - heart in space = cardiac atrophy = heart shape in space; moon size = moon vs australia/usa = moon surface area
+- mercury surface conditions = mercury temperature = ice on mercury
 - sleep in space = astronaut sleeping bag = co2 bubble while sleeping
 - monthly sky events = "<month> sky: dates to save" (her ay yeni ay sayılır; aynı ay tekrar edilmez)
 - sun size = earths across the sun = "109 earths"; nearest star distance = sun as basketball
