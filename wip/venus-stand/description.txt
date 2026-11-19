@@ -5,9 +5,9 @@ Guess first: how deep in the ocean would it feel like? 👇
 Venus is our closest planetary neighbor, but its surface is one of the deadliest places in the solar system.
 The air: Venus's thick carbon dioxide atmosphere presses down about 93 times harder than the air at sea level on Earth. NASA compares it to being more than 930 meters (3,000 feet) underwater.
 The heat: the average surface temperature is about 464 °C (867 °F), hot enough to melt lead (lead melts at 327.5 °C).
-The record: the toughest lander ever sent there, the Soviet Venera 13, survived on the surface for 2 hours and 7 minutes on 1 March 1982. It was designed to last about 32 minutes.
+The record: the longest-lived lander on Venus, the Soviet Venera 13, was built to last about 32 minutes. It survived on the surface for 2 hours and 7 minutes on 1 March 1982.
 
-About the video: an original animation and a thought experiment. The person, diver, lead bar and lander are illustrations. The pressure counter uses about 10 m of seawater per extra bar of pressure. The lander clock is sped up.
+About the video: an original animation and a thought experiment. The person, diver, lead bar and lander are illustrations. The pressure counter follows NASA's comparison (about 93 times Earth's air pressure at about 930 m deep). The lander clock is sped up.
 
 Sources:
 NASA Science, Venus Facts (hot enough to melt lead; about 93 times Earth's sea-level pressure, the same force as being more than 3,000 feet (930 meters) underwater; the longest Venera survivor lasted two hours): https://science.nasa.gov/venus/venus-facts/

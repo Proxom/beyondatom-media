@@ -5,7 +5,7 @@ L = {
  'l1': "What if you stood on Venus? Guess: how deep in the ocean would it feel?",
  'l2': "The air is so heavy, it squeezes you like the sea, more than nine hundred meters down.",
  'l3': "Then the heat. Over four hundred sixty degrees Celsius. Hot enough to melt lead.",
- 'l4': "The toughest lander ever, Venera thirteen, lasted just two hours and seven minutes.",
+ 'l4': "The longest-lived lander there, Venera thirteen, was built for thirty-two minutes. It lasted two hours and seven.",
  'l5': "How long would you last?",
 }
 for n, s in L.items():

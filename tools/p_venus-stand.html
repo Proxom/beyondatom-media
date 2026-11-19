@@ -9,7 +9,7 @@
      Lead melts at 327.5 C (Royal Society of Chemistry periodic table).
      Drawing: landscape, diver and lander are illustrations; the depth counter uses about 10 m of seawater per extra bar. -->
 <script>
-const W=1080,H=1920,FPS=30,D=25.5;
+const W=1080,H=1920,FPS=30,D=27.0;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
 const cv=document.getElementById('c'),x=cv.getContext('2d');
 function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
@@ -63,17 +63,17 @@ function ocean(t){const d=depthAt(t),k=d/ODMAX;
  const sp=d*2.2+t*40;for(const s of SNOW){const yy=((s[1]*H*1.3-sp*(0.4+s[3]))%(H*1.3)+H*1.3)%(H*1.3)-100;x.fillStyle='rgba(220,235,255,'+(0.25+0.4*s[3])+')';x.beginPath();x.arc(s[0],yy,s[2],0,7);x.fill()}
  // depth ruler on the left
  x.save();x.strokeStyle='rgba(200,230,255,.55)';x.fillStyle='rgba(200,230,255,.8)';x.lineWidth=3;x.font='34px Anton';x.textAlign='left';
- const ppm=6;for(let m=Math.floor((d-180)/50)*50;m<d+200;m+=50){if(m<0)continue;const yy=1100+(m-d)*ppm;if(yy<365||yy>1430)continue;x.beginPath();x.moveTo(70,yy);x.lineTo(m%100==0?140:110,yy);x.stroke();if(m%100==0)x.fillText(m+' m',150,yy+12)}x.restore();
+ const ppm=6;for(let m=Math.floor((d-180)/50)*50;m<d+200;m+=50){if(m<0)continue;const yy=1100+(m-d)*ppm;if(yy<580||yy>1430)continue;x.beginPath();x.moveTo(70,yy);x.lineTo(m%100==0?140:110,yy);x.stroke();if(m%100==0)x.fillText(m+' m',150,yy+12)}x.restore();
  // diver (sinking, centred), with bubbles
  const dy=1100+Math.sin(t*1.3)*10;
- for(const b of BUB){const ph=(b[1]+t*0.6*(0.6+b[2]))%1;const xx=600+Math.sin(ph*8+b[0]*6)*20+b[0]*30,yy=dy-260-ph*700;x.strokeStyle='rgba(220,240,255,'+(0.6*(1-ph))+')';x.lineWidth=2;x.beginPath();x.arc(xx,yy,4+b[2]*6,0,7);x.stroke()}
+ for(const b of BUB){const ph=(b[1]+t*0.6*(0.6+b[2]))%1;const xx=600+Math.sin(ph*8+b[0]*6)*20+b[0]*30,yy=dy-260-ph*700;if(yy<860)continue;x.strokeStyle='rgba(220,240,255,'+(0.6*(1-ph))+')';x.lineWidth=2;x.beginPath();x.arc(xx,yy,4+b[2]*6,0,7);x.stroke()}
  {const lg=x.createRadialGradient(560,dy,20,560,dy,420);lg.addColorStop(0,'rgba(120,190,255,'+(0.10+0.30*k)+')');lg.addColorStop(1,'rgba(120,190,255,0)');x.fillStyle=lg;x.beginPath();x.arc(560,dy,420,0,7);x.fill();}
  x.save();x.translate(560,dy);x.rotate(0.12);x.shadowColor='rgba(150,210,255,.9)';x.shadowBlur=18;person(0,170,340,'rgba(18,40,62,1)',1);
  x.fillStyle='rgba(5,15,25,.95)';x.beginPath();x.roundRect(-58,-130,34,110,12);x.fill();// tank
  x.beginPath();x.moveTo(-40,170);x.lineTo(-90,240);x.lineTo(-20,232);x.fill();x.beginPath();x.moveTo(30,170);x.lineTo(70,250);x.lineTo(10,236);x.fill();x.restore();
  // squeeze arrows growing with pressure
  const sq=k;if(sq>0.05){x.save();x.globalAlpha=0.35+0.5*sq;x.strokeStyle='#9fd4ff';x.lineWidth=8;x.lineCap='round';
-  for(const [ax,ay,dx,dy2] of [[560,820,0,1],[560,1360,0,-1],[330,1090,1,0],[790,1090,-1,0]]){const L=40+60*sq,o=40*sq;x.beginPath();x.moveTo(ax-dx*(L+o),ay-dy2*(L+o));x.lineTo(ax-dx*o,ay-dy2*o);x.stroke();
+  for(const [ax,ay,dx,dy2] of [[560,1360,0,-1],[330,1090,1,0],[790,1090,-1,0]]){const L=40+60*sq,o=40*sq;x.beginPath();x.moveTo(ax-dx*(L+o),ay-dy2*(L+o));x.lineTo(ax-dx*o,ay-dy2*o);x.stroke();
    x.beginPath();x.moveTo(ax-dx*o-dy2*16-dx*22,ay-dy2*o-dx*16-dy2*22);x.lineTo(ax-dx*o,ay-dy2*o);x.lineTo(ax-dx*o+dy2*16-dx*22,ay-dy2*o+dx*16-dy2*22);x.stroke()}x.restore()}
  // counters
  const done=t>=OD1;const pop=done?1+.12*Math.exp(-(t-OD1)/.15):1;
@@ -90,15 +90,15 @@ function heat(t){const T=tempAt(t),k=(T-15)/449;venus(t,0.3+0.7*k,0.05+0.01*(t-1
  const my=lerp(ty0,ty1,327/500);x.strokeStyle='#cfd6e0';x.lineWidth=5;x.beginPath();x.moveTo(tx-70,my);x.lineTo(tx-34,my);x.stroke();x.restore();
  const la=t>=12.6?ease((t-12.6)/.3):0;txt('LEAD MELTS',tx-90,my-8,56,'#e6ecf5',la,'Anton','right');txt('327 °C',tx-90,my+52,56,'#e6ecf5',la,'Anton','right');
  // lead ingot -> puddle
- const melt=cl((T-327)/60);const lx=330,lyb=1330;x.save();x.translate(lx,lyb);x.scale(1.5,1.5);x.translate(-lx,-lyb);x.save();x.fillStyle='#8d96a3';
+ const melt=cl((T-327)/35);const lx=330,lyb=1330;x.save();x.translate(lx,lyb);x.scale(1.5,1.5);x.translate(-lx,-lyb);x.save();x.fillStyle='#8d96a3';
  const hgt=lerp(120,18,ease(melt)),wid=lerp(190,330,ease(melt));x.beginPath();x.roundRect(lx-wid/2,lyb-hgt,wid,hgt,lerp(10,40,melt));x.fill();
  x.fillStyle='rgba(255,255,255,'+(0.35-0.2*melt)+')';x.beginPath();x.roundRect(lx-wid/2+10,lyb-hgt+8,wid-20,Math.max(4,hgt*0.18),6);x.fill();
  if(melt>0){x.fillStyle='rgba(255,140,60,'+(0.25*melt)+')';x.beginPath();x.ellipse(lx,lyb,wid*0.62,26,0,0,7);x.fill()}x.restore();x.restore();
  txt('LEAD',lx,lyb-hgt*1.5-24,56,'#e6ecf5',1,'Anton');
  const done=t>=HT1;const pop=done?1+.12*Math.exp(-(t-HT1)/.15):1;txt(Math.round(T)+' °C',540,720,150*pop,done?'#ffd166':'#fff',1)}
 // ---------- Lander ----------
-const LT0=17.6,LT1=21.6;
-function lander(t){venus(t,0.6,0.08+0.006*(t-17));const cx=540,by=1290,s=1.25;
+const LT0=17.6,LT1=23.4;
+function lander(t){venus(t,0.6,0.08+0.006*(t-17));const cx=540,by=1400,s=1.1;
  x.save();x.translate(cx,by);x.scale(s,s);
  // landing ring
  let g=x.createLinearGradient(-170,0,170,0);g.addColorStop(0,'#5d5a55');g.addColorStop(.5,'#c8c2b6');g.addColorStop(1,'#4a4743');x.fillStyle=g;
@@ -118,18 +118,18 @@ function lander(t){venus(t,0.6,0.08+0.006*(t-17));const cx=540,by=1290,s=1.25;
  const sec=Math.round(127*60*ease((t-LT0)/(LT1-LT0)));const hh=Math.floor(sec/3600),mm=Math.floor(sec%3600/60),ss=sec%60;
  const done=t>=LT1;const pop=done?1+.12*Math.exp(-(t-LT1)/.15):1;
  txt(hh+':'+String(mm).padStart(2,'0')+':'+String(ss).padStart(2,'0'),540,720,140*pop,done?'#ffd166':'#fff',1);
- if(done)txt('2 HOURS 7 MINUTES',540,800,58,'#ffe2b0',ease((t-LT1)/.3))}
+ if(t>=20.2)txt('BUILT TO LAST: 32 MIN',540,880,58,'#ff9f7a',ease((t-20.2)/.3));if(done)txt('2 HOURS 7 MINUTES',540,800,58,'#ffe2b0',ease((t-LT1)/.3))}
 // ---------- cards ----------
 const CARDS=[[-1,2.2,'WHAT IF YOU STOOD','ON VENUS?'],[2.2,4.3,'GUESS: HOW DEEP','UNDERWATER?'],[4.3,9.6,'THE AIR PRESSES','LIKE THE DEEP SEA'],[9.6,11.3,'MORE THAN','930 m UNDERWATER'],
- [11.3,17.3,'OVER 460 °C:','HOT ENOUGH TO MELT LEAD'],[17.3,22.7,'TOUGHEST LANDER EVER:','VENERA 13 (1982)'],[22.7,24.4,'HOW LONG','WOULD YOU LAST?'],[24.4,25.1,'FOLLOW →','MORE EVERY DAY'],[25.1,D+1,'WHAT IF YOU STOOD','ON VENUS?']];
+ [11.3,17.3,'OVER 460 °C:','HOT ENOUGH TO MELT LEAD'],[17.3,24.4,'LONGEST-LIVED VENUS LANDER:','VENERA 13 (1982)'],[24.4,26.0,'HOW LONG','WOULD YOU LAST?'],[26.0,26.7,'FOLLOW →','MORE EVERY DAY'],[26.7,D+1,'WHAT IF YOU STOOD','ON VENUS?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
- const sz=Math.min(fit(l1,80,840),fit(l2,80,840));const y0=402;const g=x.createLinearGradient(0,300,0,560);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.4,'rgba(0,0,0,'+(0.45*al)+')');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,300,W,260);
+ const sz=Math.min(fit(l1,80,840),fit(l2,80,840));const y0=442;const g=x.createLinearGradient(0,340,0,600);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.4,'rgba(0,0,0,'+(0.45*al)+')');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,340,W,260);
  txt(l1,495,y0,sz,'#fff',al);txt(l2,495,y0+sz*1.08,sz,'#ffd166',al)}}
 function hook(t){venus(t,0.15,0.03*Math.min(t,4.3)/4.3+0.0);person(540,1420,620,'rgba(25,12,4,.94)',1);
  // pressure ripples around the person
  for(let i=0;i<3;i++){const ph=((t*0.6)+i/3)%1;x.strokeStyle='rgba(255,230,180,'+(0.35*(1-ph))+')';x.lineWidth=4;x.beginPath();x.ellipse(540,1110,150+ph*300,340+ph*320,0,0,7);x.stroke()}}
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
- if(t<OD0||t>=25.1){hook(t>=25.1?t-D:t)}
+ if(t<OD0||t>=26.7){hook(t>=26.7?t-D:t)}
  else if(t<11.3){ocean(t);if(t<OD0+0.4){x.fillStyle='rgba(255,220,170,'+(1-(t-OD0)/0.4)*0.8+')';x.fillRect(0,0,W,H)}}
  else if(t<17.3){heat(t);if(t<11.6){x.fillStyle='rgba(0,0,0,'+(1-(t-11.3)/0.3)*0.7+')';x.fillRect(0,0,W,H)}}
  else{lander(t)}
