@@ -3,10 +3,10 @@ from kokoro_onnx import Kokoro
 k = Kokoro('/tmp/claude-0/kokoro/kokoro-v1.0.onnx', '/tmp/claude-0/kokoro/voices-v1.0.bin')
 L = {
  'l1': "What happens to your heart in space? Guess: bigger, smaller, or rounder?",
- 'l2': "It gets rounder. In a NASA study of twelve astronauts, about nine percent more spherical.",
- 'l3': "Without gravity, it no longer pumps blood uphill from your feet. So it works less.",
- 'l4': "On his year in space, Scott Kelly's heart muscle shrank by about three quarters of a gram every week, even with exercise six days a week.",
- 'l5': "The surprise? A swimmer crossing the Pacific lost it just as fast.",
+ 'l2': "Rounder, and smaller. In a NASA study of twelve astronauts, it became about nine percent more spherical.",
+ 'l3': "In weightlessness, it no longer pumps blood uphill from your feet. So it works less.",
+ 'l4': "On his year in space, Scott Kelly's main pumping chamber lost about three quarters of a gram a week, even with exercise six days a week.",
+ 'l5': "The surprise? A swimmer who spent a hundred fifty-nine days in the Pacific lost it just as fast. Floating takes away the uphill too.",
  'l6': "Back on Earth, the shape returns to normal.",
 }
 for n, s in L.items():

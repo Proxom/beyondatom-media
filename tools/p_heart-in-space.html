@@ -10,7 +10,7 @@
        pumping blood "uphill" from the feet.
      Drawing: the heart is an illustration; the shape change follows the 9.4 % sphericity figure; the shrink in the Kelly scene is illustrative. -->
 <script>
-const W=1080,H=1920,FPS=30,D=32.6,LOOP=32.3;
+const W=1080,H=1920,FPS=30,D=38.4,LOOP=38.1;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
 const cv=document.getElementById('c'),x=cv.getContext('2d');
 function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
@@ -31,16 +31,15 @@ function heart(cx,cy,L,S,beat,al){if(al<=0.01)return;const Wd=L*S,b=1+0.035*beat
  x.lineCap='round';x.strokeStyle='#b8323c';x.lineWidth=Wd*0.2;x.beginPath();x.moveTo(-Wd*0.05,-L*0.42);x.bezierCurveTo(-Wd*0.05,-L*0.85,Wd*0.45,-L*0.85,Wd*0.42,-L*0.45);x.stroke();
  x.strokeStyle='#4f6fb8';x.lineWidth=Wd*0.17;x.beginPath();x.moveTo(-Wd*0.3,-L*0.38);x.lineTo(-Wd*0.34,-L*0.72);x.stroke();
  x.strokeStyle='#c9434c';x.lineWidth=Wd*0.07;for(const k of [-0.1,0.12,0.3]){x.beginPath();x.moveTo(Wd*k,-L*0.75);x.lineTo(Wd*k+Wd*0.02,-L*0.9);x.stroke()}
+ x.fillStyle='#8e1c27';x.beginPath();x.ellipse(-Wd*0.08,-L*0.40,Wd*0.40,L*0.12,0,0,7);x.fill();
  // body (egg: wide base at top, apex at bottom)
  const g=x.createRadialGradient(-Wd*0.18,-L*0.15,Wd*0.05,0,0,L*0.6);g.addColorStop(0,'#ff6b6b');g.addColorStop(.5,'#c0242f');g.addColorStop(1,'#5a0a12');x.fillStyle=g;
  x.beginPath();x.moveTo(0,L*0.5);x.bezierCurveTo(Wd*0.62,L*0.32,Wd*0.62,-L*0.42,0,-L*0.45);x.bezierCurveTo(-Wd*0.62,-L*0.42,-Wd*0.62,L*0.32,0,L*0.5);x.fill();
- // atria cap
- x.fillStyle='rgba(150,30,40,.9)';x.beginPath();x.ellipse(-Wd*0.08,-L*0.38,Wd*0.42,L*0.11,0,0,7);x.fill();
  // coronary vessels
  x.strokeStyle='rgba(255,210,150,.55)';x.lineWidth=Math.max(3,Wd*0.025);x.beginPath();x.moveTo(-Wd*0.05,-L*0.3);x.bezierCurveTo(Wd*0.15,-L*0.05,Wd*0.05,L*0.2,Wd*0.02,L*0.42);x.stroke();
  x.beginPath();x.moveTo(Wd*0.04,-L*0.08);x.bezierCurveTo(Wd*0.25,0,Wd*0.3,L*0.1,Wd*0.33,L*0.18);x.stroke();
  x.fillStyle='rgba(255,255,255,.12)';x.beginPath();x.ellipse(-Wd*0.2,-L*0.12,Wd*0.12,L*0.2,0.2,0,7);x.fill();x.restore()}
-function outline(cx,cy,L,S,al){const Wd=L*S;x.save();x.globalAlpha=al;x.translate(cx,cy);x.rotate(-0.32);x.setLineDash([18,14]);x.strokeStyle='#ffffff';x.lineWidth=5;
+function outline(cx,cy,L,S,al){const Wd=L*S;x.save();x.globalAlpha=al;x.translate(cx,cy);x.rotate(-0.32);x.setLineDash([22,14]);x.strokeStyle='#7fe8ff';x.lineWidth=8;
  x.beginPath();x.moveTo(0,L*0.5);x.bezierCurveTo(Wd*0.62,L*0.32,Wd*0.62,-L*0.42,0,-L*0.45);x.bezierCurveTo(-Wd*0.62,-L*0.42,-Wd*0.62,L*0.32,0,L*0.5);x.stroke();x.restore()}
 function person(cx,by,hh,col,al,rot){x.save();x.globalAlpha=al;x.translate(cx,by-hh/2);x.rotate(rot||0);x.translate(-cx,-(by-hh/2));x.fillStyle=col;const u=hh/8;
  x.beginPath();x.arc(cx,by-hh+u*0.7,u*0.75,0,7);x.fill();x.beginPath();x.roundRect(cx-u*1.0,by-hh+u*1.6,u*2.0,u*3.2,u*0.5);x.fill();
@@ -48,22 +47,22 @@ function person(cx,by,hh,col,al,rot){x.save();x.globalAlpha=al;x.translate(cx,by
  x.beginPath();x.roundRect(cx-u*1.55,by-hh+u*1.8,u*0.55,u*2.9,u*0.25);x.fill();x.beginPath();x.roundRect(cx+u*1.0,by-hh+u*1.8,u*0.55,u*2.9,u*0.25);x.fill();
  // small heart mark on the chest
  x.fillStyle='#ff4d5e';x.beginPath();x.arc(cx-u*0.25,by-hh+u*2.5,u*0.35,0,7);x.fill();x.restore()}
-const S0=0.62,S1=0.62*1.094; // sphericity (width/length): Earth vs orbit (+9.4 %)
+const S0=0.62,S1=0.62*(1+0.094*3); // sphericity (width/length): Earth vs orbit (+9.4 %, drawn 3x exaggerated and labelled)
 function beatOf(t){const p=(t*1.15)%1;return Math.exp(-p*9)*1+Math.exp(-Math.max(0,p-0.18)*9)*(p>0.18?0.6:0)}
-const CARDS=[[-1,2.4,'WHAT HAPPENS TO YOUR','HEART IN SPACE?'],[2.4,4.6,'GUESS: BIGGER, SMALLER','OR ROUNDER?'],[4.6,10.4,'IN ORBIT IT GETS ROUNDER','NASA STUDY: 12 ASTRONAUTS'],
- [10.4,15.5,'NO GRAVITY = NO UPHILL','SO IT WORKS LESS'],[15.5,24.4,'SCOTT KELLY: 340 DAYS','EXERCISE 6 DAYS A WEEK'],[24.4,28.8,'A PACIFIC SWIMMER (159 DAYS):','ALMOST THE SAME!'],
- [28.8,31.6,'BACK ON EARTH:','NORMAL SHAPE AGAIN'],[31.6,32.3,'FOLLOW →','MORE EVERY DAY'],[32.3,D+1,'WHAT HAPPENS TO YOUR','HEART IN SPACE?']];
+const CARDS=[[-1,2.4,'WHAT HAPPENS TO YOUR','HEART IN SPACE?'],[2.4,4.6,'GUESS: BIGGER, SMALLER','OR ROUNDER?'],[4.6,11.6,'ROUNDER (AND SMALLER)','NASA STUDY: 12 ASTRONAUTS'],
+ [11.6,16.7,'WEIGHTLESS = NO UPHILL','SO IT WORKS LESS'],[16.7,25.9,'SCOTT KELLY: 340 DAYS','EXERCISE 6 DAYS A WEEK'],[25.9,34.6,'SWIMMER, 159 DAYS IN THE PACIFIC:','ALMOST THE SAME!'],
+ [34.6,37.4,'BACK ON EARTH:','NORMAL SHAPE AGAIN'],[37.4,38.1,'FOLLOW →','MORE EVERY DAY'],[38.1,D+1,'WHAT HAPPENS TO YOUR','HEART IN SPACE?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,76,840),fit(l2,76,840));const g=x.createLinearGradient(0,320,0,580);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.4,'rgba(0,0,0,'+(0.5*al)+')');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,320,W,260);
  txt(l1,495,410,sz,'#fff',al);txt(l2,495,410+sz*1.08,sz,'#ffd166',al)}}
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;const u=t>=LOOP?t-D:t;const bt=beatOf(u);
- if(u<10.4||u>=28.8){// hook / shape / back on Earth
-  space(u,1250);let S=S0;if(u>=4.6&&u<10.4)S=lerp(S0,S1,ease((u-5.4)/2.2));if(u>=28.8)S=lerp(S1,S0,ease((u-29.2)/1.6));
-  const L=600+16*Math.sin(u*0.4);heart(540,1070,L,S,bt,1);
-  if(u>=4.6&&u<10.4){const a=ease((u-5.0)/.4);outline(540,1070,L,S0,0.85*a);txt('DASHED = SHAPE ON EARTH',495,1410,40,'#e8eefc',a,'Anton');
-   if(u>=7.6){const k=ease((u-7.6)/.3);txt('ABOUT 9% MORE SPHERICAL',495,1345,64,'#ffd166',k,'Anton')}}
-  if(u>=28.8){const a=ease((u-29.0)/.4);outline(540,1070,L,S1,0.6*a*(1-ease((u-31.0)/.5)))}}
- else if(u<15.5){// why: Earth vs orbit
+ if(u<11.6||u>=34.6){// hook / shape / back on Earth
+  space(u,1250);let S=S0;if(u>=4.6&&u<11.6)S=lerp(S0,S1,ease((u-5.4)/2.2));if(u>=34.6)S=lerp(S1,S0,ease((u-35.0)/1.6));
+  const L=600+16*Math.sin(u*0.4);heart(540,1100,L,S,bt,1);
+  if(u>=4.6&&u<11.6){const a=ease((u-5.0)/.4);outline(540,1100,L,S0,0.95*a);txt('DASHED = SHAPE ON EARTH (CHANGE SHOWN 3x)',495,1420,36,'#bff3ff',a,'Anton');
+   if(u>=9.3){const k=ease((u-9.3)/.3);txt('ABOUT 9% MORE SPHERICAL',495,1345,64,'#ffd166',k,'Anton')}}
+  if(u>=34.6){const a=ease((u-34.8)/.4);outline(540,1100,L,S1,0.6*a*(1-ease((u-36.8)/.5)))}}
+ else if(u<16.7){// why: Earth vs orbit
   space(u,H+400);x.fillStyle='rgba(30,60,30,.9)';x.fillRect(0,1360,540,80);x.fillStyle='rgba(255,255,255,.12)';x.fillRect(538,560,4,880);
   txt('ON EARTH',270,660,56,'#bfe3ff',1,'Anton');txt('IN ORBIT',810,660,56,'#bfe3ff',1,'Anton');
   person(270,1360,560,'#d9dee8',1,0);person(800,1230,560,'#d9dee8',1,0.5+0.08*Math.sin(u*0.8));
@@ -71,15 +70,15 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;const u=t>=LOOP?t-D
   const ph=(u*0.9)%1;x.save();x.strokeStyle='#ff4d5e';x.lineWidth=12;x.lineCap='round';x.beginPath();x.moveTo(250,1330);x.lineTo(250,1000);x.stroke();
   x.fillStyle='#ff4d5e';x.beginPath();x.moveTo(250,960);x.lineTo(222,1006);x.lineTo(278,1006);x.closePath();x.fill();
   for(let k=0;k<4;k++){const yy=1330-((ph+k/4)%1)*330;x.fillStyle='#ffd0d6';x.beginPath();x.arc(250,yy,9,0,7);x.fill()}x.restore();
-  txt('UPHILL',345,1180,46,'#ffb3bd',1,'Anton','left');
-  const a2=ease((u-12.2)/.4);txt('NO UPHILL',800,1440-60,52,'#ffd166',a2,'Anton')}
- else if(u<24.4){// Kelly
-  space(u,1500);const k=ease((u-15.8)/8.2);const L=lerp(540,515,k);heart(540,1020,L,S1,bt,1);
-  const wk=Math.min(48.6,48.6*k);txt('WEEK '+Math.floor(wk),495,1350,96,'#fff',1,'Anton');txt('−0.74 g EVERY WEEK',495,1425,58,'#ffd166',ease((u-17.0)/.4),'Anton')}
+  txt('UPHILL',380,1180,46,'#ffb3bd',1,'Anton','left');
+  const a2=ease((u-13.4)/.4);txt('NO UPHILL',800,1440-60,52,'#ffd166',a2,'Anton')}
+ else if(u<25.9){// Kelly
+  space(u,1500);const k=ease((u-17.0)/8.6);const L=lerp(540,515,k);heart(540,1020,L,S1,bt,1);
+  const wk=Math.min(48.6,48.6*k);txt('WEEK '+Math.floor(wk),495,1350,96,'#fff',1,'Anton');txt('LOSES 0.74 g A WEEK',495,1425,58,'#ffd166',ease((u-18.5)/.4),'Anton')}
  else{// swimmer vs astronaut
   space(u,H+400);x.fillStyle='rgba(255,255,255,.12)';x.fillRect(538,600,4,840);
   // astronaut
-  x.save();x.translate(270,1000);x.rotate(0.25+0.05*Math.sin(u));x.fillStyle='#e9edf3';x.beginPath();x.roundRect(-70,-40,140,200,40);x.fill();x.beginPath();x.arc(0,-90,70,0,7);x.fill();
+  x.save();x.translate(270,900);x.rotate(0.25+0.05*Math.sin(u));x.fillStyle='#e9edf3';x.beginPath();x.roundRect(-70,-40,140,200,40);x.fill();x.beginPath();x.arc(0,-90,70,0,7);x.fill();
   x.fillStyle='#2b3b5a';x.beginPath();x.ellipse(0,-90,48,38,0,0,7);x.fill();x.fillStyle='#e9edf3';x.beginPath();x.roundRect(-110,-20,40,140,18);x.fill();x.beginPath();x.roundRect(70,-20,40,140,18);x.fill();
   x.beginPath();x.roundRect(-60,150,50,120,18);x.fill();x.beginPath();x.roundRect(10,150,50,120,18);x.fill();x.restore();
   // swimmer in waves
@@ -89,8 +88,8 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;const u=t>=LOOP?t-D
   x.beginPath();x.moveTo(800,1050);x.lineTo(800+Math.cos(aa)*120,1040-Math.abs(Math.sin(aa))*110);x.stroke();
   x.fillStyle='rgba(255,255,255,.7)';for(let i=0;i<6;i++){x.beginPath();x.arc(700+i*30+Math.sin(u*5+i)*6,1060+Math.sin(i)*8,6,0,7);x.fill()}
   txt('ASTRONAUT',270,700,52,'#bfe3ff',1,'Anton');txt('SWIMMER',810,700,52,'#bfe3ff',1,'Anton');
-  txt('0.74 g',270,1340,92,'#ffd166',ease((u-24.6)/.3),'Anton');txt('0.72 g',810,1340,92,'#ffd166',ease((u-25.6)/.3),'Anton');
-  txt('PER WEEK',270,1410,40,'#fff',ease((u-24.6)/.3),'Anton');txt('PER WEEK',810,1410,40,'#fff',ease((u-25.6)/.3),'Anton')}
+  txt('0.74 g',270,1340,92,'#ffd166',ease((u-26.4)/.3),'Anton');txt('0.72 g',810,1340,92,'#ffd166',ease((u-29.6)/.3),'Anton');
+  txt('PER WEEK',270,1410,40,'#fff',ease((u-26.4)/.3),'Anton');txt('PER WEEK',810,1410,40,'#fff',ease((u-29.6)/.3),'Anton');txt('FLOATING IN WATER',790,770,36,'#bff3ff',ease((u-31.8)/.3),'Anton')}
  cards(t)}
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont'),new Promise(r=>{if(EARTH.complete)r();else EARTH.onload=r})]).then(()=>{window.TEXREADY=true});
 </script>
