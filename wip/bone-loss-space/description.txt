@@ -1,7 +1,7 @@
 Guess first: one month in orbit equals how many years of aging? 👇
 
 On Earth, the hips and spine of older people lose about 0.5 to 1% of their bone density per year.
-In orbit, astronauts' weight-bearing bones (hips, spine) lose on average about 1 to 1.5% per month. So one month in space is like a year or more of age-related bone loss.
+In orbit, astronauts' weight-bearing bones (hips, spine) lose on average about 1 to 1.5% per month (these averages come mostly from missions before today's ARED weight machine; with hard exercise many crews now lose less). So one month in space is like a year or more of age-related bone loss.
 Why: floating, the bones no longer carry the body's weight. The cells that build new bone slow down, while the cells that break down old bone keep their normal pace, so the bone gets weaker.
 The fix: exercise. Space station crews work out for about two hours a day on a treadmill (held down by a harness), an exercise bike and a weight-lifting machine called ARED.
 
