@@ -1,0 +1,22 @@
+TITLE: How Do Astronauts Use the Toilet? 🚽
+
+Guess first: a bag, a fan or magnets? 👇
+
+In orbit everything is in free fall, so nothing falls into the toilet. The answer is air: space toilets use air flow to pull urine and feces away from the body.
+On the International Space Station's newest toilet (the Universal Waste Management System, 2020), astronauts use a specially shaped funnel and hose for urine and a small seat for bowel movements. The air flow starts automatically when the lid is lifted.
+Foot restraints and handholds keep astronauts from floating away.
+And the urine is not wasted: it is pre-treated and sent to the station's water recycling system, which also recycles sweat. After cleaning, that water becomes drinking water. In 2023 NASA showed that the station can recover 98% of the water crews bring to space.
+
+About the video: an original animation. The toilet, the air streaks and the water machine are simplified illustrations, not exact copies of the real hardware.
+
+Sources:
+NASA, "Boldly Go! NASA's New Space Toilet Offers More Comfort, Improved Efficiency for Deep Space Missions" (17 Sep 2020; air flow pulls urine and feces away from the body; funnel and hose for urine, seat for bowel movements; air flow starts when the lid is lifted; foot restraints and handholds; pre-treated urine goes to a system that recycles water): https://www.nasa.gov/humans-in-space/boldly-go-nasas-new-space-toilet-offers-more-comfort-improved-efficiency-for-deep-space-missions
+NASA, "NASA Achieves Water Recovery Milestone on International Space Station" (2023; 98% of the water crews take to space is recovered, using the urine processor and the brine processor): https://www.nasa.gov/missions/station/iss-research/nasa-achieves-water-recovery-milestone-on-international-space-station
+
+Footage: none; everything is drawn in code.
+Narration: AI voice (Kokoro). Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #astronaut #lifeinspace #shorts
