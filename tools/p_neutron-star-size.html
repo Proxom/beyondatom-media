@@ -1,0 +1,120 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- neutron-star-size ("How Big Is It?"): a star heavier than the Sun is only ~20 km across (NASA). Shrink a Sun-size ball past Earth and
+     the Moon (true diameters, log-speed zoom, live diameter counter) down to 20 km, over an illustrative night city (not a real map).
+     Then: one sugar cube of neutron-star matter ~ 1 billion tons on Earth, about a mountain (NASA Imagine the Universe).
+     Earth photo: NASA Apollo 17 AS17-148-22727 (public domain), via tools/fetch-pl.sh. -->
+<script>
+const W=1080,H=1920,FPS=30,D=29.0,LOOP=28.4,CY=930;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
+const RS=695700,RE=6371,RM=1737.4,RN=10;   // radii in km (NSSDC Sun/Earth/Moon fact sheets; neutron star ~20 km across, NASA)
+// ball radius (km, log-interpolated) and on-screen radius (px) through the shrink
+const SK=[[7.0,Math.log10(RS),420],[8.6,Math.log10(RE),330],[9.9,Math.log10(RM),280],[12.0,Math.log10(RN),170]];
+function shrink(t){if(t<=SK[0][0])return [Math.pow(10,SK[0][1]),SK[0][2]];for(let i=1;i<SK.length;i++){if(t<=SK[i][0]){const a=SK[i-1],b=SK[i],k=ease((t-a[0])/(b[0]-a[0]))*.15+((t-a[0])/(b[0]-a[0]))*.85;return [Math.pow(10,lerp(a[1],b[1],k)),lerp(a[2],b[2],k)]}}return [RN,SK[3][2]]}
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const STARS=[];{const r=rnd(19);for(let k=0;k<380;k++)STARS.push([r()*W,r()*H,r()*1.5+.3,r()])}
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.9)';x.shadowBlur=18;x.fillText(s,px,py);x.shadowBlur=5;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+const fmt=n=>Math.round(n).toLocaleString('en-US');
+// --- textures: sun granulation, moon, city (offscreen, built once)
+function mk(w,h){const c=document.createElement('canvas');c.width=w;c.height=h;return c}
+const SUN=mk(1024,1024);{const g=SUN.getContext('2d'),r=rnd(3);let gr=g.createRadialGradient(512,512,0,512,512,512);gr.addColorStop(0,'#fff6d8');gr.addColorStop(.6,'#ffc04a');gr.addColorStop(.9,'#f08a1c');gr.addColorStop(1,'#c4520c');
+ g.fillStyle=gr;g.beginPath();g.arc(512,512,512,0,7);g.fill();g.save();g.beginPath();g.arc(512,512,512,0,7);g.clip();
+ for(let k=0;k<9000;k++){const a=r()*7,d=Math.sqrt(r())*512,px=512+Math.cos(a)*d,py=512+Math.sin(a)*d,rr=3+r()*7;g.fillStyle=r()<.5?'rgba(255,255,220,.10)':'rgba(150,60,0,.10)';g.beginPath();g.arc(px,py,rr,0,7);g.fill()}
+ for(const [px,py,rr] of [[380,420,14],[400,430,9],[640,600,11]]){g.fillStyle='rgba(60,20,0,.6)';g.beginPath();g.arc(px,py,rr,0,7);g.fill()}g.restore()}
+const MOON=mk(512,512);{const g=MOON.getContext('2d'),r=rnd(8);let gr=g.createRadialGradient(200,190,20,256,256,256);gr.addColorStop(0,'#e9e7e2');gr.addColorStop(1,'#77746f');g.fillStyle=gr;g.beginPath();g.arc(256,256,256,0,7);g.fill();
+ g.save();g.beginPath();g.arc(256,256,256,0,7);g.clip();for(const [px,py,rr] of [[200,170,70],[290,150,55],[320,240,60],[230,260,45],[170,300,40]]){g.fillStyle='rgba(70,68,66,.45)';g.beginPath();g.ellipse(px,py,rr,rr*.8,.4,0,7);g.fill()}
+ for(let k=0;k<160;k++){const px=r()*512,py=r()*512,rr=r()*9+1;g.strokeStyle='rgba(40,40,40,.35)';g.lineWidth=1.2;g.beginPath();g.arc(px,py,rr,0,7);g.stroke()}g.restore()}
+const EARTH=new Image();EARTH.src='pl/as17-148-22727.jpg';
+const PXKM=17;   // city scale (px per km) when the star is 20 km across (r = 170 px)
+const CITY=mk(1600,2400);{const g=CITY.getContext('2d'),r=rnd(42),cx=800,cy=1200;g.fillStyle='#05070d';g.fillRect(0,0,1600,2400);
+ const dens=(px,py)=>{const dx=(px-cx)/(22*PXKM),dy=(py-cy)/(26*PXKM);return Math.exp(-(dx*dx+dy*dy))};
+ // soft urban glow
+ let gr=g.createRadialGradient(cx,cy,0,cx,cy,34*PXKM);gr.addColorStop(0,'rgba(255,150,60,.30)');gr.addColorStop(.5,'rgba(255,130,50,.12)');gr.addColorStop(1,'rgba(255,120,40,0)');g.fillStyle=gr;g.fillRect(0,0,1600,2400);
+ // roads: grid streets every 0.5 km, avenues every 2 km, plus radial highways
+ g.save();g.translate(cx,cy);g.rotate(.18);for(let k=-90;k<=90;k++){const p=k*0.5*PXKM;const major=k%4==0;
+  for(const [ax,ay,bx,by] of [[p,-1600,p,1600],[-1600,p,1600,p]]){const steps=40;for(let i=0;i<steps;i++){const x0=ax+(bx-ax)*i/steps,y0=ay+(by-ay)*i/steps,x1=ax+(bx-ax)*(i+1)/steps,y1=ay+(by-ay)*(i+1)/steps;
+   const d=dens(cx+(x0+x1)/2*Math.cos(.18)-(y0+y1)/2*Math.sin(.18),cy+(x0+x1)/2*Math.sin(.18)+(y0+y1)/2*Math.cos(.18));if(d<.04)continue;
+   g.strokeStyle=major?'rgba(255,190,100,'+(.75*d+.05)+')':'rgba(255,170,80,'+(.33*d)+')';g.lineWidth=major?2.6:1.2;g.beginPath();g.moveTo(x0,y0);g.lineTo(x1,y1);g.stroke()}}}g.restore();
+ for(let k=0;k<8;k++){const a=k*Math.PI/4+.4;g.strokeStyle='rgba(255,215,140,.55)';g.lineWidth=3;g.beginPath();g.moveTo(cx,cy);for(let d=0;d<1500;d+=30){g.lineTo(cx+Math.cos(a+Math.sin(d/300)*.08)*d,cy+Math.sin(a+Math.sin(d/300)*.08)*d)}g.stroke()}
+ // river (dark) on top of the grid
+ g.strokeStyle='#04050a';g.lineWidth=30;g.beginPath();for(let y=0;y<=2400;y+=20){const xx=560+Math.sin(y/260)*120+y*.12;y?g.lineTo(xx,y):g.moveTo(xx,y)}g.stroke();
+ // building lights
+ for(let k=0;k<90000;k++){const px=r()*1600,py=r()*2400;const d=dens(px,py);if(r()>d)continue;const b=.4+.6*r();
+  g.fillStyle=r()<.82?'rgba(255,'+(175+60*r()|0)+',100,'+(.45+.5*b)+')':'rgba(210,230,255,'+(.55*b)+')';const sz=r()<.08?2.6:1.6;g.fillRect(px,py,sz,sz)}}
+function city(t,al,zoom){if(al<=0)return;x.save();x.globalAlpha=al;x.translate(540,CY);x.scale(zoom,zoom);x.drawImage(CITY,-800,-1200);x.restore()}
+function nstar(cx,cy,r,t,al){if(al<=0)return;x.save();x.globalAlpha=al;
+ let g=x.createRadialGradient(cx,cy,r*.6,cx,cy,r*3.4);g.addColorStop(0,'rgba(150,200,255,.55)');g.addColorStop(.35,'rgba(110,160,255,.18)');g.addColorStop(1,'rgba(90,140,255,0)');x.fillStyle=g;x.fillRect(cx-r*3.4,cy-r*3.4,r*6.8,r*6.8);
+ g=x.createRadialGradient(cx-r*.3,cy-r*.35,r*.05,cx,cy,r);g.addColorStop(0,'#ffffff');g.addColorStop(.55,'#d6e8ff');g.addColorStop(1,'#7fa6ff');x.fillStyle=g;x.beginPath();x.arc(cx,cy,r,0,7);x.fill();
+ // two hot spots that rotate with the star
+ x.save();x.beginPath();x.arc(cx,cy,r,0,7);x.clip();for(const ph of [0,Math.PI]){const a=t*2.2+ph,sx=cx+Math.sin(a)*r*.62,vis=Math.cos(a);if(vis<0)continue;const hg=x.createRadialGradient(sx,cy-r*.25,0,sx,cy-r*.25,r*.45);hg.addColorStop(0,'rgba(255,255,255,'+.9*vis+')');hg.addColorStop(1,'rgba(255,255,255,0)');x.fillStyle=hg;x.fillRect(cx-r,cy-r,2*r,2*r)}x.restore();
+ x.restore()}
+function sunball(cx,cy,r,t,mix){// mix 0 = Sun look, 1 = neutron-star look
+ if(mix<1){x.save();x.globalAlpha=1;let g=x.createRadialGradient(cx,cy,r*.9,cx,cy,r*1.5);g.addColorStop(0,'rgba(255,170,60,.45)');g.addColorStop(1,'rgba(255,140,40,0)');x.fillStyle=g;x.fillRect(cx-r*1.5,cy-r*1.5,r*3,r*3);
+  x.translate(cx,cy);x.rotate(t*.05);x.drawImage(SUN,-r,-r,2*r,2*r);x.restore()}
+ if(mix>0)nstar(cx,cy,r,t,mix)}
+function refdisc(img,R,s,cx,cy,al,label,lt){if(al<=0)return;const r=R*s;x.save();x.globalAlpha=al;
+ if(img){x.save();x.beginPath();x.arc(cx,cy,r,0,7);x.clip();if(img.complete&&img.naturalWidth)x.drawImage(img,cx-r,cy-r,2*r,2*r);x.restore()}x.restore();}
+function outline(R,s,cx,cy,al,label,col){if(al<=0)return;const r=R*s;x.save();x.globalAlpha=al;x.setLineDash([12,10]);x.lineWidth=4;x.strokeStyle=col;x.beginPath();x.arc(cx,cy,r,0,7);x.stroke();x.restore();
+ const ly=Math.max(cy-r-18,560);if(r<1400)txt(label,540,cy-r-18>560?cy-r-18:560,40,col,al,'Anton')}
+function balance(t,al){if(al<=0)return;const k=t-20.2;x.save();x.globalAlpha=al;
+ let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#05070f');g.addColorStop(.7,'#0c1222');g.addColorStop(1,'#04050a');x.fillStyle=g;x.fillRect(0,0,W,H);
+ for(const s of STARS){x.globalAlpha=al*(.2+.5*s[3]);x.fillStyle='#fff';x.fillRect(s[0],s[1],s[2],s[2])}x.globalAlpha=al;
+ // floor
+ g=x.createLinearGradient(0,1300,0,H);g.addColorStop(0,'#1b2133');g.addColorStop(1,'#07090f');x.fillStyle=g;x.fillRect(0,1300,W,H-1300);
+ // balance: post, beam (level once the mountain lands), pans
+ const drop=ease((k-2.6)/.5),tilt=(1-drop)*0.16*ease(k/.6);x.fillStyle='#8c95a8';x.fillRect(530,880,20,420);x.fillRect(440,1290,200,16);
+ x.save();x.translate(540,880);x.rotate(-tilt);x.fillStyle='#c9d1e0';x.fillRect(-300,-10,600,20);x.restore();
+ const lx=540-300*Math.cos(tilt),ly=880+300*Math.sin(tilt),rx=540+300*Math.cos(tilt),ry=880-300*Math.sin(tilt);
+ for(const [px,py] of [[lx,ly],[rx,ry]]){x.strokeStyle='#aab3c5';x.lineWidth=3;x.beginPath();x.moveTo(px,py);x.lineTo(px-100,py+190);x.moveTo(px,py);x.lineTo(px+100,py+190);x.stroke();
+  x.fillStyle='#b7c0d2';x.beginPath();x.ellipse(px,py+196,115,16,0,0,7);x.fill()}
+ // sugar cube of neutron-star matter (left)
+ const cx=lx,cy=ly+170,cs=34,pop=1+0.25*Math.exp(-Math.max(0,k)/.2);g=x.createRadialGradient(cx,cy,0,cx,cy,110);g.addColorStop(0,'rgba(160,205,255,.75)');g.addColorStop(1,'rgba(160,205,255,0)');x.fillStyle=g;x.fillRect(cx-110,cy-110,220,220);
+ x.save();x.translate(cx,cy);x.scale(pop,pop);x.fillStyle='#eaf3ff';x.fillRect(-cs/2,-cs/2,cs,cs);x.fillStyle='#bcd3f5';x.beginPath();x.moveTo(-cs/2,-cs/2);x.lineTo(-cs/2+10,-cs/2-10);x.lineTo(cs/2+10,-cs/2-10);x.lineTo(cs/2,-cs/2);x.fill();
+ x.fillStyle='#9fbbe6';x.beginPath();x.moveTo(cs/2,-cs/2);x.lineTo(cs/2+10,-cs/2-10);x.lineTo(cs/2+10,cs/2-10);x.lineTo(cs/2,cs/2);x.fill();x.restore();
+ txt('1 SUGAR CUBE',cx,cy+90+40,34,'#d8e8ff',ease(k/.3),'Anton');
+ // mountain (right) drops onto the pan
+ if(k>1.9){const my=ry+186-(1-ease((k-1.9)/.75))*700,ma=ease((k-1.9)/.3);x.globalAlpha=al*ma;
+  g=x.createLinearGradient(0,my-330,0,my);g.addColorStop(0,'#cfd6e2');g.addColorStop(.25,'#7b8496');g.addColorStop(1,'#3a4152');x.fillStyle=g;
+  x.beginPath();x.moveTo(rx-115,my);x.lineTo(rx-50,my-220);x.lineTo(rx-20,my-330);x.lineTo(rx+30,my-250);x.lineTo(rx+60,my-280);x.lineTo(rx+115,my);x.fill();
+  x.fillStyle='#f4f7fb';x.beginPath();x.moveTo(rx-48,my-240);x.lineTo(rx-20,my-330);x.lineTo(rx+14,my-280);x.lineTo(rx-6,my-262);x.lineTo(rx-28,my-276);x.fill();
+  x.globalAlpha=al;txt('A MOUNTAIN',rx,ry+196+70,34,'#d8e8ff',ease((k-2.8)/.3),'Anton')}
+ x.restore()}
+const CARDS=[[0,2.1,'HEAVIER THAN THE SUN','HOW BIG IS IT?'],[2.1,5.9,'EARTH? THE MOON?','OR A CITY?'],[5.9,12.0,'SHRINK THE SUN…',''],
+ [12.0,15.1,'ABOUT 20 km ACROSS','THE SIZE OF A CITY'],[15.1,20.2,'A NEUTRON STAR','THE CRUSHED CORE OF A DEAD STAR'],[20.2,23.2,'ONE SUGAR CUBE OF IT…','ABOUT 1 BILLION TONS'],
+ [23.2,25.9,'ABOUT 1 BILLION TONS','AS MUCH AS A MOUNTAIN'],[25.9,27.2,'DID YOU','GUESS RIGHT?'],[27.2,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'HEAVIER THAN THE SUN','HOW BIG IS IT?']];
+function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
+ const sz=Math.min(fit(l1,82,820),l2?fit(l2,82,820):99);const pop=l1.startsWith('ABOUT 20')?1+0.08*Math.exp(-(t-a)/.15):1;
+ txt(l1,495,410,sz*pop,'#fff',al);if(l2)txt(l2,495,410+sz*1.08,sz,'#ffd166',al)}}
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#02030a';x.fillRect(0,0,W,H);
+ for(const s of STARS){x.globalAlpha=(.25+.6*s[3])*(.7+.3*Math.sin(t*1.3+s[3]*40));x.fillStyle='#fff';x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill()}x.globalAlpha=1;
+ const cityPhase=t<6.2||(t>=11.6&&t<20.6)||t>=25.6;
+ // city zoom: slow push in the hook / reveal; the star sits over the middle of the city
+ const cz=t<6.2?1.0+0.04*(t/6.2):(t<25.6?1.0+0.03*cl((t-11.6)/9):1.0+0.04*cl((t-25.6)/3));
+ const ca=t<6.2?1-ease((t-5.6)/.6):(t<20.6?ease((t-11.6)/1.0):ease((t-25.6)/.4));
+ if(t<20.6||t>=25.6)city(t,cityPhase?ca:0,t>=LOOP?1.0+0.04*((t-D)/6.2+1)*0:cz);
+ if(t<6.2||t>=25.6){const r=170*cz;nstar(540,CY,r,t,t<6.2?1-ease((t-5.8)/.4):ease((t-25.6)/.3));
+  txt('~20 km',540,CY+r+70,44,'#cfe6ff',t>=25.6?ease((t-26)/.3):0,'Anton')}
+ if(t>=5.8&&t<20.6){// the shrink
+  const [R,rp]=shrink(t);const s=rp/R;const mix=ease((t-10.6)/1.4);const a=t<6.2?ease((t-5.8)/.4):(t>20.2?1-ease((t-20.2)/.4):1);
+  x.save();x.globalAlpha=a;
+  // reference bodies behind the ball (true size on the current scale)
+  const ea=ease((t-7.6)/.4)*(1-ease((t-9.6)/.5)),ma=ease((t-9.0)/.4)*(1-ease((t-11.2)/.5));
+  refdisc(EARTH,RE,s,540,CY,ea);if(ma>0){const r=RM*s;x.save();x.globalAlpha=ma*a;x.drawImage(MOON,540-r,CY-r,2*r,2*r);x.restore()}
+  if(t<11.0||mix<1)sunball(540,CY,rp,t,mix);else nstar(540,CY,rp,t,1);
+  outline(RE,s,540,CY,ea,'EARTH SIZE','#8fd0ff');outline(RM,s,540,CY,ma,'MOON SIZE','#e6e3dc');
+  x.restore();
+  // single counter
+  const ca2=t<6.2?ease((t-6.0)/.3):(t>15.1?1-ease((t-15.1)/.3):1);txt(fmt(2*R)+' km',540,1400,fit('1,391,400 km',84,820),t>=12.0?'#9df0bf':'#ffd166',ca2*a,'Anton');
+  txt('ACROSS',540,1428-128+0,0,'#fff',0)}
+ if(t>=20.0&&t<26.0)balance(t,t<20.6?ease((t-20.0)/.6):1-ease((t-25.6)/.4));
+ // top shading so the cards read
+ let g=x.createLinearGradient(0,300,0,600);g.addColorStop(0,'rgba(0,0,0,.45)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,300,W,300);
+ cards(t);
+ const fa=(t<5.9?ease((5.9-t)/.3):0)+(t>=LOOP?1:0);txt('one star · city drawn for scale (not a real map)',495,575,22,'#eef2f8',fa*(t<2.1||t>=LOOP?1:0),'Mont');
+ g=x.createRadialGradient(540,980,560,540,980,1300);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=g;x.fillRect(0,0,W,H);}
+Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont'),new Promise(r=>{if(EARTH.complete)r();else{EARTH.onload=r;EARTH.onerror=r}})]).then(()=>{window.TEXREADY=true});
+</script>
