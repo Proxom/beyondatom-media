@@ -1,0 +1,23 @@
+Guess first: which ball never comes back? 👇
+
+The same ball is fired straight up at 3 km/s (10,800 km/h) on Earth, Mars, Mercury and the Moon. No air drag, so every world gets a fair test.
+Earth: it climbs to about 490 km, higher than the International Space Station (which orbits at about 370-460 km), and falls back after about 11 minutes. To escape Earth for good it would need 11.2 km/s.
+Mars and Mercury pull almost the same at the ground (3.73 vs 3.70 m/s²). But Mercury is smaller, so its gravity fades faster as the ball climbs. Mercury's ball peaks at about 2,420 km and lands after about 69 minutes; Mars's ball peaks at about 1,870 km and lands after about 49 minutes.
+The Moon: its escape speed is only 2.38 km/s, so a 3 km/s ball never comes back.
+
+About the video: an original simulation. Each flight is computed from Newton's law of gravity using the NASA fact sheet values (GM and mean radius), ignoring air and planet spin. The heights share one km scale; the balls and cannons are drawn much bigger than scale. The clock is sped up.
+
+Sources:
+NASA NSSDC Earth Fact Sheet (GM 0.39860 x 10^6 km³/s², mean radius 6,371 km, escape velocity 11.186 km/s): https://nssdc.gsfc.nasa.gov/planetary/factsheet/earthfact.html
+NASA NSSDC Mars Fact Sheet (GM 0.042828 x 10^6 km³/s², mean radius 3,389.5 km, surface gravity 3.73 m/s², escape velocity 5.03 km/s): https://nssdc.gsfc.nasa.gov/planetary/factsheet/marsfact.html
+NASA NSSDC Mercury Fact Sheet (GM 0.022032 x 10^6 km³/s², mean radius 2,439.7 km, surface gravity 3.70 m/s², escape velocity 4.3 km/s): https://nssdc.gsfc.nasa.gov/planetary/factsheet/mercuryfact.html
+NASA NSSDC Moon Fact Sheet (GM 0.00490 x 10^6 km³/s², mean radius 1,737.4 km, escape velocity 2.38 km/s): https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+NASA, International Space Station reference (orbits at an altitude of 370-460 km): https://www.nasa.gov/reference/international-space-station/
+
+Footage: none; everything is drawn in code.
+Narration: AI voice (Kokoro). Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #physics #planets #shorts
