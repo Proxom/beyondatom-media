@@ -48,9 +48,10 @@ function earthTilt(cx,cy,r,al){if(al<=0.01)return;x.save();x.globalAlpha=al;x.tr
  // sunlight arrows from the right
  x.save();x.globalAlpha=al*0.8;x.strokeStyle='#ffe08a';x.lineWidth=6;for(let i=-2;i<=2;i++){const yy=cy+i*90;x.beginPath();x.moveTo(1010,yy);x.lineTo(cx+r+40,yy);x.stroke();x.beginPath();x.moveTo(cx+r+40,yy);x.lineTo(cx+r+64,yy-14);x.moveTo(cx+r+40,yy);x.lineTo(cx+r+64,yy+14);x.stroke()}x.restore()}
 const TILES=[['DEC','9',4.1],['DEC','13-14',7.8],['DEC','21',15.9],['DEC','24',21.6]];
-function tiles(t,al){const y=1190,w=190,h=128,gap=24,x0=540-(4*w+3*gap)/2;for(let i=0;i<4;i++){const [m,d,ta]=TILES[i],on=t>=ta&&(i==3?t<25.2:t<TILES[i+1][2]),past=t>=ta;
+function tiles(t,al){const y=1190,w=190,h=128,gap=24,x0=495-(4*w+3*gap)/2;for(let i=0;i<4;i++){const [m,d,ta]=TILES[i],on=t>=ta&&(i==3?t<25.2:t<TILES[i+1][2]),past=t>=ta;
  const xx=x0+i*(w+gap);x.save();x.globalAlpha=al*(on?1:past?0.75:0.5);x.fillStyle=on?'#ffd166':'rgba(255,255,255,.16)';x.beginPath();x.roundRect(xx,y,w,h,18);x.fill();x.restore();
- txt(m,xx+w/2,y+44,32,on?'#1a1300':'#e8eefc',al*(on?1:0.85),'Anton');txt(d,xx+w/2,y+108,d.length>2?54:62,on?'#1a1300':'#fff',al*(on?1:0.85),'Anton')}}
+ if(on){x.save();x.globalAlpha=al;x.fillStyle='#1a1300';x.textAlign='center';x.font='32px Anton';x.fillText(m,xx+w/2,y+44);x.font=(d.length>2?54:62)+'px Anton';x.fillText(d,xx+w/2,y+108);x.restore()}
+ else{txt(m,xx+w/2,y+44,32,'#e8eefc',al*0.85,'Anton');txt(d,xx+w/2,y+108,d.length>2?54:62,'#fff',al*0.85,'Anton')}}}
 const CARDS=[[-1,4.1,'DECEMBER 2026 SKY:','4 DATES TO SAVE'],[4.1,7.8,'DEC 9: NEW MOON','DARKEST NIGHTS'],[7.8,15.9,'DEC 13-14: GEMINIDS PEAK','ONE OF THE BEST SHOWERS'],
  [15.9,21.6,'DEC 21: SOLSTICE','LONGEST NIGHT IN THE NORTH'],[21.6,24.0,'DEC 24: CHRISTMAS EVE','FULL MOON'],[24.0,25.2,'WHICH ONE','WILL YOU WATCH?'],[25.2,25.9,'FOLLOW →','MORE EVERY DAY'],[25.9,D+1,'DECEMBER 2026 SKY:','4 DATES TO SAVE']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
@@ -58,13 +59,13 @@ function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;const u=t>=LOOP?t-D:t;
  const dark=u>=4.1&&u<15.9?1:0.4;sky(u,dark);
  // meteors: a few in the hook, many at the Geminid peak
- meteors(u,1.2,u<4.1?1:0);meteors(u,4.0,u>=7.8&&u<15.9?Math.min(ease((u-7.8)/.5),ease((15.9-u)/.4)):0);
+ meteors(u,1.2,u<4.1?1:0);meteors(u,8.0,u>=7.8&&u<15.9?Math.min(ease((u-7.8)/.5),ease((15.9-u)/.4)):0);
  if(u>=7.8&&u<15.9){const a=Math.min(ease((u-8.4)/.4),ease((15.9-u)/.3));txt('GEMINI',RAD[0],RAD[1]+16,40,'rgba(200,215,255,.9)',a*0.9,'Anton');
   txt('40-50 AN HOUR UNDER DARK SKIES',495,1110,46,'#e8eefc',ease((u-10.0)/.4)*ease((15.9-u)/.3),'Anton');
   const k=ease((u-11.5)/3.6);crescent(200,lerp(1000,1420,k),46,ease((u-11.0)/.4)*ease((15.9-u)/.3))}
  if(u>=4.1&&u<7.8){const a=Math.min(ease((u-4.3)/.4),ease((7.8-u)/.3));x.save();x.globalAlpha=a;x.fillStyle='#0a0d18';x.beginPath();x.arc(540,830,170,0,7);x.fill();x.strokeStyle='rgba(200,210,240,.35)';x.lineWidth=3;x.beginPath();x.arc(540,830,170,0,7);x.stroke();x.restore();
   txt('NEW MOON',540,845,60,'rgba(220,228,255,.85)',a,'Anton')}
- if(u>=15.9&&u<21.6){const a=Math.min(ease((u-16.0)/.5),ease((21.6-u)/.3));x.fillStyle='rgba(1,2,8,'+(0.85*a)+')';x.fillRect(0,0,W,H);earthTilt(470,840,250,a);txt('SUN →',860,1110,40,'#ffe08a',a,'Anton')}
+ if(u>=15.9&&u<21.6){const a=Math.min(ease((u-16.0)/.5),ease((21.6-u)/.3));x.fillStyle='rgba(1,2,8,'+(0.85*a)+')';x.fillRect(0,0,W,H);earthTilt(470,880,220,a);txt('SUN →',860,1110,40,'#ffe08a',a,'Anton')}
  if(u>=21.6&&u<25.2){const k=ease((u-21.6)/2.6);moonImg(540,lerp(1500,930,k),250,Math.min(1,ease((u-21.6)/.3))*ease((25.2-u)/.3))}
 const mr=u>=21.6&&u<25.2?ease((u-22.4)/1.2)*ease((25.2-u)/.3):0; land(u,mr);tiles(u,u<4.1?ease((u+0.5)/.6):1);
  cards(t)}

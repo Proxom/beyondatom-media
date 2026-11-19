@@ -6,7 +6,7 @@ L = {
  'l2': "December ninth: new Moon. The darkest nights of the month.",
  'l3': "The night of the thirteenth: the Geminids peak, one of the best meteor showers of the year. And a thin crescent Moon sets early.",
  'l4': "December twenty-first: the solstice. The longest night of the year in the Northern Hemisphere.",
- 'l5': "And on Christmas Eve, a full Moon.",
+ 'l5': "And a full Moon lights up Christmas Eve.",
  'l6': "Save the dates!",
 }
 for n, s in L.items():
