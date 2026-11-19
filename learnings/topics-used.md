@@ -84,7 +84,10 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 67 | 26 Kas 01:00 | Is the Moon Bigger Than Australia? 🌕 | moon size | planlı (Metricool 434338429) |
 | 68 | 26 Kas 17:00 | December 2026 Sky: 4 Dates to Save 🌠 | december 2026 sky events | planlı (Metricool 434343324) |
 | 69 | 27 Kas 01:00 | How Do Astronauts Sleep in Space? 😴 | sleep in space | planlı (Metricool 434354206) |
-| 70 | 27 Kas 17:00 | What If You Stood on Mercury? ☀️ | mercury surface conditions | planlı (Metricool 434364842) |
+| 70 | 19 Kas 21:00 | What If You Stood on Mercury? ☀️ | mercury surface conditions | planlı (Metricool 434572127; 19 Kas 18:10'da 27 Kas 17:00'den taşındı) |
+| 71 | 20 Kas 21:00 | How Do Astronauts Use the Toilet? 🚽 | space toilet | planlı (Metricool 434599069) |
+| 72 | 21 Kas 21:00 | How Big Is Mars's Grand Canyon? 🏜️ | valles marineris | planlı (Metricool 434605506) |
+| 73 | 22 Kas 21:00 | What Happens to Your Eyes in Space? 👁️ | eyes in space (sans) | planlı (Metricool 434609875) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
@@ -110,3 +113,6 @@ Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mon
 - sleep in space = astronaut sleeping bag = co2 bubble while sleeping
 - monthly sky events = "<month> sky: dates to save" (her ay yeni ay sayılır; aynı ay tekrar edilmez)
 - sun size = earths across the sun = "109 earths"; nearest star distance = sun as basketball
+- space toilet = astronaut toilet = uwms = how astronauts pee/poop in space (su geri dönüşümü yalnız sonuç olarak anıldı; 'iss water recycling' ayrı video yapılmaz)
+- valles marineris = mars grand canyon = largest canyon in solar system
+- eyes in space (sans) = astronaut vision changes = eyeball flattening = optic disc swelling
