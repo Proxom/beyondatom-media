@@ -88,7 +88,7 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 71 | 20 Kas 21:00 | How Do Astronauts Use the Toilet? 🚽 | space toilet | planlı (Metricool 434599069) |
 | 72 | 21 Kas 21:00 | How Big Is Mars's Grand Canyon? 🏜️ | valles marineris | planlı (Metricool 434605506) |
 | 73 | 22 Kas 21:00 | What Happens to Your Eyes in Space? 👁️ | eyes in space (sans) | planlı (Metricool 434609875) |
-| 74 | 23 Kas 21:00 | How Big Is Andromeda in Our Sky? 🌌 | andromeda size in sky | planlı |
+| 74 | 23 Kas 21:00 | How Big Is Andromeda in Our Sky? 🌌 | andromeda size in sky | planlı (Metricool 434619233) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
