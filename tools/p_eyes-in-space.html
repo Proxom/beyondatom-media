@@ -7,7 +7,7 @@
        for Barratt and Thirsk, slightly stronger pairs of glasses solved the problem.
      Drawing: the eye, the head and the arrows are illustrations; the flattening and the swelling are exaggerated (labelled). -->
 <script>
-const W=1080,H=1920,FPS=30,D=28.6,LOOP=28.4;
+const W=1080,H=1920,FPS=30,D=29.1,LOOP=28.9;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
 const cv=document.getElementById('c'),x=cv.getContext('2d');
 function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
@@ -21,7 +21,7 @@ function bg(u){let g=x.createRadialGradient(540,1000,100,540,1000,1300);g.addCol
 function frontEye(u,k,gl){if(k<=0.01)return;x.save();x.globalAlpha=k;const cx=540,cy=1060;
  x.fillStyle='#d9a383';x.fillRect(0,560,W,1060);let g=x.createLinearGradient(0,560,0,1620);g.addColorStop(0,'rgba(0,0,0,.55)');g.addColorStop(.25,'rgba(0,0,0,0)');g.addColorStop(.75,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.6)');x.fillStyle=g;x.fillRect(0,560,W,1060);
  x.fillStyle='#03060f';x.fillRect(0,0,W,560);x.fillRect(0,1620,W,H);
- const blink=u>27.95&&u<28.25?Math.sin((u-27.95)/0.3*Math.PI):0,op=275*(1-blink);
+ const blink=u>28.45&&u<28.75?Math.sin((u-28.45)/0.3*Math.PI):0,op=275*(1-blink);
  x.save();x.beginPath();x.moveTo(70,cy);x.quadraticCurveTo(cx,cy-op*1.55,1010,cy);x.quadraticCurveTo(cx,cy+op*1.35,70,cy);x.closePath();
  x.fillStyle='#f4f1ec';x.fill();x.clip();
  g=x.createRadialGradient(cx,cy,100,cx,cy,430);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(150,90,80,.35)');x.fillStyle=g;x.fillRect(0,600,W,900);
@@ -51,6 +51,7 @@ function head(u,k){if(k<=0.01)return;x.save();x.globalAlpha=k;
 // cross-section (front = left, back = right); f = flattening 0..1, sw = disc swelling 0..1, pr = pressure arrows
 function section(u,k,f,sw,pr){if(k<=0.01)return;x.save();x.globalAlpha=k;const cx=470,cy=1060,Rr=340,fl=0.13*f;
  const shape=(r)=>{x.beginPath();for(let i=0;i<=120;i++){const a=i/120*Math.PI*2;let px=Math.cos(a)*r,py=Math.sin(a)*r;if(px>0)px=Math.min(px,r*(1-fl));i?x.lineTo(cx+px,cy+py):x.moveTo(cx+px,cy+py)}x.closePath()};
+ if(pr>0.01){x.save();x.globalAlpha=k*pr*(0.55+0.35*Math.sin(u*4));let pg=x.createRadialGradient(cx,cy,Rr*0.9,cx,cy,Rr*1.55);pg.addColorStop(0,'rgba(95,184,255,.85)');pg.addColorStop(1,'rgba(95,184,255,0)');x.fillStyle=pg;x.beginPath();x.arc(cx,cy,Rr*1.55,0,7);x.fill();x.restore()}
  // optic nerve
  x.fillStyle='#e8c98f';x.beginPath();x.roundRect(cx+Rr*(1-fl)-30,cy+30,330,100,30);x.fill();x.strokeStyle='#b8955a';x.lineWidth=5;x.stroke();
  shape(Rr);x.fillStyle='#f3efe8';x.fill();x.strokeStyle='#c9c1b4';x.lineWidth=8;x.stroke();
@@ -65,16 +66,15 @@ function section(u,k,f,sw,pr){if(k<=0.01)return;x.save();x.globalAlpha=k;const c
  const dx=cx+Rr*(1-fl)-24;x.fillStyle=sw>0.05?'rgb(255,'+Math.round(lerp(140,90,sw))+',60)':'#f2a35a';x.beginPath();x.ellipse(dx-sw*18,cy+80,14+sw*26,46+sw*10,0,0,7);x.fill();
  if(sw>0.05){x.save();x.globalAlpha=k*sw*(0.4+0.3*Math.sin(u*6));let gg=x.createRadialGradient(dx-20,cy+80,5,dx-20,cy+80,110);gg.addColorStop(0,'rgba(255,120,60,.9)');gg.addColorStop(1,'rgba(255,120,60,0)');x.fillStyle=gg;x.beginPath();x.arc(dx-20,cy+80,110,0,7);x.fill();x.restore()}
  // pressure arrows on the back
- if(pr>0.01){for(let i=-2;i<=2;i++){const yy=cy+i*95,off=12*Math.sin(u*5+i);x.save();x.globalAlpha=k*pr;x.strokeStyle='#5fb8ff';x.fillStyle='#5fb8ff';x.lineWidth=12;x.lineCap='round';
-  const x1=cx+Rr*(1-fl)+130+off,x0=cx+Rr*(1-fl)+30+off;x.beginPath();x.moveTo(x1,yy);x.lineTo(x0+20,yy);x.stroke();x.beginPath();x.moveTo(x0,yy);x.lineTo(x0+30,yy-20);x.lineTo(x0+30,yy+20);x.closePath();x.fill();x.restore()}}
+ 
  txt('FRONT',cx-Rr+20,cy-Rr-30,46,'#cfe9ff',k*0.9);txt('BACK',cx+Rr-40,cy-Rr-30,46,'#cfe9ff',k*0.9*(1-ease((u-15.2)/.4)));
  x.restore()}
-function chips(u){const on=(u>=3.5&&u<7.3)||(u>=20.1&&u<23.8);if(!on)return;const a0=u<7.3?3.5:20.1,a1=u<7.3?7.3:23.8;const a=Math.min(ease((u-a0)/.3),ease((a1-u)/.3));const L=[['10%',270],['40%',540],['70%',810]];
+function chips(u){const on=(u>=3.5&&u<7.3)||(u>=20.1&&u<24.6);if(!on)return;const a0=u<7.3?3.5:20.1,a1=u<7.3?7.3:24.6;const a=Math.min(ease((u-a0)/.3),ease((a1-u)/.3));const L=[['10%',270],['40%',540],['70%',810]];
  for(let i=0;i<3;i++){const [s,cx]=L[i];const ai=a*ease((u-a0-i*0.3)/.25);if(ai<=0.01)continue;const rev=u>=21.8;const win=i==2&&rev,lose=i!=2&&rev;
   x.save();x.globalAlpha=ai*(lose?0.35:1);x.fillStyle=win?'#1f9d55':'rgba(20,24,32,.85)';x.beginPath();x.roundRect(cx-110,620,220,100,22);x.fill();x.strokeStyle=win?'#8dffb8':'#ffd166';x.lineWidth=5;x.stroke();x.restore();
   txt(s,cx,697,70,'#fff',ai*(lose?0.35:1))}}
-const CARDS=[[-1,3.5,'SPACE CAN CHANGE','YOUR EYES'],[3.5,7.1,'GUESS: HOW MANY','CREW SHOW SIGNS?'],[7.1,11.2,'FLUIDS SHIFT UP','TOWARD THE HEAD'],[11.2,14.2,'PRESSURE ON THE','BACK OF THE EYE'],
- [14.2,17.2,'THE BACK OF THE','EYE CAN FLATTEN'],[17.2,20.1,'THE OPTIC DISC','CAN SWELL'],[20.1,23.8,'SIGNS IN ABOUT 70%','OF CREW MEMBERS'],[23.8,26.4,'SOME NEEDED','STRONGER GLASSES'],[26.4,27.7,'WOULD YOU','RISK IT?'],[27.7,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'SPACE CAN CHANGE','YOUR EYES']];
+const CARDS=[[-1,3.5,'SPACE CAN CHANGE','YOUR EYES'],[3.5,7.1,'GUESS: HOW MANY','CREW SHOW SIGNS?'],[7.1,11.2,'FLUIDS SHIFT UP','TOWARD THE HEAD'],[11.2,14.2,'MORE PRESSURE','IN THE HEAD?'],
+ [14.2,17.2,'THE BACK OF THE','EYE CAN FLATTEN'],[17.2,20.1,'THE OPTIC DISC','CAN SWELL'],[20.1,21.8,'SO, HOW MANY','SHOW SIGNS?'],[21.8,24.6,'SIGNS IN ABOUT 70%','OF CREW MEMBERS'],[24.6,26.9,'SOME NEEDED SLIGHTLY','STRONGER GLASSES'],[26.9,28.2,'WOULD YOU','RISK IT?'],[28.2,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'SPACE CAN CHANGE','YOUR EYES']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,80,840),fit(l2,80,840));const g=x.createLinearGradient(0,320,0,600);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.4,'rgba(0,0,0,'+(0.6*al)+')');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,320,W,280);
  txt(l1,495,420,sz,'#fff',al);txt(l2,495,420+sz*1.08,sz,'#ffd166',al)}}
@@ -83,11 +83,11 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;const u=t>=LOOP?t-D
  const hk=u>=6.9&&u<11.4?Math.min(ease((u-6.9)/.4),ease((11.4-u)/.4)):0;
  const sk=u>=11.0&&u<20.3?Math.min(ease((u-11.0)/.4),ease((20.3-u)/.4)):0;
  // camera push: slow zoom on every phase
- const zm=1+0.03*Math.sin(u*0.5);x.save();x.translate(540,1060);x.scale(zm,zm);x.translate(-540,-1060);
- head(u,hk);section(u,sk,ease((u-14.6)/1.8),ease((u-17.4)/1.4),u>=11.4&&u<17?Math.min(ease((u-11.4)/.4),ease((17-u)/.5)):0);frontEye(u,fk,ease((u-24.0)/0.7)*(u<26.4?1:ease((26.9-u)/.5)));x.restore();
+ const hz=u<0?1:u<3.6?ease((3.4-u)/3.4):u>=26.9?ease((u-26.9)/1.8):0;const zm=1+0.03*Math.sin(u*0.5)+0.10*hz,sq=1-0.07*hz*(0.5+0.5*Math.sin(u*3.2));x.save();x.translate(540,1060);x.scale(zm,zm*sq);x.translate(-540,-1060);
+ head(u,hk);section(u,sk,ease((u-14.6)/1.8),ease((u-17.4)/1.4),u>=11.4&&u<17?Math.min(ease((u-11.4)/.4),ease((17-u)/.5)):0);frontEye(u,fk,ease((u-24.7)/0.7)*(u<26.9?1:ease((27.4-u)/.5)));x.restore();
  if(sk>0.01){const a1=sk*ease((u-15.6)/.4),a2=sk*ease((u-18.4)/.4);txt('FLATTENED',760,725,60,'#ffd166',a1);txt('SWOLLEN',690,1320,58,'#ff9a6b',a2);txt('OPTIC DISC',690,1380,50,'#ff9a6b',a2);
   txt('CHANGES EXAGGERATED',500,1436,30,'#cfe9ff',Math.max(a1,a2)*0.9)}
- if(u>=21.8&&u<23.8){const a=Math.min(ease((u-21.8)/.25),ease((23.8-u)/.3));txt('70%',540,1180,220,'#8dffb8',a)}
+ if(u>=21.8&&u<24.6){const a=Math.min(ease((u-21.8)/.25),ease((24.6-u)/.3));txt('70%',540,1180,220,'#8dffb8',a)}
  chips(u);cards(t)}
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true});
 </script>
