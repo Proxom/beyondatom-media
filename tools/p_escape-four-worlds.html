@@ -8,7 +8,7 @@
 <script>
 const W=1080,H=1920,FPS=30,D=34.5,LOOP=34.0,V0=3.0,LAUNCH=0.0;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)};
-const CX=[170,385,600,815],CW=207,GY=1372,YT=722,KMAX=2600,K=(GY-YT)/KMAX; // px per km
+const CX=[170,385,600,815],CW=207,GY=1372,YT=722,KMAX=2800,K=(GY-YT)/KMAX; // px per km
 const WD=[
  {n:'EARTH',gm:398600,R:6371.0,gr:['#3f7fbf','#1d4f2a','#0b2414'],tint:'rgba(60,120,220,.16)',atm:'rgba(110,170,255,.55)'},
  {n:'MARS',gm:42828,R:3389.5,gr:['#c0623a','#7a3218','#2e1209'],tint:'rgba(200,100,60,.13)'},
@@ -61,7 +61,7 @@ function column(i,w,u,t){const cx=CX[i],x0=cx-CW/2;const sm=sim(u);const a=alt(w
   const gl=x.createRadialGradient(bxx,yb,0,bxx,yb,br*3.2);gl.addColorStop(0,'rgba(255,200,90,.5)');gl.addColorStop(1,'rgba(255,200,90,0)');x.fillStyle=gl;x.fillRect(bxx-br*3.2,yb-br*3.2,br*6.4,br*6.4);
   const bg=x.createRadialGradient(bxx-br*.35,yb-br*.4,br*.1,bxx,yb,br);bg.addColorStop(0,'#fff8ea');bg.addColorStop(.5,'#f4b53f');bg.addColorStop(1,'#a8551c');x.fillStyle=bg;x.beginPath();x.arc(bxx,yb,br,0,7);x.fill()}
  else{// off the top of the chart: arrow
-  const pulse=.75+.25*Math.sin(t*6);x.globalAlpha=pulse;x.fillStyle='#9df0bf';x.beginPath();x.moveTo(cx,YT-4);x.lineTo(cx-22,YT+30);x.lineTo(cx+22,YT+30);x.fill();x.globalAlpha=1}
+  const pulse=.75+.25*Math.sin(t*6);x.globalAlpha=pulse;x.fillStyle=t>=25.2&&t<LOOP?'#9df0bf':'#ffd166';x.beginPath();x.moveTo(cx,YT-4);x.lineTo(cx-22,YT+30);x.lineTo(cx+22,YT+30);x.fill();x.globalAlpha=1}
  // landing dust
  if(landed){const k=u-vid(w.tland/60);const ra=ease(k/.15)*(1-ease((k-.2)/1.0));if(ra>0){const rr=20+70*Math.sqrt(cl(k/1.2));x.globalAlpha=ra*.8;const dg=x.createRadialGradient(cx+46,GY-4,rr*.2,cx+46,GY-4,rr);
   dg.addColorStop(0,'rgba(255,245,225,0)');dg.addColorStop(.6,'rgba(255,240,215,.7)');dg.addColorStop(1,'rgba(255,240,215,0)');x.fillStyle=dg;x.beginPath();x.ellipse(cx+46,GY-6,rr,rr*.4,0,0,7);x.fill();x.globalAlpha=1}}
@@ -69,15 +69,15 @@ function column(i,w,u,t){const cx=CX[i],x0=cx-CW/2;const sm=sim(u);const a=alt(w
  // name in the ground band
  txt(w.n,cx,1428,fit(w.n,40,CW-16),'#fff',1,'Anton');
  // live altitude counter
- const esc=i==3&&a>KMAX;const done=landed;const kd=done?u-vid(w.tland/60):0;const pop=done?1+0.3*Math.exp(-kd/.12):1;
+ const esc=i==3&&a>KMAX&&t>=25.2;const done=landed;const kd=done?u-vid(w.tland/60):0;const pop=done?1+0.3*Math.exp(-kd/.12):1;
  const col=esc?'#9df0bf':(done?'#ffffff':'#ffd166');
  txt(done?'LANDED':fmt(a)+' km',cx,676,fit(done?'LANDED':'99,999 km',40,CW-14)*pop,col,u>-0.2?1:0.85,'Anton');
  const sub=done?'after '+Math.round(w.tland/60)+' min':(esc?'still climbing':(up?'climbing':'falling'));
  txt(sub,cx,704,20,'rgba(235,240,248,.9)',u>LAUNCH+0.2?1:0,'Mont');}
-const CARDS=[[0,4.2,'SAME SHOT, 4 WORLDS','3 km/s STRAIGHT UP'],[4.2,6.0,'WHICH BALL NEVER','COMES BACK?'],[6.0,8.75,'EARTH: 490 km UP','HIGHER THAN THE ISS'],
+const CARDS=[[0,6.0,'SAME SHOT, 4 WORLDS','WHICH BALL NEVER COMES BACK?'],[6.0,8.75,'EARTH: 490 km UP','HIGHER THAN THE ISS'],
  [8.75,11.2,'EARTH: BACK DOWN','AFTER 11 MINUTES'],[11.2,16.35,'MARS OR MERCURY:','WHICH GOES HIGHER?'],[16.35,20.5,'MERCURY: 2,420 km','SMALLER, SO ITS PULL FADES FASTER'],
  [20.5,25.2,'MARS: BACK IN 49 MIN','MERCURY: 69 MIN'],[25.2,31.4,'THE MOON: GONE FOREVER','ESCAPE SPEED: ONLY 2.4 km/s'],[31.4,33.0,'WHERE WOULD YOU','LAUNCH FROM?'],
- [33.0,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'SAME SHOT, 4 WORLDS','3 km/s STRAIGHT UP']];
+ [33.0,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'SAME SHOT, 4 WORLDS','WHICH BALL NEVER COMES BACK?']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,78,820),l2?fit(l2,80,820):99);const pop=(l1.startsWith('MERCURY:')||l1.startsWith('THE MOON'))?1+0.08*Math.exp(-(t-a)/.15):1;
  txt(l1,495,404,sz*pop,'#fff',al);if(l2)txt(l2,495,404+sz*1.08,sz,'#ffd166',al)}}
@@ -97,7 +97,7 @@ function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;
  // top shading so the cards read
  g=x.createLinearGradient(0,300,0,620);g.addColorStop(0,'rgba(0,0,0,.35)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,300,W,320);
  cards(t);
- const fa=(t<4.2?ease((4.2-t)/.3):0)+(t>=LOOP?1:0);txt('same speed everywhere · no air drag · balls not to scale',495,560,23,'#eef2f8',fa,'Mont');
+ const fa=(t<6.0?ease((6.0-t)/.3):0)+(t>=LOOP?1:0);txt('3 km/s straight up · no air drag · balls not to scale',495,560,23,'#eef2f8',fa,'Mont');
  const ga=t>=11.2&&t<16.35?Math.min(ease((t-11.2)/.3),ease((16.35-t)/.2)):0;txt('both pull about 3.7 m/s² at the ground',495,560,24,'#eef2f8',ga,'Mont');
  const sm=sim(u);txt(u<LAUNCH?'READY…':Math.floor(sm)+' MIN AFTER LAUNCH',495,618,30,'#cfe6ff',t>=LOOP?0:1,'Mont');
  g=x.createRadialGradient(540,980,560,540,980,1300);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.35)');x.fillStyle=g;x.fillRect(0,0,W,H);}
