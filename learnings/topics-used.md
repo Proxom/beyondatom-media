@@ -76,6 +76,7 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 59 | 22 Kas 01:00 | What Does Fire Look Like in Space? 🔥 | fire in space | planlı (Metricool 433543866) |
 | 60 | 22 Kas 17:00 | Same Shot on 4 Worlds: Which Ball Escapes? 🚀 | escape velocity | planlı (Metricool 433607677) |
 | 61 | 23 Kas 01:00 | How Big Is a Neutron Star? ⭐ | neutron star size | planlı (Metricool 433615261) |
+| 62 | 23 Kas 17:00 | How Fast Do Bones Age in Space? 🦴 | bone loss space | planlı (Metricool 433618109) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
@@ -86,6 +87,7 @@ Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mon
 - (18 Kas 22:07 notu) skydive on planets = aynı serbest düşüş/top düşürme ailesi, ENGELLİ sayıldı (bu hafta 3 düşüş videosu var)
 - fire in space = candle in microgravity = flames in zero g
 - escape velocity = escape speed = "fire a ball/cannon straight up on planets" = leaving a planet forever
+- bone loss space = astronaut bone density = osteoporosis in space
 - neutron star size = neutron star density = "sugar cube weighs a mountain" = pulsar size
 - fluid shift space = puffy face bird legs = blood moves to head in space (astronaut height #30 = omurga, ayrı konu)
 - iss sunrises = iss orbit period = "16 sunrises"; iss free fall orbit = newton's cannon
