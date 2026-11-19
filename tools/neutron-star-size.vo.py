@@ -4,11 +4,11 @@ k = Kokoro('/tmp/claude-0/kokoro/kokoro-v1.0.onnx', '/tmp/claude-0/kokoro/voices
 L = {
  'l1': "This star is heavier than the Sun.",
  'l2': "So how big is it? As big as Earth? The Moon? Or a city?",
- 'l3': "Start with the Sun. Now shrink it.",
+ 'l3': "Imagine squeezing the Sun. Shrink it.",
  'l4': "Past Earth.",
  'l5': "Past the Moon.",
  'l6': "Down to about twenty kilometers across. The size of a city!",
- 'l7': "It's a neutron star: the crushed core left after a giant star explodes.",
+ 'l7': "It's a neutron star: the crushed core of a giant star that exploded.",
  'l8': "One sugar cube of it would weigh about a billion tons on Earth. As much as a mountain.",
  'l9': "Did you guess right?",
 }
