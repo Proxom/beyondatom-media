@@ -11,7 +11,7 @@ About the video: an original animation. The toilet, the air streaks and the wate
 
 Sources:
 NASA, "Boldly Go! NASA's New Space Toilet Offers More Comfort, Improved Efficiency for Deep Space Missions" (17 Sep 2020; air flow pulls urine and feces away from the body; funnel and hose for urine, seat for bowel movements; air flow starts when the lid is lifted; foot restraints and handholds; pre-treated urine goes to a system that recycles water): https://www.nasa.gov/humans-in-space/boldly-go-nasas-new-space-toilet-offers-more-comfort-improved-efficiency-for-deep-space-missions
-NASA, "NASA Achieves Water Recovery Milestone on International Space Station" (2023; 98% of the water crews take to space is recovered, using the urine processor and the brine processor): https://www.nasa.gov/missions/station/iss-research/nasa-achieves-water-recovery-milestone-on-international-space-station
+NASA, "NASA Achieves Water Recovery Milestone on International Space Station" (2023; the station showed it can reach 98% total recovery of the water crews bring, using the urine processor and the brine processor): https://www.nasa.gov/missions/station/iss-research/nasa-achieves-water-recovery-milestone-on-international-space-station
 
 Footage: none; everything is drawn in code.
 Narration: AI voice (Kokoro). Music and sound: original.

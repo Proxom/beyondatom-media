@@ -7,7 +7,7 @@
      NASA image article "Valles Marineris: The Grand Canyon of Mars": about 3,870 km long.
      NASA/JPL PIA02891 "Mars Canyon with Los Angeles for Scale": 10 times longer than Arizona's Grand Canyon; could reach across the United States coast to coast; rim more than 25,000 ft (7.6 km) high, nearly as tall as Everest.
      NPS Grand Canyon FAQ: 277 river miles (446 km) long; deepest 6,000 ft (1,829 m).  Everest 8,849 m.
-     Cross-section: one vertical scale for both canyons and Everest (1 km = 92 px); widths not to scale. -->
+     Cross-section: one vertical scale for both canyons and Everest (1 km = 78 px); widths not to scale. -->
 <script>
 const W=1080,H=1920,FPS=30,D=29.0,LOOP=28.8;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
@@ -18,10 +18,10 @@ function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globa
 function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
 // Mars mosaic: crop centred on the canyon (source px), slow push toward it
 let MAP=null;
-function mars(u,dim){const z=1+0.10*ease(cl(u/28.8))+0.02*Math.sin(u*0.3);const cxs=lerp(1000,975,cl(u/28.8)),cys=1060;const hs=1150/z,ws=hs*W/H;
+function mars(u,dim){const z=1+0.10*ease(cl(u/28.8))+0.02*Math.sin(u*0.3);const cxs=lerp(1000,975,cl(u/28.8)),cys=1000;const hs=1150/z,ws=hs*W/H;
  x.drawImage(IMG,cxs-ws/2,cys-hs/2,ws,hs,0,0,W,H);MAP=(sx,sy)=>[(sx-(cxs-ws/2))/ws*W,(sy-(cys-hs/2))/hs*H,W/ws];
  if(dim>0.01){x.fillStyle='rgba(0,0,0,'+(0.62*dim)+')';x.fillRect(0,0,W,H)}}
-function chips(u){if(u<5.3||u>=14.4)return;const a=Math.min(ease((u-5.3)/.3),ease((14.4-u)/.3));const L=[['2X',270],['5X',540],['10X',810]];
+function chips(u){if(u<5.3||u>=14.4)return;const a=Math.min(ease((u-5.3)/.3),ease((14.4-u)/.3));const L=[['3X',270],['6X',540],['9X',810]];
  for(let i=0;i<3;i++){const [s,cx]=L[i];const ai=a*ease((u-5.3-i*0.3)/.25);if(ai<=0.01)continue;const rev=u>=12.2;const win=i==2&&rev,lose=i!=2&&rev;
   x.save();x.globalAlpha=ai*(lose?0.35:1);x.fillStyle=win?'#1f9d55':'rgba(20,24,32,.85)';x.beginPath();x.roundRect(cx-110,630,220,100,22);x.fill();x.strokeStyle=win?'#8dffb8':'#ffd166';x.lineWidth=5;x.stroke();x.restore();
   txt(s,cx,705,70,'#fff',ai*(lose?0.35:1))}}
@@ -33,16 +33,14 @@ function bars(u){if(u<7.6||u>=18.2)return;const a=Math.min(ease((u-7.6)/.4),ease
  x.strokeStyle='rgba(255,255,255,.75)';x.lineWidth=4;for(let k=1;k*gc<FULL*g;k++){x.beginPath();x.moveTo(X0+k*gc,1135);x.lineTo(X0+k*gc,1207);x.stroke()}
  txt((g>=1?'ABOUT ':'')+km.toLocaleString('en-US')+' KM',X0+Math.min(FULL*g,FULL),1290,72,'#ffffff',a,'Anton',g>0.5?'right':'left');
  x.restore()}
-// cross-section: one vertical scale (92 px per km)
+// cross-section: one vertical scale (78 px per km)
 function section(u,k){if(k<=0.01)return;const S=78,G=760;x.save();x.globalAlpha=k;
- let g=x.createLinearGradient(0,0,0,G);g.addColorStop(0,'#3a2a22');g.addColorStop(1,'#c7a07a');x.fillStyle=g;x.fillRect(0,0,W,G+2);
+ let g=x.createLinearGradient(0,0,0,G);g.addColorStop(0,'#3a2a22');g.addColorStop(1,'#c7a07a');x.fillStyle=g;x.fillRect(0,0,W,H);
  const dig=ease((u-18.3)/2.2),vm=7.6*S*dig,gcD=1.83*S;
  // ground with the Grand Canyon notch (left) and the Valles Marineris trench (right)
  x.fillStyle='#8a4b2c';x.beginPath();x.moveTo(0,G);x.lineTo(90,G);x.lineTo(150,G+gcD);x.lineTo(210,G+gcD);x.lineTo(270,G);x.lineTo(330,G);
- x.lineTo(400,G+vm*0.55);x.lineTo(430,G+vm);x.lineTo(880,G+vm);x.lineTo(910,G+vm*0.55);x.lineTo(990,G);x.lineTo(W,G);x.lineTo(W,H);x.lineTo(0,H);x.closePath();x.fill();
- x.strokeStyle='#d9895a';x.lineWidth=6;x.stroke();
- // strata lines
- x.strokeStyle='rgba(60,25,15,.35)';x.lineWidth=3;for(let yy=G+60;yy<H;yy+=70){x.beginPath();x.moveTo(0,yy);x.lineTo(W,yy);x.stroke()}
+ x.lineTo(400,G+vm*0.55);x.lineTo(430,G+vm);x.lineTo(880,G+vm);x.lineTo(910,G+vm*0.55);x.lineTo(990,G);x.lineTo(W,G);x.lineTo(W,H);x.lineTo(0,H);x.closePath();x.fill();x.strokeStyle='#d9895a';x.lineWidth=6;x.stroke();
+ x.save();x.clip();x.strokeStyle='rgba(60,25,15,.35)';x.lineWidth=3;for(let yy=G+60;yy<H;yy+=70){x.beginPath();x.moveTo(0,yy);x.lineTo(W,yy);x.stroke()}x.restore();
  // Everest rising from the trench floor
  const ev=ease((u-23.0)/1.6);if(ev>0.01){const eh=8.849*S*ev,base=G+vm,cx=560;x.fillStyle='#6d6f78';x.beginPath();x.moveTo(cx-230,base);x.lineTo(cx-60,base-eh*0.72);x.lineTo(cx,base-eh);x.lineTo(cx+70,base-eh*0.78);x.lineTo(cx+230,base);x.closePath();x.fill();
   x.fillStyle='#f2f4f8';x.beginPath();x.moveTo(cx-38,base-eh*0.86);x.lineTo(cx,base-eh);x.lineTo(cx+42,base-eh*0.88);x.lineTo(cx+12,base-eh*0.9);x.closePath();x.fill();
@@ -55,8 +53,8 @@ function section(u,k){if(k<=0.01)return;const S=78,G=760;x.save();x.globalAlpha=
  txt('VALLES MARINERIS',790,G-30,40,'#ffd166',k);
  txt('SAME HEIGHT SCALE · WIDTHS NOT TO SCALE',540,1420,30,'#f0e0d0',k*0.9);
  x.restore()}
-const CARDS=[[-1,5.3,'MARS HAS A CANYON.','HOW BIG IS IT?'],[5.3,7.9,'GUESS: HOW MANY','TIMES LONGER?'],[7.9,12.2,'VALLES MARINERIS:','ABOUT 4,000 KM LONG'],[12.2,14.4,'NEARLY 10 TIMES','LONGER THAN OURS'],
- [14.4,17.9,'ON EARTH: COAST TO','COAST ACROSS THE USA'],[17.9,22.4,'WALLS OVER 7.6 KM HIGH','MORE THAN 4 TIMES DEEPER'],[22.4,26.8,'NEARLY AS TALL','AS MOUNT EVEREST'],[26.8,28.1,'WOULD YOU','HIKE IT?'],[28.1,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'MARS HAS A CANYON.','HOW BIG IS IT?']];
+const CARDS=[[-1,5.3,'IT MAKES THE GRAND','CANYON LOOK TINY'],[5.3,7.9,'GUESS: HOW MANY','TIMES LONGER?'],[7.9,12.2,'VALLES MARINERIS:','ABOUT 4,000 KM LONG'],[12.2,14.4,'ABOUT 9 TIMES','LONGER THAN OURS'],
+ [14.4,17.9,'ON EARTH: COAST TO','COAST ACROSS THE USA'],[17.9,22.4,'WALLS OVER 7.6 KM HIGH','MORE THAN 4 TIMES DEEPER'],[22.4,26.8,'NEARLY AS TALL','AS MOUNT EVEREST'],[26.8,28.1,'WOULD YOU','HIKE IT?'],[28.1,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'IT MAKES THE GRAND','CANYON LOOK TINY']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,80,840),fit(l2,80,840));const g=x.createLinearGradient(0,320,0,600);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.4,'rgba(0,0,0,'+(0.6*al)+')');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,320,W,280);
  txt(l1,495,420,sz,'#fff',al);txt(l2,495,420+sz*1.08,sz,'#ffd166',al)}}
