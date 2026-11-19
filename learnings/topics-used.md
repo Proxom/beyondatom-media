@@ -77,6 +77,7 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 60 | 22 Kas 17:00 | Same Shot on 4 Worlds: Which Ball Escapes? 🚀 | escape velocity | planlı (Metricool 433607677) |
 | 61 | 23 Kas 01:00 | How Big Is a Neutron Star? ⭐ | neutron star size | planlı (Metricool 433615261) |
 | 62 | 23 Kas 17:00 | How Fast Do Bones Age in Space? 🦴 | bone loss space | planlı (Metricool 433618109) |
+| 63 | 24 Kas 01:00 | Same Shout on 4 Worlds: Who Hears It First? 📣 | speed of sound on planets | planlı (Metricool 433756016) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
@@ -95,4 +96,5 @@ Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mon
 - planet orbital speeds = earth orbital speed; solar system galactic motion = helix
 - human g tolerance = gravity on planets for humans = "your body on Jupiter"
 - earth falls into sun = earth stops orbiting; gravity tunnel through earth = fall through earth = hole through earth
+- speed of sound on planets = sound on mars = "shout on planets" = no sound on the moon / in space
 - sun size = earths across the sun = "109 earths"; nearest star distance = sun as basketball

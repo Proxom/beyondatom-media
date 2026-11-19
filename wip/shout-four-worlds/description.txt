@@ -3,10 +3,10 @@ TITLE: Same Shout on 4 Worlds: Who Hears It First? 📣
 Guess first: Venus, Earth, Mars or the Moon? 👇
 
 Imagine the same shout to a friend 100 meters away on four worlds. Sound is a wave in the air, so how fast it travels depends on the air: mostly on its temperature and what it is made of, not on how thick it is.
-Venus: its scorching hot (about 460 °C) carbon dioxide air carries sound at about 410 m/s, so your friend hears you after about 0.24 s. (No one has measured it there yet; this value comes from a physics model of Venus's surface air.)
+Venus: its scorching hot (about 460 °C) carbon dioxide air carries sound at about 410 m/s, so your friend hears you after about 0.24 s. (This value comes from a physics model of Venus's surface air.)
 Earth: 343 m/s, about 0.29 s.
 Mars: the freezing cold carbon dioxide air carries sound at only about 240 m/s, about 0.42 s. NASA's Perseverance rover measured it with its microphone. On Mars, high-pitched sounds even travel a bit faster (about 250 m/s) than low ones.
-The Moon: there is no air, so sound cannot travel at all. Your friend never hears you (astronauts talk by radio).
+The Moon: there is no air, so sound cannot travel at all. Your friend never hears you.
 
 About the video: an original animation and a thought experiment (no human could stand on Venus, and no suits are drawn). The waves are slowed down 20 times; the timers show real time. The 100 m distance is to scale in every row; the people are drawn much bigger than scale.
 
