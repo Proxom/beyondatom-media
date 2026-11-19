@@ -4,7 +4,7 @@ k = Kokoro('/tmp/claude-0/kokoro/kokoro-v1.0.onnx', '/tmp/claude-0/kokoro/voices
 L = {
  'l1': "There's a whole galaxy in our night sky, and it's bigger than the full Moon.",
  'l2': "Guess: how many full Moons wide?",
- 'l3': "The Andromeda galaxy is about six times wider than the full Moon. From a dark sky, you can even see it with your naked eye.",
+ 'l3': "The Andromeda galaxy is about six times wider than the full Moon. From a dark sky, your eye sees only its bright core, a faint smudge.",
  'l4': "It's two and a half million light-years away. The light you see left it long before our species existed.",
  'l5': "Can you find it?",
 }

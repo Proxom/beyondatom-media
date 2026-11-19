@@ -7,7 +7,7 @@
      Smithsonian: oldest Homo sapiens fossils about 300,000 years old.
      Scale: galaxy long axis (about 1,341 px in the source) drawn = 6 Moon diameters (Moon 150 px). Moon drawn; sky, hills and trees illustrative. -->
 <script>
-const W=1080,H=1920,FPS=30,D=24.1,LOOP=23.9;
+const W=1080,H=1920,FPS=30,D=24.7,LOOP=24.5;
 const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
 const cv=document.getElementById('c'),x=cv.getContext('2d');
 function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
@@ -21,7 +21,7 @@ function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globa
 function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
 function sky(u){let g=x.createLinearGradient(0,0,0,H);g.addColorStop(0,'#02030a');g.addColorStop(.6,'#081433');g.addColorStop(.8,'#14234a');g.addColorStop(1,'#1b2a4a');x.fillStyle=g;x.fillRect(0,0,W,H);
  for(const s of ST){x.fillStyle='rgba(230,235,255,'+(0.35+0.45*Math.sin(u*1.3+s[3]*11)**2)+')';x.beginPath();x.arc(s[0],s[1],s[2],0,7);x.fill()}}
-const GX=540,GY=1000;
+const GX=515,GY=1000;
 function galaxy(u,k){if(k<=0.01||!GAL)return;x.save();x.globalCompositeOperation='screen';x.globalAlpha=k;x.translate(GX,GY);x.scale(S,S);x.drawImage(GAL,-GC[0],-GC[1]);x.restore()}
 function moon(px,py,r,k){if(k<=0.01)return;x.save();x.globalAlpha=k;let g=x.createRadialGradient(px,py,r*0.6,px,py,r*2.4);g.addColorStop(0,'rgba(255,250,230,.35)');g.addColorStop(1,'rgba(255,250,230,0)');x.fillStyle=g;x.beginPath();x.arc(px,py,r*2.4,0,7);x.fill();
  g=x.createRadialGradient(px-r*0.3,py-r*0.3,r*0.1,px,py,r);g.addColorStop(0,'#fbfaf3');g.addColorStop(1,'#d6d3c6');x.fillStyle=g;x.beginPath();x.arc(px,py,r,0,7);x.fill();
@@ -35,20 +35,21 @@ function chips(u){if(u<4.4||u>=11.5)return;const a=Math.min(ease((u-4.4)/.3),eas
  for(let i=0;i<3;i++){const [s,cx]=L[i];const ai=a*ease((u-4.4-i*0.3)/.25);if(ai<=0.01)continue;const rev=u>=8.8;const win=i==2&&rev,lose=i!=2&&rev;
   x.save();x.globalAlpha=ai*(lose?0.35:1);x.fillStyle=win?'#1f9d55':'rgba(20,24,32,.85)';x.beginPath();x.roundRect(cx-120,620,240,96,22);x.fill();x.strokeStyle=win?'#8dffb8':'#ffd166';x.lineWidth=5;x.stroke();x.restore();
   txt(s,cx,690,fit(s,58,210),'#fff',ai*(lose?0.35:1))}}
-const CARDS=[[-1,4.4,'A GALAXY BIGGER','THAN THE FULL MOON'],[4.4,8.8,'GUESS: HOW MANY','FULL MOONS WIDE?'],[8.8,11.5,'ANDROMEDA:','ABOUT 6 MOONS WIDE'],[11.5,15.4,'FROM A DARK SKY','YOU CAN SEE IT'],
- [15.4,18.6,'2.5 MILLION','LIGHT-YEARS AWAY'],[18.6,22.0,'ITS LIGHT IS OLDER','THAN OUR SPECIES'],[22.0,23.2,'CAN YOU','FIND IT?'],[23.2,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'A GALAXY BIGGER','THAN THE FULL MOON']];
+const CARDS=[[-1,4.4,'A GALAXY BIGGER','THAN THE FULL MOON'],[4.4,8.8,'GUESS: HOW MANY','FULL MOONS WIDE?'],[8.8,11.5,'ANDROMEDA:','ABOUT 6 MOONS WIDE'],[11.5,16.1,'BY EYE, FROM A DARK SKY:','ONLY ITS CORE'],
+ [16.1,19.3,'2.5 MILLION','LIGHT-YEARS AWAY'],[19.3,22.6,'ITS LIGHT IS OLDER','THAN OUR SPECIES'],[22.6,23.8,'CAN YOU','FIND IT?'],[23.8,LOOP,'FOLLOW →','MORE EVERY DAY'],[LOOP,D+1,'A GALAXY BIGGER','THAN THE FULL MOON']];
 function cards(t){for(const [a,b,l1,l2] of CARDS){if(t<a||t>=b)continue;const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
  const sz=Math.min(fit(l1,80,840),fit(l2,80,840));const g=x.createLinearGradient(0,320,0,600);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.4,'rgba(0,0,0,'+(0.6*al)+')');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,320,W,280);
  txt(l1,495,420,sz,'#fff',al);txt(l2,495,420+sz*1.08,sz,'#ffd166',al)}}
 function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;const u=t>=LOOP?t-D:t;
  // camera: slow drift; push toward the core while the distance is told (15.4-22)
- const zc=u>=15.2&&u<22.4?Math.min(ease((u-15.2)/3.5),ease((22.4-u)/.9)):0;const z=1+0.03*Math.sin(u*0.4)+0.55*zc;
+ const zc=u>=15.9&&u<23.0?Math.min(ease((u-15.9)/3.5),ease((23.0-u)/.9)):0;const z=1+0.03*Math.sin(u*0.4)+0.55*zc;
  x.save();x.translate(GX,GY);x.scale(z,z);x.translate(-GX,-GY);sky(u);
- const gk=0.75+0.25*Math.sin(u*0.8)**2;galaxy(u,gk);moon(200,830,M/2,1);moonRow(u);x.restore();
+ const ne=u>=11.8&&u<15.9?Math.min(ease((u-11.8)/.6),ease((15.9-u)/.5)):0;const gk=(0.75+0.25*Math.sin(u*0.8)**2)*(1-0.85*ne);galaxy(u,gk);
+ if(ne>0.01){x.save();x.globalAlpha=ne;let cg=x.createRadialGradient(GX,GY,2,GX,GY,70);cg.addColorStop(0,'rgba(235,235,225,.75)');cg.addColorStop(1,'rgba(235,235,225,0)');x.fillStyle=cg;x.translate(GX,GY);x.rotate(ANG);x.scale(1,0.45);x.translate(-GX,-GY);x.beginPath();x.arc(GX,GY,70,0,7);x.fill();x.restore()}moon(200,830,M/2,1);moonRow(u);x.restore();
  hills();
- if(u>=11.6&&u<15.2){const a=Math.min(ease((u-11.6)/.3),ease((15.2-u)/.3));txt('ANDROMEDA',GX+60,1300,64,'#cfe0ff',a);}
- if(u<4.4||u>=22){const a=u<4.4?Math.min(ease((u-0.4)/.3),ease((4.4-u)/.3)):ease((u-22)/.4);txt('FULL MOON',200,950,46,'#fff6d0',a)}
- txt('REAL NASA IMAGE · SIZE TO SCALE',540,1425,30,'#cfe0ff',0.85);
+ if(u>=11.6&&u<15.9){const a=Math.min(ease((u-11.6)/.3),ease((15.9-u)/.3));txt('ANDROMEDA',GX+60,1300,64,'#cfe0ff',a);}
+ if(u<4.4||u>=22.6){const a=u<4.4?ease((4.4-u)/.3):ease((u-22.6)/.4);txt('FULL MOON',200,950,46,'#fff6d0',a)}
+ txt('NASA UV IMAGE · BRIGHTENED · SIZE TO SCALE',540,1400,30,'#cfe0ff',0.85);
  chips(u);cards(t)}
 Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont'),new Promise(r=>{if(IMG.complete)r();else IMG.onload=r})]).then(()=>{prep();window.TEXREADY=true});
 </script>

@@ -88,6 +88,7 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 71 | 20 Kas 21:00 | How Do Astronauts Use the Toilet? 🚽 | space toilet | planlı (Metricool 434599069) |
 | 72 | 21 Kas 21:00 | How Big Is Mars's Grand Canyon? 🏜️ | valles marineris | planlı (Metricool 434605506) |
 | 73 | 22 Kas 21:00 | What Happens to Your Eyes in Space? 👁️ | eyes in space (sans) | planlı (Metricool 434609875) |
+| 74 | 23 Kas 21:00 | How Big Is Andromeda in Our Sky? 🌌 | andromeda size in sky | planlı |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
@@ -116,3 +117,4 @@ Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mon
 - space toilet = astronaut toilet = uwms = how astronauts pee/poop in space (su geri dönüşümü yalnız sonuç olarak anıldı; 'iss water recycling' ayrı video yapılmaz)
 - valles marineris = mars grand canyon = largest canyon in solar system
 - eyes in space (sans) = astronaut vision changes = eyeball flattening = optic disc swelling
+- andromeda size in sky = andromeda vs full moon = m31 angular size (Samanyolu-Andromeda çarpışması ayrı konu sayılabilir ama önce kontrol et)
