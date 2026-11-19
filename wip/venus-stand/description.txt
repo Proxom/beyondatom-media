@@ -1,0 +1,26 @@
+TITLE: What If You Stood on Venus? 🌋
+
+Guess first: how deep in the ocean would it feel like? 👇
+
+Venus is our closest planetary neighbor, but its surface is one of the deadliest places in the solar system.
+The air: Venus's thick carbon dioxide atmosphere presses down about 93 times harder than the air at sea level on Earth. NASA compares it to being more than 930 meters (3,000 feet) underwater.
+The heat: the average surface temperature is about 464 °C (867 °F), hot enough to melt lead (lead melts at 327.5 °C).
+The record: the toughest lander ever sent there, the Soviet Venera 13, survived on the surface for 2 hours and 7 minutes on 1 March 1982. It was designed to last about 32 minutes.
+
+About the video: an original animation and a thought experiment. The person, diver, lead bar and lander are illustrations. The pressure counter uses about 10 m of seawater per extra bar of pressure. The lander clock is sped up.
+
+Sources:
+NASA Science, Venus Facts (hot enough to melt lead; about 93 times Earth's sea-level pressure, the same force as being more than 3,000 feet (930 meters) underwater; the longest Venera survivor lasted two hours): https://science.nasa.gov/venus/venus-facts/
+NASA Science, Solar System Temperatures (Venus mean temperature 464 °C): https://science.nasa.gov/resource/solar-system-temperatures/
+NASA NSSDC Venus Fact Sheet (mean surface temperature 737 K; surface pressure 92 bar): https://nssdc.gsfc.nasa.gov/planetary/factsheet/venusfact.html
+NASA NSSDC, Venera 13 Lander image page (survived on the surface for 2 hours, 7 minutes, 1 March 1982): https://nssdc.gsfc.nasa.gov/imgcat/html/object_page/v13_vg261_262.html
+NASA, Beyond Earth: A Chronicle of Deep Space Exploration (Venera 13 transmitted for 127 minutes, far beyond its planned lifetime of 32 minutes): https://www.nasa.gov/wp-content/uploads/2018/09/beyond-earth-tagged.pdf
+Royal Society of Chemistry, Lead (melting point 327.462 °C): https://www.rsc.org/periodic-table/element/82/lead
+
+Footage: none; everything is drawn in code.
+Narration: AI voice (Kokoro). Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #venus #planets #shorts
