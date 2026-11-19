@@ -78,6 +78,11 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 61 | 23 Kas 01:00 | How Big Is a Neutron Star? ⭐ | neutron star size | planlı (Metricool 433615261) |
 | 62 | 23 Kas 17:00 | How Fast Do Bones Age in Space? 🦴 | bone loss space | planlı (Metricool 433618109) |
 | 63 | 24 Kas 01:00 | Same Shout on 4 Worlds: Who Hears It First? 📣 | speed of sound on planets | planlı (Metricool 433756016) |
+| 64 | 24 Kas 17:00 | What If You Stood on Venus? 🌋 | venus surface conditions | planlı (Metricool 434299333) |
+| 65 | 25 Kas 01:00 | Same Pot on 4 Worlds: Which Boils Last? 🫖 | boiling point on planets | planlı (Metricool 434313183) |
+| 66 | 25 Kas 17:00 | What Happens to Your Heart in Space? ❤️ | heart in space | planlı (Metricool 434330451) |
+| 67 | 26 Kas 01:00 | Is the Moon Bigger Than Australia? 🌕 | moon size | hazırlanıyor (yt-1410) |
+| 68 | 26 Kas 17:00 | December 2026 Sky: 4 Dates to Save 🌠 | december 2026 sky events | hazırlanıyor (yt-1410) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
@@ -97,4 +102,7 @@ Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mon
 - human g tolerance = gravity on planets for humans = "your body on Jupiter"
 - earth falls into sun = earth stops orbiting; gravity tunnel through earth = fall through earth = hole through earth
 - speed of sound on planets = sound on mars = "shout on planets" = no sound on the moon / in space
+- venus surface conditions = venus pressure/heat = "stand on venus" = venera landers; boiling point on planets = water boils on mars
+- heart in space = cardiac atrophy = heart shape in space; moon size = moon vs australia/usa = moon surface area
+- monthly sky events = "<month> sky: dates to save" (her ay yeni ay sayılır; aynı ay tekrar edilmez)
 - sun size = earths across the sun = "109 earths"; nearest star distance = sun as basketball

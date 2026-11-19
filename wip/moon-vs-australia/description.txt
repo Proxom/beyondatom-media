@@ -1,0 +1,23 @@
+TITLE: Is the Moon Bigger Than Australia? 🌕
+
+Guess before it lands: yes or no? 👇
+
+Across: the Moon is about 3,475 km wide. Australia is almost 4,000 km wide from east to west, but the mainland is only about 3,180 km from top to bottom (Cape York to South Point). So Australia is wider than the Moon, but not taller.
+But the Moon is a ball. Its whole surface covers about 37.9 million square kilometers, about the same as Africa (about 30.4 million) and Australia (about 7.7 million) put together: 38.1 million. By area, the Moon is nearly 5 Australias (37.9 / 7.7 = 4.9).
+
+About the video: an original animation, drawn to scale. In the first part the Moon and Australia share one scale. In the second part the Moon's whole surface is laid flat as an equal-area map (its area is exact; the picture on it is only illustrative), with Africa and Australia at the same scale. Maps use equal-area projections.
+
+Sources:
+NASA NSSDC Moon Fact Sheet (mean radius 1,737.4 km, so 3,474.8 km across; its surface 4 x pi x r squared = 37.9 million km2): https://nssdc.gsfc.nasa.gov/planetary/factsheet/moonfact.html
+Geoscience Australia, Most extreme points of Australia (almost 4,000 km wide from east to west): https://www.ga.gov.au/scientific-topics/national-location-information/geography/extreme-points
+Geoscience Australia, How large is Australia? (total area 7,688,287 km2): https://www.ga.gov.au/scientific-topics/national-location-information/geography/areas-of-australia
+Australian Bureau of Statistics, Year Book Australia 2012, Geography of Australia (Cape York to South Point about 3,180 km; Steep Point to Cape Byron about 4,000 km): https://www.abs.gov.au/ausstats/abs@.nsf/Lookup/by%20Subject/1301.0~2012~Main%20Features~Geography%20of%20Australia~12
+Britannica, Africa (land area about 30,365,000 km2): https://www.britannica.com/place/Africa
+
+Footage: Moon image "Full Moon", NASA's Goddard Space Flight Center Scientific Visualization Studio (LRO/LOLA data), public domain: https://images.nasa.gov/details/GSFC_20171208_Archive_e001861 . Map outlines: Natural Earth (public domain): https://www.naturalearthdata.com . Everything else is drawn in code.
+Narration: AI voice (Kokoro). Music and sound: original.
+
+Follow for more: new space Shorts every day.
+More space every day on BeyondAtom.
+
+#space #moon #scale #shorts
