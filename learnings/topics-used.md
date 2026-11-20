@@ -91,7 +91,7 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 74 | 23 Kas 21:00 | How Big Is Andromeda in Our Sky? 🌌 | andromeda size in sky | planlı (Metricool 434619233) |
 | 75 | 24 Kas 21:00 | How Do Astronauts Wash Their Hair? 🧴 | hair washing in space | planlı (Metricool 434960824) |
 | 76 | 25 Kas 21:00 | Same Timer on 4 Worlds: How Long on Pluto? ⏳ | sand timer on planets | planlı (Metricool 434976974) |
-| 77 | 26 Kas 21:00 | What If You Stood on Titan? 🪐 | titan surface conditions | planlı (Metricool ID_PENDING) |
+| 77 | 26 Kas 21:00 | What If You Stood on Titan? 🪐 | titan surface conditions | planlı (Metricool 435994478) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
