@@ -1,9 +1,0 @@
-# iss-orbit-twist (YouTube Short, sprint style C: scale/concept shock, target slot 10 Nov 2026 17:00 Europe/London)
-Run: 9 Nov 20:07 run (yt-2007, session clever-rubin-jxl2hj). QUEUE was 2 (sun-basketball 9 Nov 21:00, no-suit-space 10 Nov 01:00) -> build one Short for the empty 10 Nov 17:00 slot. This is the VIEWER-PROMISED Short (@charliebad asked about the oblate spheroid under "The ISS Is Always Falling"; Erkan promised a Short). Counts as sprint style C.
-Concept: Earth's equatorial bulge (equatorial diameter ~43 km larger than pole-to-pole) precesses the ISS orbit plane ~5 deg/day, a full turn in ~72 days -> why the ISS flies over new ground. Payoff: satellites use it on purpose (Sun-synchronous, near-polar, same place same time every day).
-Scene tools/p_iss-orbit-twist.html (WebGL oblate-ellipsoid Blue Marble + canvas orbit ring; node precession, near-polar morph for the payoff), stills tools/snap-sb.js, sound tools/iss-orbit-twist.sound.py (sound-v2, root 80, wood/marimba only). D=23.0 s.
-Facts verified: NASA Earth Fact Sheet (radii, J2); NASA GDC Orbit Primer (precession formula, Sun-synchronous 0.9856 deg/day); NASA ISS reference (51.6 deg, ~400 km); NASA Earth Observatory Catalog of Orbits (Sun-synchronous same local time). DESCRIPTION: normal, NO viewer mention/tag (Erkan 9 Nov 19:21); starts with guess question "How many days for a full turn?".
-Honesty: Earth flattening shown greatly exaggerated and labelled on screen ("shape exaggerated — real flattening is tiny"); orbit size not to scale (said in caption).
-Gate: pending render + gate check.
-
-GATE PASS (final): 1080x1920 30 fps, 690 frames = 23.0 s, H.264 CRF 18, AAC; no black first/last frame; -17.6 LUFS, TP -2.4 dBFS, >4kHz band 27.3 dB below; spelling clean; hook 78 px; safe zones clear (day counter moved below 320, ISS label clamped out of the right zone). Self-review ~8/10 (hook/visual/clarity/payoff). Media: media/iss-orbit-twist/.
