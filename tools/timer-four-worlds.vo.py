@@ -2,7 +2,7 @@ import sys, soundfile as sf
 from kokoro_onnx import Kokoro
 k = Kokoro('/tmp/claude-0/kokoro/kokoro-v1.0.onnx', '/tmp/claude-0/kokoro/voices-v1.0.bin')
 L = {
- 'l1': "The same thirty-second sand timer, on four worlds. Which one runs out last?",
+ 'l1': "The same thirty-second sand timer, on four worlds. How long will it take on Pluto?",
  'l2': "Earth: thirty seconds.",
  'l3': "Mars: forty-nine.",
  'l4': "The Moon: one minute, fourteen.",

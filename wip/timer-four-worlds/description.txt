@@ -10,7 +10,7 @@ Why? Sand pours out of a small hole at a steady rate, and that rate grows with t
 
 The math: time = 30 s × √(9.82 / g). This assumes the sand flows the same way at low gravity as it does here; experiments in a centrifuge (up to 20 times Earth's gravity) and a low-gravity setup found the same square-root rule.
 
-About the video: an original animation. The timers are drawn the same size on every world; the motion is sped up, and the clocks show the real time. Landscapes are illustrative.
+About the video: an original animation. The timers are drawn the same size on every world; the motion is sped up, and the clocks show the real time. At the end, Earth's and Pluto's timers are flipped and run again side by side at the same speed: when Earth's runs out, Pluto's is only a quarter done. Landscapes are illustrative.
 
 Sources:
 W. A. Beverloo, H. A. Leniger & J. van de Velde, "The flow of granular solids through orifices", Chemical Engineering Science 15, 260 (1961) (the flow rate of grains through a hole grows with the square root of gravity and does not depend on how much is left above): https://doi.org/10.1016/0009-2509(61)85030-6
