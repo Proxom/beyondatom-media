@@ -91,6 +91,7 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 74 | 23 Kas 21:00 | How Big Is Andromeda in Our Sky? 🌌 | andromeda size in sky | planlı (Metricool 434619233) |
 | 75 | 24 Kas 21:00 | How Do Astronauts Wash Their Hair? 🧴 | hair washing in space | planlı (Metricool 434960824) |
 | 76 | 25 Kas 21:00 | Same Timer on 4 Worlds: How Long on Pluto? ⏳ | sand timer on planets | planlı (Metricool 434976974) |
+| 77 | 26 Kas 21:00 | What If You Stood on Titan? 🪐 | titan surface conditions | planlı (Metricool ID_PENDING) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
@@ -122,3 +123,4 @@ Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mon
 - andromeda size in sky = andromeda vs full moon = m31 angular size (Samanyolu-Andromeda çarpışması ayrı konu sayılabilir ama önce kontrol et)
 - hair washing in space = shampoo in space = astronaut hygiene hair (su geri dönüşümü yalnız sonuç olarak anıldı)
 - sand timer on planets = hourglass on planets = granular flow in low gravity (aynı deney 4 dünyada serisi: kum saati KULLANILDI)
+- titan surface conditions = standing on titan = human flight on titan (Titan'ın atmosferi/yerçekimi/insan uçuşu KULLANILDI; Dragonfly görevi ayrı konu sayılabilir ama önce kontrol et)

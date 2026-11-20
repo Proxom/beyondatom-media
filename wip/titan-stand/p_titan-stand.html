@@ -1,0 +1,166 @@
+<!doctype html><meta charset=utf8>
+<style>@font-face{font-family:Anton;src:url(fonts/Anton-Regular.ttf)}@font-face{font-family:Mont;src:url(fonts/Montserrat-ExtraBold.ttf)}body{margin:0;background:#000}</style>
+<body><canvas id=c width=1080 height=1920></canvas>
+<!-- titan-stand (series "What If…?"): what standing on Saturn's moon Titan would be like.
+     NASA Science, Titan Facts: surface -179 C; only moon with a thick atmosphere; ~95% nitrogen, ~5% methane; lakes and seas of methane/ethane.
+     NASA press release 19-052 (Dragonfly): atmosphere four times denser than Earth's; surface pressure 50 percent higher than Earth's.
+     NASA Science, Why Dragonfly to Titan: gravity 1/7th of Earth's; -179 C; oxygen absent.
+     The Planetary Society, What would it be like to stand on the surface of Titan?: pressure about 1.5 times Earth's; heavily insulated suit;
+       "it could even be possible for a human to strap wings onto their spacesuit, flap those wings, get a running start, and take off".
+     The Planetary Society, Titan: no bulky pressure suits needed.
+     Drawing: landscape, lake, astronaut and wings are illustrations; 70 kg x 1/7 = 10 kg. -->
+<script>
+const W=1080,H=1920,FPS=30,D=35.0;
+const cl=(v,a=0,b=1)=>Math.max(a,Math.min(b,v)),ease=t=>{t=cl(t);return t*t*(3-2*t)},lerp=(a,b,k)=>a+(b-a)*k;
+const cv=document.getElementById('c'),x=cv.getContext('2d');
+function rnd(seed){let s=seed>>>0;return()=>{s=(s*1664525+1013904223)>>>0;return s/4294967296}}
+const R=rnd(91);
+const DUNES=[];for(let l=0;l<4;l++){const a=[];for(let i=0;i<=30;i++)a.push(R());DUNES.push(a)}
+const PEB=[];for(let i=0;i<70;i++)PEB.push([R(),R(),R(),R()]);PEB.sort((a,b)=>a[1]-b[1]);
+const HAZE=[];for(let i=0;i<140;i++)HAZE.push([R()*W,R()*H,R(),R()]);
+const FROST=[];for(let i=0;i<90;i++)FROST.push([R(),R(),R(),R()]);
+function txt(s,px,py,size,col,al,font,align){if(al<=0.01)return;x.save();x.globalAlpha=cl(al);x.font=size+'px '+(font||'Anton');x.textAlign=align||'center';x.textBaseline='alphabetic';
+ x.fillStyle=col||'#fff';x.shadowColor='rgba(0,0,0,.95)';x.shadowBlur=22;x.fillText(s,px,py);x.shadowBlur=6;x.fillText(s,px,py);x.restore()}
+function fit(s,size,maxw,font){x.font=size+'px '+(font||'Anton');const w=x.measureText(s).width;return w>maxw?size*maxw/w:size}
+// ---------- Titan landscape. hz = horizon y, sx = sideways scroll (px), lake = lake visibility ----------
+function titan(t,hz,sx,cold){
+ let g=x.createLinearGradient(0,hz-1400,0,hz);g.addColorStop(0,'#6b3a12');g.addColorStop(.45,'#b4702a');g.addColorStop(.85,'#dca055');g.addColorStop(1,'#efc27a');
+ x.fillStyle=g;x.fillRect(0,0,W,hz+2);
+ // soft haze bands
+ for(let i=0;i<6;i++){const yy=hz-1100+i*170,off=((t*(10+i*4)+i*230+sx*0.05)%1100+1100)%1100;x.fillStyle='rgba(255,215,150,'+(0.05+0.03*(i%2))+')';
+  for(let k=-1;k<3;k++){x.beginPath();x.ellipse(off+k*1100-400,yy,600,40+i*8,0,0,7);x.fill()}}
+ // diffuse bright patch where the Sun is hidden
+ g=x.createRadialGradient(780,hz-700,10,780,hz-700,520);g.addColorStop(0,'rgba(255,230,180,.28)');g.addColorStop(1,'rgba(255,230,180,0)');x.fillStyle=g;x.fillRect(0,0,W,hz);
+ // dune layers far -> near
+ const cols=['#9a5a22','#7c4418','#5e3212','#43230c'];
+ for(let l=0;l<4;l++){const d=DUNES[l],amp=[40,70,110,150][l],y0=hz+[0,40,120,260][l],par=[0.15,0.3,0.55,0.9][l],span=W*1.6,step=span/30;
+  if(l==1){// methane lake between dune layers
+   const ly=hz+18;g=x.createLinearGradient(0,ly,0,ly+120);g.addColorStop(0,'#2a2118');g.addColorStop(1,'#140f0a');x.fillStyle=g;x.fillRect(0,ly,W,130);
+   x.fillStyle='rgba(255,210,150,.16)';for(let i=0;i<9;i++){const yy=ly+8+i*12,w=180+((i*53)%140);x.fillRect(((620-sx*0.2+i*37)%W+W)%W-w/2,yy,w,2)}}
+  x.fillStyle=cols[l];x.beginPath();x.moveTo(0,H+10);const o=((sx*par)%span+span)%span;
+  for(let i=-1;i<=Math.ceil(W/step)+1;i++){const gx=i*step,idx=((Math.floor((gx+o)/step))%30+30)%30,fr=((gx+o)/step)%1;
+   const v=lerp(d[idx],d[(idx+1)%30],fr*fr*(3-2*fr));x.lineTo(gx-fr*step,y0-v*amp)}
+  x.lineTo(W,H+10);x.closePath();x.fill();
+  // haze between layers (aerial perspective)
+  x.fillStyle='rgba(225,160,85,'+[0.32,0.22,0.12,0.04][l]+')';x.fillRect(0,y0-amp-20,W,H);}
+ // rounded ice pebbles on the near ground (Huygens saw such)
+ for(const p of PEB){const z=p[1],yy=hz+300+Math.pow(z,1.4)*(H-hz-200),sc=0.3+z*1.6,xx=((p[0]*W*1.4-sx*(0.9+z*0.6))%(W*1.4)+W*1.4)%(W*1.4)-W*0.2;
+  if(yy>H+40)continue;x.fillStyle='rgba(30,16,6,.55)';x.beginPath();x.ellipse(xx+6*sc,yy+5*sc,(14+p[2]*20)*sc,(6+p[3]*6)*sc,0,0,7);x.fill();
+  x.fillStyle='rgba(200,150,95,'+(0.55+0.3*z)+')';x.beginPath();x.ellipse(xx,yy,(13+p[2]*18)*sc,(7+p[3]*7)*sc,0,0,7);x.fill();
+  x.fillStyle='rgba(255,225,180,.35)';x.beginPath();x.ellipse(xx-4*sc,yy-3*sc,(6+p[2]*6)*sc,(2.5+p[3]*2)*sc,0,0,7);x.fill()}
+ if(cold>0){x.fillStyle='rgba(120,170,230,'+(0.22*cold)+')';x.fillRect(0,0,W,H)}
+ // floating haze specks
+ for(const d of HAZE){const xx=((d[0]+t*(14+d[2]*22)-sx*0.3)%W+W)%W,yy=(d[1]+Math.sin(t*0.8+d[3]*6)*18);x.fillStyle='rgba(255,220,160,'+(0.08+0.12*d[3])+')';x.beginPath();x.arc(xx,yy,1.4+d[2]*2.4,0,7);x.fill()}}
+// ---------- Astronaut (front view). cx,cy = hip centre; u = unit (figure ~8.6u tall); arm = angle from straight down (rad);
+// wing 0..1 = how much of the wing is on; legs = running phase amplitude; heat = suit heater glow ----------
+function astro(cx,cy,u,arm,wing,run,ph,heat){x.save();x.translate(cx,cy);
+ const lift=run*Math.sin(ph)*0.35*u;
+ // wings (behind the arms)
+ if(wing>0.01){for(const s of [-1,1]){x.save();x.scale(s,1);x.globalAlpha=wing;
+   const sh=[1.05*u,-2.9*u],a=arm,ex=sh[0]+Math.sin(a)*3.2*u,ey=sh[1]+Math.cos(a)*3.2*u,tx=sh[0]+Math.sin(a)*5.1*u,ty=sh[1]+Math.cos(a)*5.1*u;
+   const g=x.createLinearGradient(0,sh[1],tx,ty);g.addColorStop(0,'rgba(255,170,70,.92)');g.addColorStop(1,'rgba(255,120,40,.85)');x.fillStyle=g;
+   x.beginPath();x.moveTo(sh[0]-0.2*u,sh[1]-0.2*u);x.lineTo(tx,ty);
+   const hx=0.95*u,hy=-0.1*u;for(let k=1;k<=4;k++){const f=k/4,px=lerp(tx,hx,f),py=lerp(ty,hy,f);const mx=lerp(tx,hx,f-0.125)+Math.cos(a)*0.55*u,my=lerp(ty,hy,f-0.125)+0.55*u*Math.sin(a)*0.5+0.4*u;x.quadraticCurveTo(mx,my,px,py)}
+   x.closePath();x.fill();
+   x.strokeStyle='rgba(90,40,10,.75)';x.lineWidth=0.09*u;x.lineCap='round';
+   for(let k=1;k<=4;k++){const f=k/4,px=lerp(tx,hx,f),py=lerp(ty,hy,f);x.beginPath();x.moveTo(lerp(sh[0],tx,0.25+0.75*(1-f)*0.9),lerp(sh[1],ty,0.25+0.75*(1-f)*0.9));x.lineTo(px,py);x.stroke()}
+   x.lineWidth=0.16*u;x.beginPath();x.moveTo(ex,ey);x.lineTo(tx,ty);x.stroke();
+   x.restore()}}
+ // backpack
+ x.fillStyle='#8f949c';x.beginPath();x.roundRect(-1.35*u,-3.3*u,2.7*u,2.9*u,0.4*u);x.fill();
+ // legs
+ for(const s of [-1,1]){const lp=run*Math.sin(ph+(s>0?Math.PI:0));const ly=-Math.max(0,lp)*0.9*u;
+  const g=x.createLinearGradient(s*0.2*u,0,s*1.1*u,0);g.addColorStop(0,'#f4f2ee');g.addColorStop(1,'#bdbcb8');x.fillStyle=g;
+  x.beginPath();x.roundRect(s>0?0.08*u:-1.02*u,-0.2*u+ly*0.3,0.94*u,3.5*u+ly,0.35*u);x.fill();
+  x.fillStyle='#6c6f76';x.beginPath();x.roundRect(s>0?0.0*u:-1.12*u,3.05*u+ly*0.7,1.12*u,0.6*u,0.25*u);x.fill();
+  x.fillStyle='rgba(0,0,0,.12)';x.fillRect(s>0?0.08*u:-1.02*u,1.4*u+ly*0.5,0.94*u,0.12*u)}
+ // torso
+ let g=x.createLinearGradient(-1.2*u,0,1.2*u,0);g.addColorStop(0,'#c4c3bf');g.addColorStop(.35,'#fbfaf7');g.addColorStop(1,'#b5b4b0');x.fillStyle=g;
+ x.beginPath();x.roundRect(-1.15*u,-3.35*u,2.3*u,3.6*u,0.55*u);x.fill();
+ x.fillStyle='#5d6f86';x.beginPath();x.roundRect(-0.6*u,-2.6*u,1.2*u,0.8*u,0.12*u);x.fill();
+ x.fillStyle='#d6463a';x.fillRect(-0.45*u,-2.42*u,0.25*u,0.18*u);x.fillStyle='#e8c14a';x.fillRect(-0.1*u,-2.42*u,0.25*u,0.18*u);x.fillStyle='#4aa3d8';x.fillRect(0.25*u,-2.42*u,0.2*u,0.18*u);
+ x.fillStyle='#9a9994';x.fillRect(-1.15*u,-0.35*u,2.3*u,0.22*u);
+ if(heat>0){x.save();x.globalCompositeOperation='lighter';const hg=x.createRadialGradient(0,-1.6*u,0.2*u,0,-1.6*u,3.4*u);hg.addColorStop(0,'rgba(255,120,40,'+(0.35*heat)+')');hg.addColorStop(1,'rgba(255,120,40,0)');x.fillStyle=hg;x.fillRect(-4*u,-5*u,8*u,7*u);x.restore()}
+ // arms
+ for(const s of [-1,1]){x.save();x.scale(s,1);x.translate(1.05*u,-2.9*u);x.rotate(-arm);
+  g=x.createLinearGradient(-0.4*u,0,0.4*u,0);g.addColorStop(0,'#cfcdc9');g.addColorStop(.4,'#fbfaf7');g.addColorStop(1,'#b3b2ae');x.fillStyle=g;
+  x.beginPath();x.roundRect(-0.38*u,-0.2*u,0.76*u,3.0*u,0.36*u);x.fill();
+  x.fillStyle='#e0e0dc';x.beginPath();x.arc(0,3.05*u,0.42*u,0,7);x.fill();x.fillStyle='#7d8088';x.fillRect(-0.38*u,2.5*u,0.76*u,0.2*u);x.restore()}
+ // helmet
+ const hy=-4.25*u;g=x.createRadialGradient(-0.35*u,hy-0.4*u,0.1*u,0,hy,1.25*u);g.addColorStop(0,'#ffffff');g.addColorStop(.7,'#e4e3df');g.addColorStop(1,'#a9a8a4');x.fillStyle=g;
+ x.beginPath();x.arc(0,hy,1.12*u,0,7);x.fill();
+ g=x.createLinearGradient(-0.8*u,hy-0.6*u,0.8*u,hy+0.6*u);g.addColorStop(0,'#ffe9a8');g.addColorStop(.35,'#d79a2a');g.addColorStop(1,'#5a3608');x.fillStyle=g;
+ x.beginPath();x.ellipse(0,hy+0.08*u,0.86*u,0.66*u,0,0,7);x.fill();
+ x.fillStyle='rgba(255,255,255,.55)';x.beginPath();x.ellipse(-0.35*u,hy-0.2*u,0.28*u,0.13*u,-0.5,0,7);x.fill();
+ x.fillStyle='#c9c8c4';x.fillRect(-0.7*u,hy+0.95*u,1.4*u,0.35*u);
+ x.restore()}
+function shadow(cx,gy,w,al){x.fillStyle='rgba(30,14,4,'+al+')';x.beginPath();x.ellipse(cx,gy,w,w*0.16,0,0,7);x.fill()}
+// ---------- flight state: used for the hook and the ending (they match so the Short loops) ----------
+const FL=1.2; // flaps per second (42 in 35 s)
+function flapArm(t){return 1.5+0.55*Math.sin(2*Math.PI*FL*t)}
+function flight(t,alt,sx){// alt 0..1 : 0 = on the ground, 1 = high above the dunes
+ const hz=lerp(1180,1560,alt);titan(t,hz,sx,0);
+ const cy=lerp(1420,1120,ease(alt))+Math.sin(2*Math.PI*FL*t-1.2)*18*alt;
+ if(alt<0.6)shadow(540,1675,lerp(280,90,alt/0.6),0.45*(1-alt/0.6));
+ x.save();x.translate(540,cy);x.rotate(0.07*Math.sin(2*Math.PI*FL*t*0.5)+0.04);astro(0,0,90,flapArm(t),1,0,0,0);x.restore();
+ // air streaks past
+ for(let i=0;i<10;i++){const ph=(t*1.3+i*0.137)%1;const yy=lerp(400,1500,(i*0.371)%1)+ph*260,xx=(i%2?170:910)+(i%3-1)*60;x.strokeStyle='rgba(255,235,200,'+(0.22*Math.sin(ph*Math.PI)*alt)+')';x.lineWidth=3;x.beginPath();x.moveTo(xx,yy);x.lineTo(xx,yy+90);x.stroke()}}
+// ---------- scenes ----------
+const S2=4.75,S3=10.3,S4=18.1,S5=28.25,SE=34.15;
+function sPressure(t){const k=t-S2;titan(t,1180,k*8,0);
+ const u=lerp(90,96,k/5.5);shadow(540,1675,280,0.45);astro(540,1325+Math.sin(t*1.6)*4,u,0.18+0.03*Math.sin(t*1.6),0,0,0,0);
+ for(let i=0;i<3;i++){const ph=((t*0.55)+i/3)%1;x.strokeStyle='rgba(255,235,190,'+(0.32*(1-ph))+')';x.lineWidth=4;x.beginPath();x.ellipse(540,1060,190+ph*300,430+ph*260,0,0,7);x.stroke()}
+ const v=lerp(1.0,1.5,ease((k-0.6)/2.4)),done=k>=3.0,pop=done?1+.12*Math.exp(-(k-3.0)/.15):1;
+ txt(v.toFixed(1)+' TIMES',540,670,140*pop,done?'#ffd166':'#fff',1);txt("EARTH'S AIR PRESSURE",540,735,56,'#ffe2b0',1)}
+const TC0=S3+0.4,TC1=S3+3.2;
+function sCold(t){const k=t-S3,T=lerp(15,-179,ease((t-TC0)/(TC1-TC0))),c=(15-T)/194;titan(t,1180,40+k*6,c);
+ const heat=t>S3+4.6?ease((t-S3-4.6)/0.5):0;shadow(540,1675,280,0.45);astro(540,1325,96,0.18,0,0,0,heat*(0.75+0.25*Math.sin(t*5)));
+ // frost creeping in from the corners
+ if(c>0){const vg=x.createRadialGradient(W/2,H/2,600,W/2,H/2,1200);vg.addColorStop(0,'rgba(200,230,255,0)');vg.addColorStop(1,'rgba(200,230,255,'+(0.35*c)+')');x.fillStyle=vg;x.fillRect(0,0,W,H)}
+ const done=t>=TC1,pop=done?1+.12*Math.exp(-(t-TC1)/.15):1;txt(Math.round(T)+' °C',540,670,150*pop,done?'#9fd4ff':'#fff',1);
+ if(t>S3+3.6)txt('AND NO OXYGEN',540,738,66,'#d6efff',ease((t-S3-3.6)/.3));
+ if(heat>0){txt('HEATED SUIT',230,1180,58,'#ffb37a',heat,'Anton','center');txt('OWN AIR',830,1180,58,'#9fd4ff',heat,'Anton','center')}}
+const GW0=S4+4.3,GW1=S4+6.6,AD=S4+8.3,WG=S4+8.9;
+function sGrav(t){const k=t-S4;titan(t,1180,80+k*6,0);
+ const light=ease((t-GW0)/(GW1-GW0));const hop=light>0.5?Math.max(0,Math.sin((t-GW1+0.3)*2.4))*30*light:0;
+ // scale platform
+ x.fillStyle='#3a3d44';x.beginPath();x.roundRect(370,1660,340,44,12);x.fill();x.fillStyle='#5c616b';x.beginPath();x.roundRect(380,1654,320,16,8);x.fill();
+ shadow(540,1675,lerp(280,220,hop/30),0.4);
+ const wing=ease((t-WG)/1.2);astro(540,1325-hop,96,lerp(0.18,1.35,wing),wing,0,0,0);
+ // weight readout
+ const kg=Math.round(lerp(70,10,light)),done=t>=GW1,pop=done?1+.12*Math.exp(-(t-GW1)/.15):1;
+ if(t<AD+0.2){const a=t<AD?1:1-(t-AD)/0.2;txt(kg+' KG',540,670,150*pop,done?'#ffd166':'#fff',a);txt(t<GW0+0.3?'YOU ON EARTH':'YOU ON TITAN',540,735,56,'#ffe2b0',a)}
+ // dense air
+ if(t>=AD){const a=ease((t-AD)/.3);const pop2=1+.12*Math.exp(-(t-AD)/.15);txt('4 TIMES',540,670,150*pop2,'#ffd166',a);txt('DENSER AIR',540,735,56,'#ffe2b0',a);
+  for(let i=0;i<220;i++){const r1=(i*0.6180339)%1,r2=(i*0.4142135)%1;const xx=((r1*W+t*60*(0.5+r2))%W),yy=200+r2*1300+Math.sin(t*2+i)*10;x.fillStyle='rgba(255,235,200,'+(0.22*a)+')';x.beginPath();x.arc(xx,yy,2.2,0,7);x.fill()}}}
+const RUN1=S5+1.4,UP=S5+1.9;
+function sFly(t){const k=t-S5;
+ if(t<RUN1){// run along the ground, flapping starts
+  const sx=k*k*260+120;titan(t,1180,sx,0);shadow(540,1675,280,0.45);
+  const fl=ease(k/0.8);astro(540,1325+Math.abs(Math.sin(k*9))*-14,96,lerp(1.35,flapArm(t),fl),1,1,k*18,0);
+  for(let i=0;i<6;i++){const ph=(k*2.5+i/6)%1;x.fillStyle='rgba(200,150,95,'+(0.4*(1-ph))+')';x.beginPath();x.arc(380+i*60-ph*200,1680-ph*50,10+ph*26,0,7);x.fill()}}
+ else{const alt=ease((t-RUN1)/2.6);const sx=1.4*1.4*260+120+(t-RUN1)*520;
+  // blend: ground run figure -> flight figure (same unit, flight uses 72)
+  const hz=lerp(1180,1560,alt);titan(t,hz,sx,0);
+  if(alt<0.6)shadow(540,1675,lerp(280,90,alt/0.6),0.45*(1-alt/0.6));
+  const u=lerp(96,90,alt),cy=lerp(1325,1120,alt)+Math.sin(2*Math.PI*FL*t-1.2)*18*alt;astro(540,cy,u,flapArm(t),1,1-alt,(t-S5)*18,0);
+  for(let i=0;i<10;i++){const ph=(t*1.3+i*0.137)%1;const yy=lerp(400,1500,(i*0.371)%1)+ph*260,xx=(i%2?170:910)+(i%3-1)*60;x.strokeStyle='rgba(255,235,200,'+(0.22*Math.sin(ph*Math.PI)*alt)+')';x.lineWidth=3;x.beginPath();x.moveTo(xx,yy);x.lineTo(xx,yy+90);x.stroke()}}}
+// ---------- cards ----------
+const CARDS=[[-1,2.3,'COULD YOU FLY','ON TITAN?'],[2.3,S2,'GUESS:','YES OR NO?'],[S2,S3,'WHAT IF YOU STOOD','ON SATURN\'S MOON TITAN?'],[S2+3.4,S3,'NO PRESSURE SUIT','NEEDED'],
+ [S3,S4,'BUT THE COLD','IS EXTREME'],[S4,S4+8.3,'GRAVITY:','1/7 OF EARTH\'S'],[S4+8.3,S5,'THICK AIR + LOW GRAVITY','= EASY FLYING'],[S5,S5+2.2,'STRAP ON WINGS.','RUN. FLAP.'],[S5+2.2,SE-1.5,'YOU MIGHT','TAKE OFF!'],
+ [SE-1.5,SE,'WOULD YOU','TRY IT?'],[SE,D-0.25,'FOLLOW →','MORE EVERY DAY'],[D-0.25,D+1,'COULD YOU FLY','ON TITAN?']];
+function cards(t){let shown=null;for(const c of CARDS){if(t>=c[0]&&t<c[1])shown=c}if(!shown)return;const [a,b,l1,l2]=shown;
+ const al=Math.min(a<=0||b>D?1:ease((t-a)/.2),b>D?1:ease((b-t)/.18));
+ const sz=Math.min(fit(l1,80,840),fit(l2,80,840));const y0=420;const g=x.createLinearGradient(0,330,0,590);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.4,'rgba(0,0,0,'+(0.45*al)+')');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,330,W,260);
+ txt(l1,495,y0,sz,'#fff',al);txt(l2,495,y0+sz*1.08,sz,'#ffd166',al)}
+const HOOKALT=0.85,HOOKSX=2600;
+function draw(t){x.setTransform(1,0,0,1,0,0);x.globalAlpha=1;x.fillStyle='#000';x.fillRect(0,0,W,H);
+ if(t<S2){flight(t,HOOKALT,HOOKSX+t*420);if(t>S2-0.3){x.fillStyle='rgba(255,225,180,'+((t-(S2-0.3))/0.3)*0.7+')';x.fillRect(0,0,W,H)}}
+ else if(t<S3){sPressure(t);if(t<S2+0.3){x.fillStyle='rgba(255,225,180,'+(1-(t-S2)/0.3)*0.7+')';x.fillRect(0,0,W,H)}}
+ else if(t<S4)sCold(t);
+ else if(t<S5)sGrav(t);
+ else if(t<SE)sFly(t);
+ else{const k=(t-SE)/(D-SE);flight(t,lerp(ease((SE-RUN1)/2.6),HOOKALT,ease(k)),HOOKSX+(t-D)*420)}
+ cards(t)}
+Promise.all([document.fonts.load('80px Anton'),document.fonts.load('30px Mont')]).then(()=>{window.TEXREADY=true});
+</script>
