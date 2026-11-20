@@ -89,6 +89,7 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 72 | 21 Kas 21:00 | How Big Is Mars's Grand Canyon? 🏜️ | valles marineris | planlı (Metricool 434605506) |
 | 73 | 22 Kas 21:00 | What Happens to Your Eyes in Space? 👁️ | eyes in space (sans) | planlı (Metricool 434609875) |
 | 74 | 23 Kas 21:00 | How Big Is Andromeda in Our Sky? 🌌 | andromeda size in sky | planlı (Metricool 434619233) |
+| 75 | 24 Kas 21:00 | How Do Astronauts Wash Their Hair? 🧴 | hair washing in space | planlı (Metricool 434960824) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
@@ -118,3 +119,4 @@ Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mon
 - valles marineris = mars grand canyon = largest canyon in solar system
 - eyes in space (sans) = astronaut vision changes = eyeball flattening = optic disc swelling
 - andromeda size in sky = andromeda vs full moon = m31 angular size (Samanyolu-Andromeda çarpışması ayrı konu sayılabilir ama önce kontrol et)
+- hair washing in space = shampoo in space = astronaut hygiene hair (su geri dönüşümü yalnız sonuç olarak anıldı)
