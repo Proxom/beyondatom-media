@@ -71,27 +71,27 @@ Her yeni video planlandığında buraya satır eklenir. Kaynaklar: dashboard vid
 | 54 | 19 Kas 01:00 | What If Earth Stopped Orbiting the Sun? ☀️ | earth falls into sun | planlı (Metricool 433500606) |
 | 55 | 20 Kas 01:00 | What If You Fell Through Earth? 🌍 | gravity tunnel through earth | planlı (Metricool 433511597) |
 | 56 | 20 Kas 17:00 | Same Swing on 4 Worlds: Which Is Slowest? 🎢 | swing on planets | planlı (Metricool 433518934) |
-| 57 | 21 Kas 01:00 | What If You Jumped Off the Tallest Cliff? 🧗 | miranda cliff fall | planlı (Metricool 433530519) |
-| 58 | 21 Kas 17:00 | Why Do Astronauts Get Bird Legs? 🦵 | fluid shift space | planlı (Metricool 433536076) |
-| 59 | 22 Kas 01:00 | What Does Fire Look Like in Space? 🔥 | fire in space | planlı (Metricool 433543866) |
-| 60 | 22 Kas 17:00 | Same Shot on 4 Worlds: Which Ball Escapes? 🚀 | escape velocity | planlı (Metricool 433607677) |
-| 61 | 23 Kas 01:00 | How Big Is a Neutron Star? ⭐ | neutron star size | planlı (Metricool 433615261) |
-| 62 | 23 Kas 17:00 | How Fast Do Bones Age in Space? 🦴 | bone loss space | planlı (Metricool 433618109) |
-| 63 | 24 Kas 01:00 | Same Shout on 4 Worlds: Who Hears It First? 📣 | speed of sound on planets | planlı (Metricool 433756016) |
-| 64 | 24 Kas 17:00 | What If You Stood on Venus? 🌋 | venus surface conditions | planlı (Metricool 434299333) |
-| 65 | 25 Kas 01:00 | Same Pot on 4 Worlds: Which Boils Last? 🫖 | boiling point on planets | planlı (Metricool 434313183) |
-| 66 | 25 Kas 17:00 | What Happens to Your Heart in Space? ❤️ | heart in space | planlı (Metricool 434330451) |
-| 67 | 26 Kas 01:00 | Is the Moon Bigger Than Australia? 🌕 | moon size | planlı (Metricool 434338429) |
+| 57 | 21 Kas 17:00 | What If You Jumped Off the Tallest Cliff? 🧗 | miranda cliff fall | planlı (Metricool 436171589; 20 Kas 22:44 21 Kas 01:00'den taşındı) |
+| 58 | 22 Kas 17:00 | Why Do Astronauts Get Bird Legs? 🦵 | fluid shift space | planlı (Metricool 436171739; 20 Kas 22:44 21 Kas 17:00'den taşındı) |
+| 59 | 24 Kas 17:00 | What Does Fire Look Like in Space? 🔥 | fire in space | planlı (Metricool 436172154; 20 Kas 22:44 22 Kas 01:00'den taşındı) |
+| 60 | 25 Kas 17:00 | Same Shot on 4 Worlds: Which Ball Escapes? 🚀 | escape velocity | planlı (Metricool 436172313; 20 Kas 22:44 22 Kas 17:00'den taşındı) |
+| 61 | 28 Kas 17:00 | How Big Is a Neutron Star? ⭐ | neutron star size | planlı (Metricool 436172646; 20 Kas 22:44 23 Kas 01:00'den taşındı) |
+| 62 | 29 Kas 17:00 | How Fast Do Bones Age in Space? 🦴 | bone loss space | planlı (Metricool 436172862; 20 Kas 22:44 23 Kas 17:00'den taşındı) |
+| 63 | 1 Ara 17:00 | Same Shout on 4 Worlds: Who Hears It First? 📣 | speed of sound on planets | planlı (Metricool 436173233; 20 Kas 22:44 24 Kas 01:00'den taşındı) |
+| 64 | 2 Ara 17:00 | What If You Stood on Venus? 🌋 | venus surface conditions | planlı (Metricool 436173323; 20 Kas 22:44 24 Kas 17:00'den taşındı) |
+| 65 | 4 Ara 17:00 | Same Pot on 4 Worlds: Which Boils Last? 🫖 | boiling point on planets | planlı (Metricool 436173657; 20 Kas 22:44 25 Kas 01:00'den taşındı) |
+| 66 | 5 Ara 17:00 | What Happens to Your Heart in Space? ❤️ | heart in space | planlı (Metricool 436173804; 20 Kas 22:44 25 Kas 17:00'den taşındı) |
+| 67 | 7 Ara 17:00 | Is the Moon Bigger Than Australia? 🌕 | moon size | planlı (Metricool 436174205; 20 Kas 22:44 26 Kas 01:00'den taşındı) |
 | 68 | 26 Kas 17:00 | December 2026 Sky: 4 Dates to Save 🌠 | december 2026 sky events | planlı (Metricool 434343324) |
-| 69 | 27 Kas 01:00 | How Do Astronauts Sleep in Space? 😴 | sleep in space | planlı (Metricool 434354206) |
-| 70 | 19 Kas 21:00 | What If You Stood on Mercury? ☀️ | mercury surface conditions | planlı (Metricool 434572127; 19 Kas 18:10'da 27 Kas 17:00'den taşındı) |
-| 71 | 20 Kas 21:00 | How Do Astronauts Use the Toilet? 🚽 | space toilet | planlı (Metricool 434599069) |
-| 72 | 21 Kas 21:00 | How Big Is Mars's Grand Canyon? 🏜️ | valles marineris | planlı (Metricool 434605506) |
-| 73 | 22 Kas 21:00 | What Happens to Your Eyes in Space? 👁️ | eyes in space (sans) | planlı (Metricool 434609875) |
-| 74 | 23 Kas 21:00 | How Big Is Andromeda in Our Sky? 🌌 | andromeda size in sky | planlı (Metricool 434619233) |
-| 75 | 24 Kas 21:00 | How Do Astronauts Wash Their Hair? 🧴 | hair washing in space | planlı (Metricool 434960824) |
-| 76 | 25 Kas 21:00 | Same Timer on 4 Worlds: How Long on Pluto? ⏳ | sand timer on planets | planlı (Metricool 434976974) |
-| 77 | 26 Kas 21:00 | What If You Stood on Titan? 🪐 | titan surface conditions | planlı (Metricool 435994478) |
+| 69 | 9 Ara 17:00 | How Do Astronauts Sleep in Space? 😴 | sleep in space | planlı (Metricool 436174596; 20 Kas 22:44 27 Kas 01:00'den taşındı) |
+| 70 | 19 Kas 21:00 | What If You Stood on Mercury? ☀️ | mercury surface conditions | yayında (Metricool 434572127; 19 Kas 18:10'da 27 Kas 17:00'den taşındı) |
+| 71 | 20 Kas 21:00 | How Do Astronauts Use the Toilet? 🚽 | space toilet | yayında (https://www.youtube.com/shorts/U_4nq4wTw10) |
+| 72 | 23 Kas 17:00 | How Big Is Mars's Grand Canyon? 🏜️ | valles marineris | planlı (Metricool 436172013; 20 Kas 22:44 21 Kas 21:00'den taşındı) |
+| 73 | 27 Kas 17:00 | What Happens to Your Eyes in Space? 👁️ | eyes in space (sans) | planlı (Metricool 436172400; 20 Kas 22:44 22 Kas 21:00'den taşındı) |
+| 74 | 30 Kas 17:00 | How Big Is Andromeda in Our Sky? 🌌 | andromeda size in sky | planlı (Metricool 436172963; 20 Kas 22:44 23 Kas 21:00'den taşındı) |
+| 75 | 3 Ara 17:00 | How Do Astronauts Wash Their Hair? 🧴 | hair washing in space | planlı (Metricool 436173400; 20 Kas 22:44 24 Kas 21:00'den taşındı) |
+| 76 | 6 Ara 17:00 | Same Timer on 4 Worlds: How Long on Pluto? ⏳ | sand timer on planets | planlı (Metricool 436173904; 20 Kas 22:44 25 Kas 21:00'den taşındı) |
+| 77 | 8 Ara 17:00 | What If You Stood on Titan? 🪐 | titan surface conditions | planlı (Metricool 436174393; 20 Kas 22:44 26 Kas 21:00'den taşındı) |
 
 Reddedilen / yayınlanmayan (konu yine de kullanılmış sayılır): olympus mons (hazırlandı, yayınlanmadı), speed of light to moon ilk sürüm.
 
