@@ -3,6 +3,12 @@
 v4 REPLACES THE WHOLE OLD FILE. The old rules (about 25 overlapping sections) are kept only for reference in docs/archive/AGENT-v3-2026-11-07.md. Do NOT follow the archive; where anything conflicts, this file wins. Write everything Erkan reads (dashboard, reports, messages) in Turkish; titles, descriptions, on-screen text and voice in natural US English.
 
 
+## TOP OVERRIDE (Erkan, 25 Nov 2026 11:21): NO LONG VIDEOS — the Saturday long video is CANCELLED — overrides every long-video rule in this file
+- BeyondAtom makes NO long (normal, non-Short) YouTube videos. The "SATURDAY LONG VIDEO" (from 28 Nov) in the 15 Nov block and every later mention ("long-video work", "Saturday has both the Short and the long video", Saturday long-video report) are cancelled. Do not plan, build, render, upload or schedule any long video. Saturday has only the normal 17:00 Short.
+- wip/long-2026-11-28/ is frozen (CANCELLED.md added); do not continue it. Its parts may be reused only as material for Shorts, under the normal Short rules and quality gate.
+- The 12 old long videos stay untouched (no change to rule 5 of the 15 Nov block: list them in reports/long-video-audit.md; Erkan decides later).
+- Shorts rules are unchanged (1 a day at 17:00, queue limit 3).
+
 ## TOP OVERRIDE (Erkan, 20 Nov 2026 22:34): 1 POST A DAY AT 17:00 ONLY + QUEUE LIMIT 3 + RESCHEDULE THE QUEUE + 2 RUNS A DAY — overrides EVERY older slot, schedule, queue and run-count rule in this file (incl. the 19 Nov "3 a day" and "QUEUE TARGET = 20" blocks and the 18 Nov "2 a day / 5 runs a day" block)
 - From now on exactly 1 YouTube Short a day, at 17:00 Europe/London (Metricool brand 7675089). The 01:00 and 21:00 slots are CLOSED: never schedule anything at 01:00 or 21:00.
 - QUEUE = future non-draft posts in Metricool for this account + finished, gate-passed YouTube Shorts not yet scheduled.
